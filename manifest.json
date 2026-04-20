@@ -1,15 +1,40 @@
 {
   "id": "./index.html",
   "name": "My Garden Side",
-  "short_name": "My Garden Side",
-  "description": "Your smart garden assistant — crops, weather, AI learning",
+  "short_name": "My Garden",
+  "description": "Your smart garden assistant — plan crops, track harvests, get AI recommendations and weather forecasts for your vegetable garden.",
   "start_url": "./index.html",
   "display": "standalone",
   "orientation": "portrait",
   "theme_color": "#0B5D47",
   "background_color": "#F8F6EF",
   "scope": "./",
-  "categories": ["lifestyle", "productivity"],
+  "lang": "fr",
+  "dir": "ltr",
+  "categories": ["lifestyle", "productivity", "food"],
+  "shortcuts": [
+    {
+      "name": "Mon Jardin",
+      "short_name": "Jardin",
+      "description": "Voir mes espaces de culture",
+      "url": "./index.html#beds",
+      "icons": [{ "src": "icon-96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Mes Cultures",
+      "short_name": "Cultures",
+      "description": "Gérer mes cultures en cours",
+      "url": "./index.html#crops",
+      "icons": [{ "src": "icon-96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Planning",
+      "short_name": "Planning",
+      "description": "Planifier mes prochaines cultures",
+      "url": "./index.html#planning",
+      "icons": [{ "src": "icon-96.png", "sizes": "96x96" }]
+    }
+  ],
   "icons": [
     {
       "src": "icon-72.png",
