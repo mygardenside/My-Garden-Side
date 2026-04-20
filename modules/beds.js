@@ -200,14 +200,17 @@ function renderBedDetail(bedId) {
             '</div>' +
     
             '<div style="font-size:0.75rem;color:var(--text-light);margin-top:6px;">' +
-              (c.mode === 'plant' ? c.qty + ' plants' : c.qty + ' m²') +
-              ' | ' + getStartTypeLabel(c.startType) +
-              ' | ' + t('beds_lbl_family') + ': ' + escH(t('family_' + v.family)) +
+              (c.mode === 'plant' ? c.qty + ' plants' : c.qty + ' m\u00b2') +
+              ' \u00b7 ' + getStartTypeLabel(c.startType) +
+              ' \u00b7 ' + escH(t('family_' + v.family)) +
+              ' \u00b7 ' + getCropSurface(c).toFixed(2) + ' m\u00b2' +
             '</div>' +
-    
-            '<div style="font-size:0.8rem;color:var(--text-light);margin-top:4px;">' +
-              getCropSurface(c).toFixed(2) + ' m²' +
-            '</div>' +
+            (c.datePlant || c.dateHarvest ?
+            '<div style="font-size:0.75rem;color:var(--text-light);margin-top:3px;">' +
+              (c.datePlant ? '\uD83C\uDF31 ' + fmtDate(new Date(c.datePlant)) : '') +
+              (c.datePlant && c.dateHarvest ? ' \u00b7 ' : '') +
+              (c.dateHarvest && c.status !== 'harvested' ? '\uD83C\uDF81 ' + fmtDate(new Date(c.dateHarvest)) : '') +
+            '</div>' : '') +
           '</div>' +
     
           '<div class="btn-group" style="margin-top:0;justify-content:flex-end;">' +
