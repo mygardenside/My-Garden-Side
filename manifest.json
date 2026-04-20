@@ -85,5 +85,49 @@
       "purpose": "maskable"
     }
   ],
+  "screenshots": [
+    {
+      "src": "assets/screenshots/accueil.jpg",
+      "sizes": "1080x2104",
+      "type": "image/jpeg",
+      "form_factor": "narrow",
+      "label": "Tableau de bord"
+    },
+    {
+      "src": "assets/screenshots/mon-jardin.jpg",
+      "sizes": "1074x2071",
+      "type": "image/jpeg",
+      "form_factor": "narrow",
+      "label": "Mon Jardin"
+    },
+    {
+      "src": "assets/screenshots/aujourdhui.jpg",
+      "sizes": "1074x2062",
+      "type": "image/jpeg",
+      "form_factor": "narrow",
+      "label": "Aujourd'hui"
+    },
+    {
+      "src": "assets/screenshots/planning.jpg",
+      "sizes": "1068x2084",
+      "type": "image/jpeg",
+      "form_factor": "narrow",
+      "label": "Planning"
+    },
+    {
+      "src": "assets/screenshots/calendrier.jpg",
+      "sizes": "1079x2243",
+      "type": "image/jpeg",
+      "form_factor": "narrow",
+      "label": "Calendrier"
+    },
+    {
+      "src": "assets/screenshots/referentiel.jpg",
+      "sizes": "1079x2075",
+      "type": "image/jpeg",
+      "form_factor": "narrow",
+      "label": "Référentiel légumes"
+    }
+  ],
   "prefer_related_applications": false
 }
