@@ -1,231 +1,1648 @@
+// Green Vibes — modules/i18n.js
+// Internationalisation : dictionnaires FR/EN + fonction t()
+// ============================================================
+// I18N — INTERNATIONALISATION
+// Toute nouvelle UI v20 utilise t(key). Fallback sur FR.
+// ============================================================
+var I18N = {
+  fr: {
+    // ── Navigation ──
+    nav_home:'Accueil', nav_beds:'Mon jardin', nav_today:"Aujourd\u2019hui",
+    nav_calendar:'Calendrier', nav_more:'Plus', nav_crops:'Cultures',
+    nav_planning:'Planning', nav_analysis:'Analyse', nav_settings:'R\u00e9glages',
+    nav_notifications:'Notifications', nav_ai:'AI', nav_veggieref:'R\u00e9f\u00e9rentiel l\u00e9gumes',
+
+    // ── Jours ──
+    day_0:'Dimanche', day_1:'Lundi', day_2:'Mardi', day_3:'Mercredi',
+    day_4:'Jeudi', day_5:'Vendredi', day_6:'Samedi',
+    day_s_0:'Dim', day_s_1:'Lun', day_s_2:'Mar', day_s_3:'Mer',
+    day_s_4:'Jeu', day_s_5:'Ven', day_s_6:'Sam',
+
+    // ── Mois ──
+    month_0:'janvier', month_1:'f\u00e9vrier', month_2:'mars',
+    month_3:'avril', month_4:'mai', month_5:'juin',
+    month_6:'juillet', month_7:'ao\u00fbt', month_8:'septembre',
+    month_9:'octobre', month_10:'novembre', month_11:'d\u00e9cembre',
+
+    // ── Salutations ──
+    greeting_morning:'Bonjour\u00a0!', greeting_afternoon:'Bon apr\u00e8s-midi\u00a0!', greeting_evening:'Bonsoir\u00a0!',
+
+    // ── Dashboard ──
+    dash_loading:'Chargement\u2026',
+    dash_error:'Erreur de chargement',
+    dash_garden_empty:'\uD83C\uDF31 Ajoutez votre premier espace de culture pour commencer',
+    dash_garden_waiting:'Votre jardin vous attend\u2026',
+    dash_phrase_welcome:'Bienvenue dans votre jardin',
+    dash_phrase_frost:'Risque de gel \u2014 prot\u00e9gez vos cultures',
+    dash_phrase_cold:'Temps froid \u2014 surveillez les semis',
+    dash_phrase_heavy_rain:'Fortes pluies \u2014 pas d\u2019arrosage aujourd\u2019hui',
+    dash_phrase_rain:'Pluie en cours \u2014 l\'arrosage est fait',
+    dash_phrase_wind:'Vent fort \u2014 v\u00e9rifiez les tuteurs',
+    dash_phrase_heat:'Forte chaleur \u2014 arrosez t\u00f4t le matin',
+    dash_phrase_warm:'Beau temps chaud \u2014 bon moment pour arroser',
+    dash_phrase_ideal:'Journ\u00e9e id\u00e9ale pour votre jardin',
+    dash_phrase_plant:'Bon moment pour planter',
+    dash_phrase_default:'Consultez vos t\u00e2ches du jour',
+    dash_no_weather:'M\u00e9t\u00e9o indisponible',
+    dash_section_garden:'Mon Jardin',
+    dash_section_actions:'Actions du jour',
+    dash_section_conseil:'Conseil intelligent',
+    dash_see_all:'Voir tout \u203A',
+    dash_see_today:'Tout voir \u203A',
+    dash_see_analysis:'Analyse \u203A',
+    dash_today_label:'Ce que tu dois faire maintenant',
+    dash_zone_free:'Espace libre',
+
+    // ── Stats carte accueil ──
+    stat_crops:'Cultures', stat_ready:'Pr\u00eates',
+    stat_harvested:'R\u00e9colt\u00e9es', stat_occupation:'Occupation',
+
+    // ── Actions ──
+    act_do_now:'Faire maintenant',
+    act_harvest:'R\u00e9colter',
+    act_plan:'Planifier',
+    act_go:'Agir',
+    act_see_today:"Voir aujourd'hui",
+    act_all_good_title:'Tout est en ordre',
+    act_all_good_sub:'Votre jardin se porte bien\u00a0!',
+    action_now:'Faire maintenant', action_harvest:'R\u00e9colter',
+    action_plant:'Planter', action_fix:'Corriger', action_water:'Arroser',
+
+    // ── Cat\u00e9gories t\u00e2ches ──
+    cat_harvest:'R\u00e9colte', cat_watering:'Arrosage',
+    cat_weather_prot:'Protection m\u00e9t\u00e9o', cat_staking:'Tuteurage',
+    cat_maintenance:'Entretien', cat_rotation:'Rotation',
+
+    // ── M\u00e9t\u00e9o ──
+    wx_today:'Aujourd\'hui', wx_today_short:'Auj.',
+    wx_clear:'Ciel d\u00e9gag\u00e9', wx_partly_cloudy:'Partiellement nuageux',
+    wx_foggy:'Brouillard', wx_drizzle:'Bruine', wx_rain:'Pluie',
+    wx_freezing_rain:'Pluie verglacante', wx_snow:'Neige',
+    wx_snow_grains:'Grains de neige', wx_showers:'Averses',
+    wx_snow_showers:'Averses de neige', wx_storm:'Orage',
+    wx_variable:'Variable',
+    wx_offline:'M\u00e9t\u00e9o indisponible',
+    wx_offline_mode:'M\u00e9t\u00e9o indisponible \u2014 Mode hors ligne',
+    wx_humidity:'Humidit\u00e9', wx_rain_lbl:'Pluie',
+    wx_location_fallback:'Localisation',
+    wx_error:'Erreur de chargement m\u00e9t\u00e9o. V\u00e9rifiez votre connexion.',
+
+    // ── Alertes m\u00e9t\u00e9o ──
+    alert_frost:'Risque de gel\u00a0!',
+    alert_cold:'Temp\u00e9ratures basses\u00a0:',
+    alert_heat:'Forte chaleur\u00a0:',
+    alert_warm:'Chaleur\u00a0:',
+    alert_heavy_rain:'Fortes pr\u00e9cipitations\u00a0:',
+    alert_rain_lbl:'Pr\u00e9cipitations\u00a0:',
+    alert_strong_wind:'Vent fort\u00a0:',
+    alert_moderate_wind:'Vent mod\u00e9r\u00e9\u00a0:',
+
+    // ── Notifications ──
+    notif_title:'Notifications', notif_none:'Aucune notification active',
+    notif_done:'Fait', notif_ignore:'Ignorer (7j)',
+    notif_harvest_today_title:'{name} \u2014 r\u00e9colter AUJOURD\'HUI',
+    notif_harvest_soon_title:'{name} \u2014 r\u00e9colte dans {n}j',
+    notif_harvest_quality:'Ne laissez pas la qualit\u00e9 se d\u00e9grader.',
+    notif_harvest_late_title:'{name} en retard de {n}j',
+    notif_harvest_check:'V\u00e9rifiez et r\u00e9coltez rapidement.',
+    notif_frost_title:'Risque de gel ({temp}\u00b0C)',
+    notif_frost_text:'Prot\u00e9gez vos semis et cultures sensibles.',
+    notif_water_title:'Arrosage conseill\u00e9',
+    notif_water_text:'{temp}\u00b0C et sec. Vos cultures ont besoin d\'eau.',
+    notif_bed_full_title:'{name} est surcharg\u00e9 ({pct}%)',
+    notif_bed_full_text:'D\u00e9placez une culture pour am\u00e9liorer les rendements.',
+    notif_rotation_title:'Rotation \u00e0 corriger \u2014 {name}',
+    notif_rotation_text:'M\u00eame famille r\u00e9p\u00e9t\u00e9e plusieurs saisons.',
+    notif_replant_title:'Moment id\u00e9al pour planter {name}',
+    notif_replant_text:'{pct}% de rendement historique. Bonne p\u00e9riode.',
+    lbl_today:'Aujourd\'hui', lbl_tomorrow:'Demain',
+    risk_frost_title:'{label} \u2014 Gel pr\u00e9vu ({temp}\u00b0C)',
+    risk_cold_title:'{label} \u2014 Temp\u00e9ratures basses ({temp}\u00b0C)',
+    risk_cold_text:'Surveillez les cultures sensibles au froid.',
+    risk_heat_crit_title:'{label} \u2014 Chaleur critique ({temp}\u00b0C)',
+    risk_heat_crit_text:'Arrosez t\u00f4t le matin. Prot\u00e9gez les semis et cultures sensibles \u00e0 la chaleur. Risque de fl\u00e9trissement.',
+    risk_heat_warn_title:'{label} \u2014 Forte chaleur ({temp}\u00b0C)',
+    risk_heat_warn_text:'Arrosez en soir\u00e9e et surveillez le stress hydrique. Mulchez si possible.',
+    risk_flood_title:'{label} \u2014 Pluie torrentielle ({mm}\u00a0mm)',
+    risk_flood_text:'Risque d\'inondation des bacs. V\u00e9rifiez le drainage. \u00c9vitez d\'arroser.',
+    risk_rain_title:'{label} \u2014 Fortes pluies ({mm}\u00a0mm)',
+    risk_rain_text:'Risque de pourriture racinaire pour les cultures sensibles. N\'arrosez pas.',
+    risk_drought_title:'{n} jours secs cons\u00e9cutifs \u2014 stress hydrique',
+    risk_drought_text:'Les cultures ont besoin d\'eau. Arrosez tous les jours en soir\u00e9e ou au goutte-\u00e0-goutte.',
+    risk_frost_now_title:'Gel actuellement ({temp}\u00b0C)',
+    risk_frost_now_text:'Prot\u00e9gez imm\u00e9diatement vos cultures sensibles.',
+    risk_harvest_late_title:'{name} \u2014 R\u00e9colte compromise ({n}j de retard)',
+    risk_harvest_late_text:'La qualit\u00e9 se d\u00e9grade. R\u00e9coltez d\u00e8s que possible pour \u00e9viter la perte totale.',
+    risk_cold_sensitive_title:'{name} \u2014 Sensible au froid pr\u00e9vu ({temp}\u00b0C)',
+    risk_cold_sensitive_text:'Cette culture (sensibilit\u00e9 froid {sens}/10) risque d\'\u00eatre endomag\u00e9e. Couvrez-la.',
+    risk_overload_title:'{name} \u2014 Surcharge ({pct}%)',
+    risk_overload_text:'Trop de cultures en comp\u00e9tition r\u00e9duisent les rendements de tout l\'espace de culture.',
+    risk_rotation_title:'{name} \u2014 Rotation probl\u00e9matique',
+    risk_rotation_text:'Famille r\u00e9p\u00e9t\u00e9e\u00a0: {fams}. Risque de maladie du sol et baisse de rendement.',
+    risk_frost_base:'Prot\u00e9gez vos cultures, surtout les semis et plants r\u00e9cents.',
+    risk_frost_specific:'Prot\u00e9gez en priorit\u00e9\u00a0: {names} (tr\u00e8s sensibles au gel).',
+
+    // ── Onboarding ──
+    onb_next:'Suivant', onb_start:'Commencer', onb_skip:'Passer',
+    onb_step1_title:'Bienvenue\u00a0!', onb_step1_sub:'Comment vous appelez-vous\u00a0?',
+    onb_step2_title:'Votre jardin', onb_step2_sub:'Quel type d\'espace de jardinage\u00a0?',
+    onb_step3_title:'Votre localisation', onb_step3_sub:'Pour la m\u00e9t\u00e9o et les conseils saisonniers.',
+    onb_step4_title:'Vos objectifs', onb_step4_sub:'Que recherchez-vous dans le jardinage\u00a0?',
+
+    // ── R\u00e9glages ──
+    settings_profile:'Profil', settings_app:'Application', settings_data:'Donn\u00e9es',
+    settings_location:'Localisation', settings_language:'Langue',
+    settings_current_city:'Ville actuelle', settings_coordinates:'Coordonn\u00e9es',
+    settings_active_season:'Saison active', settings_all_seasons:'Toutes les saisons',
+    settings_veggie_ref:'R\u00e9f\u00e9rentiel l\u00e9gumes',
+    settings_add_veggie:'+ Ajouter un l\u00e9gume',
+    settings_edit:'\u270F\uFE0F Modifier',
+    settings_search_city:'\uD83D\uDD0D Chercher',
+    settings_my_position:'\uD83D\uDCCD Position',
+    settings_reset_location:'\u21A9\uFE0F R\u00e9init.',
+    settings_seasons_title:'\uD83D\uDCC5 Saisons',
+    settings_my_garden:'Mon Jardin',
+
+    // ── Export / Import ──
+    export_full:'Exporter (complet)', export_light:'Export l\u00e9ger', import_btn:'Importer (JSON)',
+    reset_btn:'Effacer les donn\u00e9es',
+
+    // ── Niveaux ──
+    pred_next_harvests:'Prochaines r\u00e9coltes', pred_no_harvest:'Aucune r\u00e9colte pr\u00e9vue dans les 60 prochains jours',
+    level_debutant:'D\u00e9butant', level_apprenti:'Apprenti',
+    level_intermediaire:'Interm\u00e9diaire', level_avance:'Avanc\u00e9', level_expert:'Expert',
+
+    // ── Familles botaniques ──
+    family_Solanacees:'Solanac\u00e9es', family_Brassicacees:'Brassicac\u00e9es',
+    family_Lamiacees:'Lamiac\u00e9es', family_Cucurbitacees:'Cucurbitac\u00e9es',
+    family_Fabacees:'Fabac\u00e9es', family_Asteracees:'Ast\u00e9rac\u00e9es',
+    family_Apiacees:'Apiac\u00e9es', family_Liliacees:'Liliac\u00e9es',
+    family_Chenopodiacees:'Ch\u00e9nopodiac\u00e9es', family_Rosacees:'Rosac\u00e9es',
+    family_Poacees:'Poac\u00e9es', family_Convolvulacees:'Convolvulac\u00e9es',
+    family_Asparagacees:'Asparagac\u00e9es', family_Grossulariacees:'Grossulariac\u00e9es',
+    family_Valerianacees:'Val\u00e9rianac\u00e9es',
+
+    // ── G\u00e9n\u00e9ral ──
+    btn_save:'Enregistrer', btn_cancel:'Annuler', btn_delete:'Supprimer',
+    btn_add:'Ajouter', btn_edit:'Modifier', btn_close:'Fermer',
+    lbl_name:'Nom', lbl_surface:'Surface', lbl_type:'Type',
+    empty_no_beds:'Aucun espace de culture cr\u00e9\u00e9', empty_no_crops:'Aucune culture enregistr\u00e9e',
+    lbl_days_abbr:'j', lbl_percent:'%',
+    lbl_crop_s:'cultures', lbl_crop:'culture', lbl_in_progress:'en cours',
+
+    // ── Analysis — sections ──
+    ana_section_global:'Performance globale',
+    ana_section_progression:'Progression du jardinier',
+    ana_section_seasons:'Comparaison saisons',
+    ana_section_actions:'Actions recommand\u00e9es',
+    ana_section_yield:'Rendement par l\u00e9gume',
+    ana_section_surfaces:'Analyse des surfaces',
+    ana_section_tips:'Conseils intelligents',
+    ana_section_ai:'Apprentissage IA',
+    ana_section_badges:'Badges',
+    ana_section_top_flop:'Top / Flop',
+    ana_section_health:'Sant\u00e9 des espaces de culture',
+    ana_section_prev_season:'Saison pr\u00e9c\u00e9dente',
+    ana_prev_season_title:'R\u00e9cap saison {season}',
+    ana_prev_season_summary:'{n} culture{s} \u00b7 {h} r\u00e9colt\u00e9e{hs} \u00b7 {kg} kg',
+    ana_prev_season_no_harvest:'Aucune r\u00e9colte enregistr\u00e9e cette saison.',
+    ana_empty:'Pas encore de donn\u00e9es \u00e0 analyser.\nAjoutez des cultures pour commencer.',
+    ana_garden_perfect:'Votre jardin est en excellent \u00e9tat\u00a0!',
+    ana_all_good:'Tout semble bien\u00a0! Continuez comme \u00e7a.',
+
+    // ── Analysis — legend ──
+    ana_estimated:'Estim\u00e9 (kg)', ana_real:'R\u00e9el (kg)',
+    ana_best:'Meilleur', ana_to_improve:'\u00c0 am\u00e9liorer',
+    ana_pct_yield:'% du rendement estim\u00e9',
+    ana_cultures:'cultures', ana_kg:'kg',
+
+    // ── Analysis — progression ──
+    ana_score_up:'+{d} pts cette saison',
+    ana_score_down:'{d} pts cette saison',
+    ana_score_stable:'Score stable',
+    ana_season_label:'Saison actuelle',
+
+    // ── Analysis — season comparison ──
+    ana_comp_need_more:'Compl\u00e9tez au moins 2 saisons pour voir votre \u00e9volution.',
+    ana_comp_up:'+{p}% de performance vs saison pr\u00e9c\u00e9dente \u2014 vous progressez\u00a0!',
+    ana_comp_stable:'Performance stable vs saison pr\u00e9c\u00e9dente.',
+    ana_comp_down:'{p}% de performance vs saison pr\u00e9c\u00e9dente \u2014 analysez ce qui a chang\u00e9.',
+
+    // ── Analysis — recommendations ──
+    ana_reco_plant_more:'Plantez plus de {name}',
+    ana_reco_plant_text:'{pct}% de rendement moyen',
+    ana_reco_plant_text_now:'{pct}% de rendement moyen \u2014 c\'est la bonne p\u00e9riode\u00a0!',
+    ana_reco_plan:'Planifier', ana_reco_see_planning:'Voir planning',
+    ana_reco_overloaded:'{name} est surcharg\u00e9',
+    ana_reco_overloaded_text:'{pct}% d\'occupation. D\u00e9placez une culture pour lib\u00e9rer de l\'espace.',
+    ana_reco_optimize:'Optimiser',
+    ana_reco_reduce:'R\u00e9duire la densit\u00e9 de {name}',
+    ana_reco_reduce_text:'Seulement {pct}% de rendement moyen. Moins de plants = meilleur r\u00e9sultat.',
+    ana_reco_see_crops:'Voir cultures',
+    ana_reco_exploit:'Exploitez {name} ({pct}% occup\u00e9)',
+    ana_reco_suggest_plant:'Suggestion\u00a0: planter {name} ({reason}).',
+    ana_reco_space_available:'Cet espace de culture a de la place disponible.',
+    ana_reco_add:'Ajouter', ana_reco_see_zone:'Voir l\'espace',
+    ana_reco_harvest_late:'R\u00e9colte en retard\u00a0: {name}',
+    ana_reco_harvest_late_text:'{n} culture{s} auraient d\u00fb \u00eatre r\u00e9colt\u00e9es.',
+    ana_reco_harvest_btn:'R\u00e9colter',
+
+    // ── Analysis — badges ──
+    badge_first_harvest:'Premi\u00e8re r\u00e9colte',
+    badge_yield_80:'Rendement 80%+',
+    badge_three_harvests:'3 r\u00e9coltes',
+    badge_diversity:'Diversit\u00e9 (3 familles)',
+    badge_three_seasons:'3 saisons actives',
+    badge_multi_beds:'2 espaces exploit\u00e9s',
+    badge_progression:'Progression saison',
+    badge_expert_veg:'Expert d\'un l\u00e9gume',
+    badge_ten_harvests:'10 r\u00e9coltes',
+    badge_unlocked:'D\u00e9bloqu\u00e9\u00a0!', badge_in_progress:'En cours',
+
+    // ── Analysis — tips ──
+    tip_underused:'{name} est sous-exploit\u00e9 ({pct}% d\'occupation). Plantez-y de nouvelles cultures\u00a0!',
+    tip_overloaded:'{name} est surcharg\u00e9 ({pct}%). Envisagez de r\u00e9partir les cultures.',
+    tip_rotation:'M\u00eame famille trop souvent dans {name} ({fams}). Pensez \u00e0 la rotation.',
+    tip_low_perf:'{icon} {name} peu performant(e) depuis {n} saisons ({pct}% du rendement estim\u00e9).',
+    tip_space_greedy:'{icon} {name} occupe {pct}% de {bed}. Envisagez un espace plus grand.',
+
+    // ── Beds ──
+    beds_empty:'Aucun espace de culture pour le moment.\nAjoutez votre premier espace\u00a0!',
+    beds_add_btn:'+ Ajouter un espace',
+    beds_m2_total:'m\u00b2 total',
+    beds_legend_seedling:'Semis', beds_legend_growing:'Croissance',
+    beds_legend_maturing:'Maturation', beds_legend_ready:'Pr\u00eat', beds_legend_free:'Libre',
+    beds_zone_empty:'Espace vide', beds_zone_free_chip:'Espace libre',
+    beds_active:'{n} actif', beds_active_pl:'{n} actif(s)',
+    beds_planned:'{n} planifi\u00e9', beds_planned_pl:'{n} planifi\u00e9(s)',
+    beds_health:'Sant\u00e9', beds_occupation:'Occupation',
+    bed_occ_optimized:'\uD83C\uDF3F Optimis\u00e9',
+    beds_ai_suggest:'IA\u00a0: planter {icon} {name}',
+    beds_ai_history:' \u2014 {pct}% historique',
+    beds_no_crops:'Aucune culture dans cet espace',
+    beds_families_current:'Familles actuelles\u00a0:',
+    beds_families_prev:'Familles saisons pr\u00e9c\u00e9dentes\u00a0:',
+    beds_no_history:'Aucun historique',
+    beds_none:'Aucune',
+    beds_rotation:'Rotation',
+    beds_add_crop:'+ Ajouter une culture',
+    beds_err_display:'Erreur affichage espace',
+    beds_modal_new:'Nouvel espace de culture', beds_modal_edit:'Modifier l\'espace de culture',
+    beds_lbl_name:'Nom', beds_lbl_length:'Longueur (m)', beds_lbl_width:'Largeur (m)',
+    beds_lbl_notes:'Notes', beds_lbl_family:'Famille',
+    beds_err_name:'Veuillez entrer un nom pour cet espace.',
+    beds_err_length:'Entrez une longueur valide (ex\u00a0: 2.0 m).',
+    beds_err_width:'Entrez une largeur valide (ex\u00a0: 1.0 m).',
+    beds_confirm_delete:'Supprimer cet espace de culture et toutes ses cultures\u00a0?',
+    beds_btn_move:'\u2194\uFE0F D\u00e9placer',
+    beds_btn_harvest:'\uD83C\uDF89 R\u00e9colter',
+    beds_btn_delete:'\uD83D\uDDD1\uFE0F Supprimer',
+    beds_stat_health:'Sant\u00e9 /100',
+
+    // ── Crops ──
+    crops_header:'Mes Cultures',
+    crops_empty:'Aucune culture cette saison.<br>Commencez\u00a0\u00e0 planter\u00a0!',
+    crops_add_btn:'+ Ajouter une culture',
+    crops_no_bed:'Sans espace',
+    stage_all:'Toutes', stage_planned:'Planifi\u00e9es', stage_seedling:'Semis',
+    stage_growing:'Croissance', stage_maturing:'Maturation',
+    stage_harvest:'Pr\u00eates', stage_harvested:'R\u00e9colt\u00e9es',
+    crops_lbl_planned_plant:'\uD83D\uDCC5 Plant. pr\u00e9vue\u00a0: ',
+    crops_lbl_planted:'\uD83C\uDF31 Plant\u00e9\u00a0: ',
+    crops_lbl_harvest_date:'\uD83C\uDF81 R\u00e9colte\u00a0: ',
+    crops_lbl_est_yield:' kg estim\u00e9',
+    crops_lbl_real_yield:' \u2014 {kg} kg r\u00e9el',
+    crops_btn_harvest:'\uD83C\uDF89 R\u00e9colter',
+    crops_btn_edit:'\u270F\uFE0F Modifier',
+    crops_btn_move:'\u21D4\uFE0F D\u00e9placer',
+    crops_modal_new:'Nouvelle culture', crops_modal_edit:'Modifier la culture',
+    crops_lbl_veggie:'L\u00e9gume', crops_lbl_bed:'Bac',
+    crops_lbl_start_type:'Type de d\u00e9part',
+    crops_lbl_date_plant:'Date plantation',
+    crops_lbl_date_harvest:'R\u00e9colte pr\u00e9vue',
+    crops_hint_days:'{name}\u00a0: ~{days} jours, rendement {yield} kg/m\u00b2',
+    crops_hint_surface:'Disponible\u00a0: {rem} m\u00b2 | Cette culture\u00a0: {size} m\u00b2',
+    crops_err_qty:'Quantit\u00e9 invalide',
+    crops_err_veggie:'L\u00e9gume invalide',
+    crops_err_surface:'Surface insuffisante dans cet espace de culture.\nDisponible\u00a0: {rem} m\u00b2\nDemand\u00e9\u00a0: {size} m\u00b2',
+    crops_harvest_title:'\uD83C\uDF89 R\u00e9colte de {name}',
+    crops_lbl_real_yield_input:'Rendement r\u00e9el (kg)',
+    crops_lbl_estimate:'Estimation\u00a0: {kg} kg',
+    crops_lbl_kg_harvested:'kg r\u00e9colt\u00e9s',
+    crops_harvest_confirm:'Valider la r\u00e9colte',
+    crops_harvest_partial:'\uD83D\uDCE6 R\u00e9colte partielle',
+    crops_harvest_final:'\u2705 Terminer la saison',
+    crops_harvest_partial_hint:'La culture reste active. Les r\u00e9coltes s\'accumulent.',
+    crops_harvest_final_hint:'Cl\u00f4ture la saison. La culture passe en r\u00e9colt\u00e9e.',
+    crops_harvest_partial_confirm:'\uD83D\uDCE6 R\u00e9colte partielle enregistr\u00e9e\u00a0!',
+    crops_harvest_final_confirm:'\u2705 Saison termin\u00e9e. Bonne r\u00e9colte\u00a0!',
+    crops_partial_count:'{n} r\u00e9colte{s} \u00b7 {kg} kg cumul\u00e9s',
+    crops_confirm_delete:'Supprimer cette culture\u00a0?',
+    crops_move_title:'D\u00e9placer {name}',
+    crops_move_subtitle:'Choisir l\'espace de destination\u00a0:',
+    crops_move_occupied:'% occup\u00e9',
+    crops_move_none:'Aucun autre espace disponible',
+    crops_rotation_warn:'Attention\u00a0: {family} \u00e9tait dans cet espace en {season}. Rotation d\u00e9conseill\u00e9e.',
+
+    // ── Planning / Today ──
+    plan_title:'Planning',
+    plan_filter_today:'Actions imm\u00e9diates pour aujourd\'hui',
+    plan_filter_week:'Vue de la semaine',
+    plan_filter_all:'Toutes les actions et pr\u00e9visions',
+    plan_filter_1m:'Anticipation du mois \u00e0 venir',
+    plan_filter_2m:'Projection sur 2 mois',
+    plan_filter_3m:'Projection sur 3 mois',
+    plan_filter_next:'Pr\u00e9paration de la prochaine saison',
+    plan_filter_default:'Pr\u00e9paration et organisation du jardin',
+    plan_new_season:'+ Nouvelle saison',
+    plan_btn_plan:'\uD83D\uDCC5 Planifier une culture',
+    plan_section_rotation:'\uD83D\uDD04 Recommandations de rotation',
+    plan_section_suggestions:'\uD83D\uDCA1 Suggestions intelligentes',
+    plan_rota_current:'Saison actuelle\u00a0:',
+    plan_rota_prev:'Saisons pr\u00e9c\u00e9dentes\u00a0:',
+    plan_rota_recommended:'\u2705 Familles recommand\u00e9es\u00a0:',
+    plan_rota_avoid:'\u274C Familles \u00e0 \u00e9viter\u00a0:',
+    plan_rota_suggested:'\uD83D\uDCA1 L\u00e9gumes sugg\u00e9r\u00e9s\u00a0:',
+    plan_sug_in:'dans',
+    plan_sug_available:'m\u00b2 disponible',
+    plan_modal_title:'\uD83D\uDCC5 Planifier une culture',
+    plan_lbl_veggie:'L\u00e9gume',
+    plan_lbl_in_season:'\u2705 = en saison pour',
+    plan_lbl_zone:'Espace de culture',
+    plan_lbl_zone_none:'Sans espace',
+    plan_lbl_mode:'Mode',
+    plan_lbl_mode_plants:'Par plants',
+    plan_lbl_mode_surface:'Par surface (m\u00b2)',
+    plan_lbl_start_type:'Type de d\u00e9part',
+    plan_lbl_young_plant:'Jeune plant',
+    plan_lbl_seed:'Semis',
+    plan_lbl_qty_plants:'Nombre de plants',
+    plan_lbl_qty_surface:'Surface (m\u00b2)',
+    plan_lbl_spacing:'Espacement (m\u00b2/plant)',
+    plan_lbl_date_plant:'Date plantation pr\u00e9vue',
+    plan_lbl_date_harvest:'R\u00e9colte pr\u00e9vue',
+    plan_lbl_notes:'Notes',
+    plan_btn_plan_action:'Planifier',
+    plan_confirm_delete:'Supprimer cette culture planifi\u00e9e\u00a0?',
+    plan_available:'m\u00b2 dispo',
+    plan_rotation_warn:'\u26A0\uFE0F Attention\u00a0: {family} d\u00e9j\u00e0 pr\u00e9sente dans cet espace. Rotation d\u00e9conseill\u00e9e.',
+    plan_rotation_ok:'\u2705 {family}\u00a0: bonne rotation pour cet espace\u00a0!',
+
+    // ── Today screen ──
+    today_loading:'Chargement...',
+    today_all_done:'Tout est fait\u00a0!',
+    today_count_one:'1 action aujourd\'hui',
+    today_count_many:'{n} actions aujourd\'hui',
+    today_progress_done:'{done}/{total} faites',
+    today_group_urgent:'\uD83D\uDD34 Urgent ({n})',
+    today_group_important:'\uD83D\uDFE0 Important ({n})',
+    today_group_todo:'\uD83D\uDFE2 \u00c0 faire ({n})',
+    today_done_header:'\u2705 T\u00e2ches termin\u00e9es ({n})',
+    today_task_done:'Termin\u00e9',
+    today_empty:'Aucune action pour aujourd\'hui.\nVotre jardin est en pleine forme\u00a0!',
+    today_dry:'Sec',
+    today_alert_frost:'Risque de gel \u2014 {temp}\u00b0C',
+    today_alert_frost_sub:'Prot\u00e9ger tous les semis et cultures sensibles',
+    today_alert_cold:'Temp\u00e9ratures basses \u2014 {temp}\u00b0C',
+    today_alert_cold_sub:'Surveiller les plants fragiles cette nuit',
+    today_alert_heat:'Forte chaleur \u2014 {temp}\u00b0C',
+    today_alert_heat_sub:'Arroser t\u00f4t le matin, ombrager si possible',
+    today_alert_rain:'Fortes pluies \u2014 {mm}mm',
+    today_alert_rain_sub:"Reporter l'arrosage, v\u00e9rifier le drainage",
+    today_alert_wind:'Vent fort \u2014 {kmh} km/h',
+    today_alert_wind_sub:'V\u00e9rifier les tuteurs et protections',
+    today_harvest_btn:'\uD83C\uDF89 R\u00e9colter',
+
+    // ── Calendar ──
+    cal_veggie_col:'L\u00e9gume',
+    cal_planting_legend:'\uD83D\uDFE9 Plantation \u00a0\u00a0 \uD83D\uDFE7 R\u00e9colte',
+    cal_visual_title:'\uD83D\uDCCA Calendrier visuel',
+    cal_simple_title:'\uD83D\uDDD3\uFE0F Calendrier simple des plantations',
+    cal_simple_desc:'Voici les l\u00e9gumes de ton application, class\u00e9s par mois de plantation.',
+    cal_no_veggie_month:'Aucun l\u00e9gume renseign\u00e9 pour ce mois.',
+
+    // ── Common modal / forms ──
+    btn_cancel:'Annuler', btn_add_label:'Ajouter', btn_edit_label:'Modifier',
+    lbl_placeholder_notes:'Notes...',
+    lbl_ex:'Ex\u00a0:',
+
+    // ── Settings — référentiel légumes ──
+    settings_lbl_vegetables:'l\u00e9gumes',
+    settings_lbl_families:'familles',
+    settings_lbl_in_season:'de saison',
+    settings_in_season_badge:'saison',
+    settings_veggie_placeholder:'Rechercher un l\u00e9gume\u2026',
+    settings_veggie_none:'Aucun l\u00e9gume trouv\u00e9',
+    settings_filter_all:'Tous',
+    settings_filter_easy:'\u2605 Facile',
+    settings_filter_summer:'\u2600\uFE0F \u00C9t\u00e9',
+    settings_filter_winter:'\u2744\uFE0F Hiver',
+    settings_filter_dry:'\uD83D\uDCA7 Sec',
+    settings_filter_yield:'\uD83D\uDCC8 Rendement',
+
+    // ── Settings — modal ville ──
+    settings_search_city_title:'Chercher une ville',
+    settings_search_city_input:'Nom de la ville\u2026',
+
+    // ── Settings — modal légume ──
+    settings_veggie_modal_new:'Nouveau l\u00e9gume',
+    settings_veggie_modal_edit:'Modifier le l\u00e9gume',
+    settings_veggie_lbl_name:'Nom',
+    settings_veggie_lbl_icon:'Ic\u00f4ne',
+    settings_veggie_lbl_family:'Famille',
+    settings_veggie_lbl_yield:'Rendement/m\u00b2 (kg)',
+    settings_veggie_lbl_days:'Jours r\u00e9colte',
+    settings_veggie_lbl_space:'Espace/plant (m\u00b2)',
+    settings_veggie_lbl_sensitivity:'Sensibilit\u00e9s (1-10)',
+    settings_veggie_lbl_heat:'\u2600\uFE0F Chaleur',
+    settings_veggie_lbl_rain:'\uD83C\uDF27\uFE0F Pluie',
+    settings_veggie_lbl_cold:'\u2744\uFE0F Froid',
+    settings_veggie_lbl_wind:'\uD83D\uDCA8 Vent',
+    settings_veggie_err_name:'Veuillez entrer un nom',
+    settings_veggie_err_used:'Impossible de supprimer ce l\u00e9gume car il est utilis\u00e9 dans des cultures.',
+    settings_veggie_confirm_delete:'Supprimer {name}\u00a0?',
+
+    // ── Settings — saisons ──
+    settings_new_season_btn:'+ Nouvelle saison',
+    settings_new_season_prompt:'Nouvelle saison (ex\u00a0: {year})\u00a0:',
+    settings_new_season_exists:'Cette saison existe d\u00e9j\u00e0.',
+
+    // ── Planning — frise ──
+    plan_frise_today:'Aujourd\u2019hui\u00a0:',
+
+    // ── Planning — section titles ──
+    plan_section_prio:'Actions prioritaires',
+    plan_section_frise:'\uD83D\uDCC5 Frise de la saison',
+    plan_section_smart_sug:'\uD83E\uDDE0 Suggestions intelligentes',
+    plan_section_preparation:'\uD83D\uDDD3\uFE0F Pr\u00e9paration de la saison',
+    plan_section_tasks:'\uD83D\uDCCB T\u00e2ches du jour',
+
+    // ── Planning — actions ──
+    plan_prio_empty:'Aucune action urgente pour le moment. Votre jardin est en ordre\u00a0!',
+    plan_badge_urgent:'Urgent', plan_badge_important:'Important', plan_badge_suggestion:'Suggestion',
+    plan_btn_do_now:'Faire maintenant \u2192',
+    plan_load_err:'Erreur de chargement.',
+    plan_sug_cta:'Planifier \u203A',
+    plan_sug_hist:'{pct}% historique',
+
+    // ── Planning — frise labels ──
+    plan_frise_empty:'Aucune culture cette saison.<br>Ajoutez des cultures pour voir la frise.',
+    plan_frise_tab_full:'Saison compl\u00e8te',
+    plan_frise_tab_6m:'6 prochains mois',
+    plan_frise_tab_3m:'3 prochains mois',
+    plan_frise_leg_active:'En cours',
+    plan_frise_leg_growing:'Croissance',
+    plan_frise_leg_ready:'Pr\u00eat \u00e0 r\u00e9colter',
+    plan_frise_leg_planned:'Planifi\u00e9e',
+    plan_frise_leg_harvested:'R\u00e9colt\u00e9e',
+
+    // ── Planning — task texts ──
+    plan_tasks_empty:'Aucune action pour le moment\u00a0!',
+    plan_tasks_empty2:'Aucune t\u00e2che en attente.<br>Votre jardin est en bon \u00e9tat\u00a0!',
+    task_cold_protect:'Prot\u00e9ger {icon} {name} du froid ({temp}\u00b0C){seedling}',
+    task_cold_seedling:' - semis fragiles\u00a0!',
+    task_heat_protect:'Prot\u00e9ger {icon} {name} de la chaleur ({temp}\u00b0C) - ombrage recommand\u00e9',
+    task_wind_stake:'Tuteurer/prot\u00e9ger {icon} {name} du vent ({speed}km/h)',
+    task_rain_protect:'Prot\u00e9ger {icon} {name} de la pluie ({mm}mm){harvest}',
+    task_rain_harvest:' - r\u00e9colter avant si possible',
+    task_water:'Arroser {icon} {name}{intensive}',
+    task_water_intensive:' abondamment',
+    task_frost_alert:'Alerte gel\u00a0: {temp}\u00b0C - prot\u00e9ger tous les semis et cultures sensibles',
+    task_harvest_ready:'{icon} {name} est pr\u00eat \u00e0 r\u00e9colter\u00a0!',
+    task_harvest_soon:'{icon} {name}\u00a0: r\u00e9colte dans {n} jours',
+    plan_reason_rotation:'Excellente rotation',
+
+    // ── Planning — smart actions descriptions ──
+    plan_action_harvest_title:'R\u00e9colter {name}',
+    plan_action_harvest_desc:'Culture \u00e0 maturit\u00e9 optimale dans {bed}',
+    plan_action_harvest_desc_nobed:'Culture \u00e0 maturit\u00e9 optimale',
+    plan_action_overdue_title:'{name} en retard de {n}j',
+    plan_action_overdue_desc:'Date de r\u00e9colte d\u00e9pass\u00e9e. V\u00e9rifiez la maturit\u00e9.',
+    plan_action_overloaded_title:'{name} surcharg\u00e9 ({pct}%)',
+    plan_action_overloaded_desc:'D\u00e9placez une culture pour optimiser la productivit\u00e9.',
+    plan_action_plant_title:'Planter {name} dans {bed}',
+    plan_action_plant_hist:' \u2014 {pct}% de rendement historique',
+    plan_action_replant_title:'Replanter {name} (bon historique)',
+    plan_action_replant_desc:'{pct}% de rendement sur {n} r\u00e9coltes. En saison maintenant.',
+    plan_action_exploit_title:'Exploitez {name} ({pct}% seulement)',
+    plan_action_exploit_desc:'Suggestion\u00a0: {icon} {vegname} \u2014 {reason}',
+    plan_loading:'Chargement\u2026',
+    plan_cta_harvest:'R\u00e9colter', plan_cta_plant:'Planifier', plan_cta_fix:'Corriger', plan_cta_act:'Agir',
+    plan_badge_info:'Info',
+    plan_tasks_done:'Termin\u00e9es ({n})',
+    plan_sug_name:'{name} dans {bed}',
+    plan_sug_m2:'m\u00b2 dispo',
+    plan_cat_harvest:'R\u00e9colte', plan_cat_water:'Arrosage', plan_cat_weather:'Protection m\u00e9t\u00e9o',
+    plan_cat_stake:'Tuteurage', plan_cat_maintenance:'Entretien', plan_cat_rotation:'Rotation',
+    plan_reason_new_bed:'Nouveau carr\u00e9',
+    plan_reason_good_companion:'{n} bon(s) voisin(s)',
+    plan_reason_bad_companion:'Voisinage d\u00e9conseill\u00e9',
+    plan_reason_heat_sens:'Sensible \u00e0 la chaleur',
+    plan_reason_rain_sens:'Sensible aux pluies',
+    plan_reason_cold_sens:'Sensible au froid',
+    plan_reason_big_space:'Grande surface libre',
+    plan_reason_good_space:'Bonne place disponible',
+    plan_reason_small_space:'Petite place restante',
+    task_rotation_bad:'{bed}\u00a0: rotation mauvaise ({n} familles r\u00e9p\u00e9t\u00e9es)',
+    task_check_garden:'V\u00e9rifier les tuteurs et paillis',
+
+    // ── Intelligence — crop health ──
+    intel_health_section:'Sant\u00e9 des cultures',
+    intel_health_empty:'Aucune culture active cette saison.',
+    health_not_found:'Culture introuvable',
+    health_harvested_sug:'Culture r\u00e9colt\u00e9e avec succ\u00e8s.',
+    health_planned_sug:'Culture planifi\u00e9e, en attente de plantation.',
+    health_late_crit_risk:'R\u00e9colte en retard de {n} jours \u2014 qualit\u00e9 d\u00e9grad\u00e9e',
+    health_late_crit_sug:'R\u00e9coltez imm\u00e9diatement pour \u00e9viter la perte totale.',
+    health_late_risk:'R\u00e9colte en retard de {n} jours',
+    health_late_sug:'Planifiez la r\u00e9colte dans les 2 prochains jours.',
+    health_ready_sug:'Culture \u00e0 maturit\u00e9 optimale \u2014 moment id\u00e9al pour r\u00e9colter.',
+    health_bed_overload_risk:'Bac {bed} satur\u00e9 ({pct}%) \u2014 comp\u00e9tition entre cultures',
+    health_bed_overload_sug:'D\u00e9placez une culture vers un espace moins charg\u00e9.',
+    health_bed_full_risk:'Bac {bed} tr\u00e8s charg\u00e9 ({pct}%)',
+    health_bed_full_sug:'Surveillez les signes de stress (jaunissement, ralentissement).',
+    health_frost_risk:'Risque de gel ({temp}\u00b0C) \u2014 sensibilit\u00e9 froid\u00a0: {sens}/10',
+    health_frost_sug:'Prot\u00e9gez avec voile d\'hivernage ou rentrez les pots sensibles.',
+    health_cold_risk:'Temp\u00e9ratures basses ({temp}\u00b0C)',
+    health_heat_risk:'Chaleur excessive ({temp}\u00b0C) \u2014 sensibilit\u00e9 chaleur\u00a0: {sens}/10',
+    health_heat_sug:'Arrosez t\u00f4t le matin et cr\u00e9ez de l\'ombre si possible.',
+    health_heat_mild_sug:'Arrosez en soir\u00e9e pour limiter l\u2019\u00e9vaporation.',
+    health_wind_risk:'Vent fort ({speed} km/h) \u2014 risque de casse',
+    health_wind_sug:'Tuteurez ou prot\u00e9gez les tiges fragiles.',
+    health_rain_risk:'Pr\u00e9cipitations \u00e9lev\u00e9es ({mm} mm) \u2014 risque de pourriture racinaire',
+    health_rain_sug:'V\u00e9rifiez le drainage de l\'espace de culture et relevez les feuilles basses.',
+    health_dry_risk:'Temps chaud et sec \u2014 risque de stress hydrique',
+    health_dry_sug:'Arrosez r\u00e9guli\u00e8rement en soir\u00e9e.',
+    health_slow_risk:'Croissance plus lente que pr\u00e9vu ({pct}% du cycle \u00e9coul\u00e9)',
+    health_slow_sug:'V\u00e9rifiez la fertilisation et l\'exposition solaire.',
+    health_poor_hist_risk:'{name} peu performant historiquement ({pct}%)',
+    health_poor_hist_sug:'Essayez un autre espace ou r\u00e9duisez la densit\u00e9 pour cette vari\u00e9t\u00e9.',
+    health_ok_sug:'Culture en bonne sant\u00e9 \u2014 continuez l\'entretien habituel.',
+
+    // ── Intelligence — risks block ──
+    intel_risks_section:'Risques \u00e0 venir',
+    intel_risks_empty:'Aucun risque d\u00e9tect\u00e9 sur 7 jours.',
+    intel_sev_high:'Critique', intel_sev_medium:'Mod\u00e9r\u00e9', intel_sev_low:'Faible',
+
+    // ── Intelligence — opportunity block ──
+    intel_opp_section:'Opportunit\u00e9s',
+    intel_opp_empty:'Aucune opportunit\u00e9 identifi\u00e9e pour le moment.',
+    intel_opp_yield:'+{kg} kg potentiels',
+    intel_opp_prio_high:'Priorit\u00e9 haute', intel_opp_prio_medium:'Opportunit\u00e9', intel_opp_prio_low:'Suggestion',
+
+    // ── Intelligence — season advisor ──
+    intel_adv_timing_now:'maintenant', intel_adv_timing_next:'le mois prochain',
+    intel_adv_reason_now:'C\'est la p\u00e9riode id\u00e9ale pour planter {name}.',
+    intel_adv_reason_next:'Pr\u00e9parez la plantation de {name} pour le mois prochain.',
+    intel_adv_toavoid:'{pct}% de rendement moyen sur {n} r\u00e9coltes.',
+    intel_adv_prep_rotation:'Rotation probl\u00e9matique \u2014 m\u00eame famille trop souvent.',
+    intel_adv_prep_rotation_act:'Planifiez une culture d\'une famille diff\u00e9rente.',
+    intel_adv_prep_low:'Bac sous-utilis\u00e9 ({pct}% d\'occupation).',
+    intel_adv_prep_low_act:'Profitez de la saison pour planter d\u00e8s maintenant.',
+    intel_adv_rot_crit:'Critique', intel_adv_rot_warn:'\u00c0 surveiller',
+    intel_adv_rot_tip:'\u00c9vitez {fams} dans {bed} cette saison.',
+    intel_adv_opp_hist:' ({pct}% historique)',
+
+    // ── Intelligence — yield optimization ──
+    intel_opt_density_title:'{name} occupe {pct}% de {bed}',
+    intel_opt_density_text:'Une culture unique dominant l\'espace de culture limite la diversit\u00e9. Envisagez un espace plus grand ou une r\u00e9duction.',
+    intel_opt_placement_title:'{name} performe mieux dans {bed}',
+    intel_opt_placement_text:'{pct}% de rendement dans {bed} vs placement actuel. Envisagez de d\u00e9placer.',
+    intel_opt_overload_title:'{bed} surcharg\u00e9 ({pct}%) \u2014 d\u00e9placer {crop}',
+    intel_opt_overload_text:'Lib\u00e9rez de l\'espace en d\u00e9pla\u00e7ant la culture la moins performante vers un autre espace.',
+    intel_opt_timing_title:'Fen\u00eatre optimale pour {name} \u2014 ne la manquez pas',
+    intel_opt_timing_text:'{pct}% de rendement historique. C\'est la bonne p\u00e9riode.',
+
+    // ── Opportunities ──
+    opp_hist_pct:' \u00b7 {pct}% historique',
+    opp_free_month:'ce mois-ci',
+    opp_hi_suffix:'\u2014 historique excellent',
+    opp_hi_text:'{pct}% de rendement moyen sur {n} r\u00e9coltes. P\u00e9riode id\u00e9ale. Bac sugg\u00e9r\u00e9\u00a0: {bed}.',
+    opp_sw_suffix_now:'\u2014 \u00e0 planter maintenant',
+    opp_sw_suffix_prep:'\u2014 \u00e0 pr\u00e9parer',
+    opp_sw_text_now:'P\u00e9riode id\u00e9ale pour planter {name}. Rendement estim\u00e9\u00a0: {kg} kg.',
+    opp_sw_text_next:'Pr\u00e9parez la plantation de {name} pour le mois prochain.',
+    opp_div_title:'Diversifiez avec la famille {fam}',
+    opp_div_text:'{name} est plantable maintenant et am\u00e9liore la biodiversit\u00e9 de votre jardin.',
+
+    // ── Onboarding ──
+    onb_firstname_ph:'Votre pr\u00e9nom...',
+    onb_skill_label:'Niveau de jardinage\u00a0:',
+    onb_space_pots:'Espaces / pots', onb_space_ground:'Pleine terre',
+    onb_space_mixed:'Mixte', onb_space_balcony:'Balcon',
+    onb_goal_yield:'Rendement', onb_goal_autonomy:'Autonomie',
+    onb_goal_pleasure:'Plaisir', onb_goal_learn:'Apprendre',
+    onb_city_lbl:'Ville actuelle\u00a0:',
+    onb_use_gps:'\uD83D\uDCCD Utiliser ma position',
+    onb_search_city_btn:'\uD83D\uDD0D Chercher une ville',
+    onb_tagline:'Votre assistant jardin intelligent',
+
+    // ── Calendar — fiche ──
+    cal_diff_easy:'Facile', cal_diff_medium:'Moyen', cal_diff_hard:'Expert',
+    cal_water_high:'Gourmand en eau', cal_water_med:'Arrosage mod\u00e9r\u00e9', cal_water_low:'Tr\u00e8s sobre',
+    cal_sun_full:'Plein soleil', cal_sun_half:'Mi-soleil', cal_sun_shade:'Mi-ombre',
+    cal_per_m2:'par m\u00b2', cal_to_harvest:'\u00e0 r\u00e9colte', cal_per_plant:'par plant',
+    cal_legend_planting:'Plantation', cal_legend_harvest:'R\u00e9colte',
+    cal_legend_task:'T\u00e2che', cal_legend_urgent:'Urgent',
+    cal_section_sensib:'\uD83C\uDF21\uFE0F Sensibilit\u00e9s',
+    cal_section_assoc:'\uD83E\uDD1D Associations',
+    cal_section_diseases:'\uD83D\uDD0D Maladies & ravageurs',
+    cal_section_tips:'\uD83D\uDCA1 Conseils My Garden Side',
+    cal_section_calendar:'\uD83D\uDCC5 Calendrier',
+    cal_data_soon:'\uD83C\uDF31 Donn\u00e9es enrichies bient\u00f4t disponibles',
+    cal_sensib_heat:'Chaleur', cal_sensib_rain:'Pluie', cal_sensib_cold:'Froid', cal_sensib_wind:'Vent',
+    cal_assoc_good:'\u2714 Bons voisins', cal_assoc_bad:'\u2716 \u00c0 \u00e9viter',
+    cal_evt_plant:'Planter {name}', cal_evt_harvest:'R\u00e9colter {name}',
+    cal_plant_sub:'Date de plantation', cal_harvest_planned:'R\u00e9colte pr\u00e9vue',
+    cal_today_suffix:' \u2014 Aujourd\u2019hui',
+    cal_no_event:'Aucun \u00e9v\u00e9nement ce jour',
+    cal_loading:'Chargement...',
+    cal_fiche_edit:'\u270F\uFE0F Modifier', cal_fiche_delete:'\uD83D\uDDD1\uFE0F Supprimer',
+
+    // ── Learning — points forts / faibles ──
+    learn_str_good_yields:'Bons rendements r\u00e9guliers',
+    learn_str_diversity:'Belle diversit\u00e9 de cultures',
+    learn_str_experience:'Exp\u00e9rience solide ({n} r\u00e9coltes)',
+    learn_str_progress:'Progression saison en cours',
+    learn_str_reliable:'{icon} {name} tr\u00e8s fiable',
+    learn_weak_low_yields:'Rendements souvent inf\u00e9rieurs aux pr\u00e9visions',
+    learn_weak_diversity:'Manque de diversit\u00e9',
+    learn_weak_decline:'Baisse de performance cette saison',
+    learn_weak_difficult:'{icon} {name} difficile \u00e0 rentabiliser',
+
+    // ── Learning — prochaines \u00e9tapes ──
+    learn_mile_harvests:'R\u00e9colter {n} culture(s) suppl\u00e9mentaire(s) pour affiner les conseils',
+    learn_mile_diversity:'Ajouter {n} nouvelle famille de l\u00e9gumes',
+    learn_mile_ratio:'Am\u00e9liorer le ratio rendement r\u00e9el/estim\u00e9',
+    learn_mile_season:'Compl\u00e9ter une deuxi\u00e8me saison pour voir votre progression',
+    learn_mile_perfect:'Maintenir vos excellentes pratiques\u00a0!',
+
+    // ── Learning — insights actionnables ──
+    learn_ins_replant_now:'Replantez {name} maintenant',
+    learn_ins_replant_soon:'Replantez {name} prochainement',
+    learn_ins_replant_text_now:'{pct}% de rendement moyen sur {n} r\u00e9coltes. C\u2019est la bonne p\u00e9riode.',
+    learn_ins_replant_text:'{pct}% de rendement moyen sur {n} r\u00e9coltes. Bon historique chez vous.',
+    learn_ins_density_title:'R\u00e9duire la densit\u00e9 de {name}',
+    learn_ins_density_text:'Rendement moyen de {pct}%. Essayez moins de plants ou un autre espace.',
+    learn_ins_improving_title:'Vous progressez sur {name}',
+    learn_ins_improving_text:'Rendements en hausse sur vos {n} derni\u00e8res r\u00e9coltes. Continuez dans cet espace\u00a0!',
+    learn_ins_best_bed_title:'{name} est votre meilleur espace de culture',
+    learn_ins_best_bed_text:'{pct1}% de rendement vs {pct2}% pour {worst}. Concentrez-y vos cultures cl\u00e9s.',
+    learn_ins_rotation_title:'\u00c9vitez {fams} dans {bed} la saison prochaine',
+    learn_ins_rotation_same_fam:'les m\u00eames familles',
+    learn_ins_rotation_text:'Rotation r\u00e9p\u00e9titive d\u00e9tect\u00e9e. Changez de famille pour pr\u00e9server le sol.',
+    learn_ins_plant_title:'Plantez {name} dans {bed}',
+    learn_ins_plant_good_hist:' \u2014 bon historique chez vous ({pct}%).',
+
+    // ── Learning — notifications potentielles (learning.js) ──
+    learn_notif_harvest_title:'{icon} {name} pr\u00eate \u00e0 r\u00e9colter',
+    learn_notif_harvest_text:'Votre {name} est \u00e0 maturit\u00e9 optimale.',
+    learn_notif_lowyield_title:'{icon} Rendement faible r\u00e9current\u00a0: {name}',
+    learn_notif_lowyield_text:'Seulement {pct}% de vos pr\u00e9visions atteint en moyenne.',
+    learn_notif_replant_title:'{icon} Bon moment pour replanter {name}',
+    learn_notif_replant_text:'C\u2019est la p\u00e9riode id\u00e9ale et votre historique est excellent ({pct}%).',
+    learn_notif_rotation_title:'\uD83D\uDD04 Rotation \u00e0 corriger dans {bed}',
+    learn_notif_rotation_text:'M\u00eame famille plant\u00e9e plusieurs saisons de suite. Risque de fatigue du sol.',
+
+    // ── Learning-notifications ──
+    learn_notif_ready_title:'R\u00e9colte possible',
+    learn_notif_ready_msg:'{name} dans {bed} pourrait \u00eatre pr\u00eat (bas\u00e9 sur historique)',
+    learn_notif_yield_title:'Rendement faible d\u00e9tect\u00e9',
+    learn_notif_yield_msg:'{name}\u00a0: rendement moyen de {pct}%',
+
+    // ── Crops — erreur rendu ──
+    crops_err_render:'Erreur renderCrops\u00a0:',
+
+    // ── Learning — section rendu ──
+    learn_empty_state:'R\u00e9coltez au moins 2 cultures avec un rendement r\u00e9el pour que le syst\u00e8me apprenne de votre jardin.<br><br>Plus vous utilisez l\'app, plus les conseils seront personnalis\u00e9s.',
+    learn_conf_fort:'Confiance forte',
+    learn_conf_moyen:'Confiance moyenne',
+    learn_conf_low:'A confirmer',
+    learn_section_veggie:'\uD83E\uDD6C Performance par l\u00e9gume',
+    learn_section_bed:'\uD83C\uDF31 Performance par espace de culture',
+    learn_section_reco:'\uD83D\uDCA1 Conseils personnalis\u00e9s',
+    learn_trend_hausse:'hausse',
+    learn_trend_baisse:'baisse',
+    learn_trend_stable:'stable',
+    learn_proven_title:'{name} \u2014 bon historique chez vous',
+    learn_proven_text:'{pct}% de rendement moyen sur {count} r\u00e9coltes.',
+
+    // ── Dashboard — score progression ──
+    dash_score_lbl:'Score',
+
+    // ── Settings — messages UI ──
+    settings_no_result:'Aucun r\u00e9sultat',
+    settings_search_err:'Erreur de recherche',
+    settings_geo_unavail:'G\u00e9olocalisation non disponible',
+    settings_my_location:'Ma position',
+    settings_geo_error:'Impossible d\'obtenir la position',
+    settings_import_ok:'Donn\u00e9es import\u00e9es avec succ\u00e8s\u00a0!',
+    settings_clear_confirm1:'Effacer TOUTES les donn\u00e9es\u00a0? Cette action est irr\u00e9versible\u00a0!',
+    settings_clear_confirm2:'\u00cates-vous vraiment s\u00fbr\u00a0?',
+
+    // ── Types de démarrage ──
+    start_type_seed:'Semis',
+    start_type_plant:'Jeune plant',
+
+    // ── Texte de confiance (basé sur nombre récoltes) ──
+    lbl_n_harvests:'{n}\u00a0r\u00e9coltes',
+    lbl_one_harvest:'1\u00a0r\u00e9colte',
+
+    // ── Patterns apprentissage — titres/textes ──
+    pat_top_veg_title:'{name}\u00a0: l\u00e9gume fiable chez vous',
+    pat_top_veg_text:'{pct}% du rendement estim\u00e9 atteint en moyenne sur {conf}.',
+    pat_low_veg_title:'{name}\u00a0: rendement souvent d\u00e9cevant',
+    pat_low_veg_text:'Seulement {pct}% des pr\u00e9visions atteint sur {conf}. Revoyez la densit\u00e9 ou le placement.',
+    pat_decline_title:'{name}\u00a0: tendance \u00e0 la baisse',
+    pat_decline_text:'Les {n} derni\u00e8res r\u00e9coltes montrent une performance d\u00e9croissante. Envisagez\u00a0: rotation, sol, espacement.',
+    pat_improve_title:'{name}\u00a0: vous progressez\u00a0!',
+    pat_improve_text:'Rendements en hausse sur les {n} derni\u00e8res r\u00e9coltes. Continuez sur cette lanc\u00e9e.',
+    pat_top_bed_title:'{name}\u00a0: espace tr\u00e8s productif',
+    pat_top_bed_text:'{pct}% des rendements estim\u00e9s atteints. Cet espace fonctionne bien.',
+    pat_low_bed_title:'{name}\u00a0: espace peu productif',
+    pat_low_bed_text:'Seulement {pct}% des pr\u00e9visions atteint sur {conf}. Analysez le sol et la rotation.',
+    pat_rotation_title:'Rotation r\u00e9p\u00e9titive \u2014 {name}',
+    pat_rotation_text:'{n} famille(s) r\u00e9p\u00e9t\u00e9e(s)\u00a0: {fams}. Risque de fatigue du sol.',
+    pat_late_title:'{name}\u00a0: r\u00e9coltes souvent tardives',
+    pat_late_text:'Vous r\u00e9coltez en moyenne {avg} contre {est} estim\u00e9s. Surveillez la maturit\u00e9 plus t\u00f4t.',
+    pat_density_title:'{name}\u00a0: densit\u00e9 peut-\u00eatre trop \u00e9lev\u00e9e',
+    pat_density_text:'Rendement faible et cycles longs r\u00e9currents. Essayez un espacement plus grand ou moins de plants.',
+    pat_bed_full_title:'{name}\u00a0: surchargement r\u00e9current',
+    pat_bed_full_text:'Cet espace a \u00e9t\u00e9 tr\u00e8s charg\u00e9 sur {n} saisons. Consid\u00e9rez l\'agrandir ou r\u00e9partir les cultures.',
+    pat_bac_pref_title:'{name} pr\u00e9f\u00e8re {bed}',
+    pat_bac_pref_text:'{pct}% de rendement dans cet espace vs {pct2}% ailleurs. Concentrez-y les plantations.',
+
+    // ── Bloc progression (learning-render) ──
+    lrn_prog_no_data:'Pas assez de donn\u00e9es pour analyser la progression.',
+    lrn_prog_title_section:'Progression saisonni\u00e8re',
+    lrn_prog_up:'Am\u00e9lioration',
+    lrn_prog_down:'D\u00e9clin',
+    lrn_prog_stable:'Stable',
+    lrn_prog_season_row:'Saison {s}\u00a0: {pct}% du rendement estim\u00e9',
+    lrn_prog_vs_prev:'{trend} par rapport \u00e0 {prev} ({diff}%)',
+    lrn_prog_total_row:'Total r\u00e9coltes\u00a0: {n} ({kg}\u00a0kg)',
+
+    // ── Bloc insights actionnables (learning-render) ──
+    lrn_insights_none:'Aucun insight particulier pour le moment.',
+    lrn_insights_title:'\uD83D\uDCA1 Insights actionnables',
+
+    // ── Predictive section (analysis) ──
+    pred_section_yield:'Rendement saison',
+    pred_lbl_harvested:'R\u00e9colt\u00e9',
+    pred_lbl_projected:'Projet\u00e9',
+    pred_lbl_total:'Total',
+    pred_kg_est:'kg estim\u00e9s',
+    pred_today:'Aujourd\'hui',
+    pred_tomorrow:'Demain',
+    pred_in_days:'dans {n}j',
+  },
+  en: {
+    // ── Navigation ──
+    nav_home:'Home', nav_beds:'My garden', nav_today:'Today',
+    nav_calendar:'Calendar', nav_more:'More', nav_crops:'Crops',
+    nav_planning:'Planning', nav_analysis:'Analysis', nav_settings:'Settings',
+    nav_notifications:'Notifications', nav_ai:'AI', nav_veggieref:'Veggie Reference',
+
+    // ── Days ──
+    day_0:'Sunday', day_1:'Monday', day_2:'Tuesday', day_3:'Wednesday',
+    day_4:'Thursday', day_5:'Friday', day_6:'Saturday',
+    day_s_0:'Sun', day_s_1:'Mon', day_s_2:'Tue', day_s_3:'Wed',
+    day_s_4:'Thu', day_s_5:'Fri', day_s_6:'Sat',
+
+    // ── Months ──
+    month_0:'January', month_1:'February', month_2:'March',
+    month_3:'April', month_4:'May', month_5:'June',
+    month_6:'July', month_7:'August', month_8:'September',
+    month_9:'October', month_10:'November', month_11:'December',
+
+    // ── Greetings ──
+    greeting_morning:'Good morning!', greeting_afternoon:'Good afternoon!', greeting_evening:'Good evening!',
+
+    // ── Dashboard ──
+    dash_loading:'Loading\u2026',
+    dash_error:'Loading error',
+    dash_garden_empty:'\uD83C\uDF31 Add your first growing space to get started',
+    dash_garden_waiting:'Your garden is waiting\u2026',
+    dash_phrase_welcome:'Welcome to your garden',
+    dash_phrase_frost:'Frost risk \u2014 protect your crops',
+    dash_phrase_cold:'Cold weather \u2014 watch your seedlings',
+    dash_phrase_heavy_rain:'Heavy rain \u2014 no watering needed today',
+    dash_phrase_rain:'Rain falling \u2014 watering is done',
+    dash_phrase_wind:'Strong wind \u2014 check your stakes',
+    dash_phrase_heat:'Strong heat \u2014 water early in the morning',
+    dash_phrase_warm:'Warm sunny day \u2014 good time to water',
+    dash_phrase_ideal:'Ideal day for your garden',
+    dash_phrase_plant:'Good time to plant',
+    dash_phrase_default:'Check your tasks for today',
+    dash_no_weather:'Weather unavailable',
+    dash_section_garden:'My Garden',
+    dash_section_actions:"Today's actions",
+    dash_section_conseil:'Smart advice',
+    dash_see_all:'See all \u203A',
+    dash_see_today:'View all \u203A',
+    dash_see_analysis:'Analysis \u203A',
+    dash_today_label:'What to do right now',
+    dash_zone_free:'Empty space',
+
+    // ── Stats ──
+    stat_crops:'Crops', stat_ready:'Ready',
+    stat_harvested:'Harvested', stat_occupation:'Occupancy',
+
+    // ── Actions ──
+    act_do_now:'Do now',
+    act_harvest:'Harvest',
+    act_plan:'Schedule',
+    act_go:'Act',
+    act_see_today:'View today',
+    act_all_good_title:'All good',
+    act_all_good_sub:'Your garden is doing well!',
+    action_now:'Do it now', action_harvest:'Harvest',
+    action_plant:'Plant', action_fix:'Fix', action_water:'Water',
+
+    // ── Task categories ──
+    cat_harvest:'Harvest', cat_watering:'Watering',
+    cat_weather_prot:'Weather protection', cat_staking:'Staking',
+    cat_maintenance:'Maintenance', cat_rotation:'Rotation',
+
+    // ── Weather ──
+    wx_today:'Today', wx_today_short:'Today',
+    wx_clear:'Clear sky', wx_partly_cloudy:'Partly cloudy',
+    wx_foggy:'Fog', wx_drizzle:'Drizzle', wx_rain:'Rain',
+    wx_freezing_rain:'Freezing rain', wx_snow:'Snow',
+    wx_snow_grains:'Snow grains', wx_showers:'Showers',
+    wx_snow_showers:'Snow showers', wx_storm:'Thunderstorm',
+    wx_variable:'Variable',
+    wx_offline:'Weather unavailable',
+    wx_offline_mode:'Weather unavailable \u2014 Offline mode',
+    wx_humidity:'Humidity', wx_rain_lbl:'Rain',
+    wx_location_fallback:'Location',
+    wx_error:'Weather loading error. Check your connection.',
+
+    // ── Weather alerts ──
+    alert_frost:'Frost risk!',
+    alert_cold:'Low temperatures:',
+    alert_heat:'Strong heat:',
+    alert_warm:'Heat:',
+    alert_heavy_rain:'Heavy rainfall:',
+    alert_rain_lbl:'Rainfall:',
+    alert_strong_wind:'Strong wind:',
+    alert_moderate_wind:'Moderate wind:',
+
+    // ── Notifications ──
+    notif_title:'Notifications', notif_none:'No active notifications',
+    notif_done:'Done', notif_ignore:'Ignore (7d)',
+    notif_harvest_today_title:'{name} \u2014 harvest TODAY',
+    notif_harvest_soon_title:'{name} \u2014 harvest in {n}d',
+    notif_harvest_quality:'Don\'t let quality degrade.',
+    notif_harvest_late_title:'{name} overdue by {n}d',
+    notif_harvest_check:'Check and harvest quickly.',
+    notif_frost_title:'Frost risk ({temp}\u00b0C)',
+    notif_frost_text:'Protect your seedlings and sensitive crops.',
+    notif_water_title:'Watering recommended',
+    notif_water_text:'{temp}\u00b0C and dry. Your crops need water.',
+    notif_bed_full_title:'{name} overloaded ({pct}%)',
+    notif_bed_full_text:'Move a crop to improve yields.',
+    notif_rotation_title:'Rotation to fix \u2014 {name}',
+    notif_rotation_text:'Same family repeated over several seasons.',
+    notif_replant_title:'Ideal time to plant {name}',
+    notif_replant_text:'{pct}% historical yield. Good period.',
+    lbl_today:'Today', lbl_tomorrow:'Tomorrow',
+    risk_frost_title:'{label} \u2014 Frost forecast ({temp}\u00b0C)',
+    risk_cold_title:'{label} \u2014 Low temperatures ({temp}\u00b0C)',
+    risk_cold_text:'Watch sensitive crops in the cold.',
+    risk_heat_crit_title:'{label} \u2014 Critical heat ({temp}\u00b0C)',
+    risk_heat_crit_text:'Water early in the morning. Protect seedlings and heat-sensitive crops. Risk of wilting.',
+    risk_heat_warn_title:'{label} \u2014 Strong heat ({temp}\u00b0C)',
+    risk_heat_warn_text:'Water in the evening and watch for water stress. Mulch if possible.',
+    risk_flood_title:'{label} \u2014 Torrential rain ({mm}\u00a0mm)',
+    risk_flood_text:'Risk of bed flooding. Check drainage. Avoid watering.',
+    risk_rain_title:'{label} \u2014 Heavy rain ({mm}\u00a0mm)',
+    risk_rain_text:'Root rot risk for sensitive crops. Do not water.',
+    risk_drought_title:'{n} dry days in a row \u2014 water stress',
+    risk_drought_text:'Crops need water. Water daily in the evening or use drip irrigation.',
+    risk_frost_now_title:'Frost right now ({temp}\u00b0C)',
+    risk_frost_now_text:'Protect your sensitive crops immediately.',
+    risk_harvest_late_title:'{name} \u2014 Harvest compromised ({n}d late)',
+    risk_harvest_late_text:'Quality is degrading. Harvest as soon as possible to prevent total loss.',
+    risk_cold_sensitive_title:'{name} \u2014 Sensitive to forecast cold ({temp}\u00b0C)',
+    risk_cold_sensitive_text:'This crop (cold sensitivity {sens}/10) may be damaged. Cover it.',
+    risk_overload_title:'{name} \u2014 Overloaded ({pct}%)',
+    risk_overload_text:'Too many competing crops reduce yields across the whole bed.',
+    risk_rotation_title:'{name} \u2014 Problematic rotation',
+    risk_rotation_text:'Repeated family: {fams}. Risk of soil disease and yield drop.',
+    risk_frost_base:'Protect your crops, especially seedlings and recent plants.',
+    risk_frost_specific:'Prioritise protecting: {names} (very frost-sensitive).',
+
+    // ── Onboarding ──
+    onb_next:'Next', onb_start:'Get started', onb_skip:'Skip',
+    onb_step1_title:'Welcome!', onb_step1_sub:'What is your name?',
+    onb_step2_title:'Your garden', onb_step2_sub:'What type of growing space?',
+    onb_step3_title:'Your location', onb_step3_sub:'For weather and seasonal advice.',
+    onb_step4_title:'Your goals', onb_step4_sub:'What are you looking for in gardening?',
+
+    // ── Settings ──
+    settings_profile:'Profile', settings_app:'Application', settings_data:'Data',
+    settings_location:'Location', settings_language:'Language',
+    settings_current_city:'Current city', settings_coordinates:'Coordinates',
+    settings_active_season:'Active season', settings_all_seasons:'All seasons',
+    settings_veggie_ref:'Vegetable reference',
+    settings_add_veggie:'+ Add a vegetable',
+    settings_edit:'\u270F\uFE0F Edit',
+    settings_search_city:'\uD83D\uDD0D Search',
+    settings_my_position:'\uD83D\uDCCD Location',
+    settings_reset_location:'\u21A9\uFE0F Reset',
+    settings_seasons_title:'\uD83D\uDCC5 Seasons',
+    settings_my_garden:'My Garden',
+
+    // ── Export / Import ──
+    export_full:'Export (full)', export_light:'Light export', import_btn:'Import (JSON)',
+    reset_btn:'Clear data',
+
+    // ── Levels ──
+    pred_next_harvests:'Upcoming harvests', pred_no_harvest:'No harvest in the next 60 days',
+    level_debutant:'Beginner', level_apprenti:'Apprentice',
+    level_intermediaire:'Intermediate', level_avance:'Advanced', level_expert:'Expert',
+
+    // ── Plant families ──
+    family_Solanacees:'Nightshades', family_Brassicacees:'Brassicas',
+    family_Lamiacees:'Lamiaceae', family_Cucurbitacees:'Cucurbits',
+    family_Fabacees:'Legumes', family_Asteracees:'Asteraceae',
+    family_Apiacees:'Apiaceae', family_Liliacees:'Alliums',
+    family_Chenopodiacees:'Chenopodiaceae', family_Rosacees:'Rosaceae',
+    family_Poacees:'Grasses', family_Convolvulacees:'Convolvulaceae',
+    family_Asparagacees:'Asparagaceae', family_Grossulariacees:'Grossulariaceae',
+    family_Valerianacees:'Valerianaceae',
+
+    // ── General ──
+    btn_save:'Save', btn_cancel:'Cancel', btn_delete:'Delete',
+    btn_add:'Add', btn_edit:'Edit', btn_close:'Close',
+    lbl_name:'Name', lbl_surface:'Surface', lbl_type:'Type',
+    empty_no_beds:'No growing spaces created', empty_no_crops:'No crops registered',
+    lbl_days_abbr:'d', lbl_percent:'%',
+    lbl_crop_s:'crops', lbl_crop:'crop', lbl_in_progress:'in progress',
+    // ── Analysis — sections ──
+    ana_section_global:'Overall performance',
+    ana_section_progression:'Gardener progression',
+    ana_section_seasons:'Season comparison',
+    ana_section_actions:'Recommended actions',
+    ana_section_yield:'Yield by vegetable',
+    ana_section_surfaces:'Surface analysis',
+    ana_section_tips:'Smart advice',
+    ana_section_ai:'AI Learning',
+    ana_section_badges:'Badges',
+    ana_section_top_flop:'Top / Flop',
+    ana_section_health:'Growing space health',
+    ana_section_prev_season:'Previous season',
+    ana_prev_season_title:'Season {season} recap',
+    ana_prev_season_summary:'{n} crop{s} \u00b7 {h} harvested \u00b7 {kg} kg',
+    ana_prev_season_no_harvest:'No harvest recorded this season.',
+    ana_empty:'No data to analyze yet.\nAdd crops to get started.',
+    ana_garden_perfect:'Your garden is in excellent shape!',
+    ana_all_good:'Everything looks good! Keep it up.',
+
+    // ── Analysis — legend ──
+    ana_estimated:'Estimated (kg)', ana_real:'Actual (kg)',
+    ana_best:'Best', ana_to_improve:'To improve',
+    ana_pct_yield:'% of estimated yield',
+    ana_cultures:'crops', ana_kg:'kg',
+
+    // ── Analysis — progression ──
+    ana_score_up:'+{d} pts this season',
+    ana_score_down:'{d} pts this season',
+    ana_score_stable:'Stable score',
+    ana_season_label:'Current season',
+
+    // ── Analysis — season comparison ──
+    ana_comp_need_more:'Complete at least 2 seasons to see your progress.',
+    ana_comp_up:'+{p}% performance vs previous season \u2014 you\'re improving!',
+    ana_comp_stable:'Stable performance vs previous season.',
+    ana_comp_down:'{p}% performance vs previous season \u2014 analyze what changed.',
+
+    // ── Analysis — recommendations ──
+    ana_reco_plant_more:'Plant more {name}',
+    ana_reco_plant_text:'{pct}% average yield',
+    ana_reco_plant_text_now:'{pct}% average yield \u2014 it\'s the right time!',
+    ana_reco_plan:'Schedule', ana_reco_see_planning:'View planning',
+    ana_reco_overloaded:'{name} is overloaded',
+    ana_reco_overloaded_text:'{pct}% occupancy. Move a crop to free up space.',
+    ana_reco_optimize:'Optimize',
+    ana_reco_reduce:'Reduce density of {name}',
+    ana_reco_reduce_text:'Only {pct}% average yield. Fewer plants = better results.',
+    ana_reco_see_crops:'View crops',
+    ana_reco_exploit:'Use {name} ({pct}% occupied)',
+    ana_reco_suggest_plant:'Suggestion: plant {name} ({reason}).',
+    ana_reco_space_available:'This growing space has room available.',
+    ana_reco_add:'Add', ana_reco_see_zone:'View space',
+    ana_reco_harvest_late:'Overdue harvest: {name}',
+    ana_reco_harvest_late_text:'{n} crop{s} should have been harvested.',
+    ana_reco_harvest_btn:'Harvest',
+
+    // ── Analysis — badges ──
+    badge_first_harvest:'First harvest',
+    badge_yield_80:'80%+ yield',
+    badge_three_harvests:'3 harvests',
+    badge_diversity:'Diversity (3 families)',
+    badge_three_seasons:'3 active seasons',
+    badge_multi_beds:'2 spaces used',
+    badge_progression:'Season progress',
+    badge_expert_veg:'Vegetable expert',
+    badge_ten_harvests:'10 harvests',
+    badge_unlocked:'Unlocked!', badge_in_progress:'In progress',
+
+    // ── Analysis — tips ──
+    tip_underused:'{name} is underused ({pct}% occupancy). Plant new crops here!',
+    tip_overloaded:'{name} is overloaded ({pct}%). Consider redistributing crops.',
+    tip_rotation:'Same family too often in {name} ({fams}). Think about rotation.',
+    tip_low_perf:'{icon} {name} underperforming for {n} seasons ({pct}% of estimated yield).',
+    tip_space_greedy:'{icon} {name} occupies {pct}% of {bed}. Consider a larger bed.',
+
+    // ── Beds ──
+    beds_empty:'No growing spaces yet.\nAdd your first space!',
+    beds_add_btn:'+ Add a space',
+    beds_m2_total:'m\u00b2 total',
+    beds_legend_seedling:'Seedling', beds_legend_growing:'Growing',
+    beds_legend_maturing:'Maturing', beds_legend_ready:'Ready', beds_legend_free:'Free',
+    beds_zone_empty:'Empty space', beds_zone_free_chip:'Empty space',
+    beds_active:'{n} active', beds_active_pl:'{n} active',
+    beds_planned:'{n} planned', beds_planned_pl:'{n} planned',
+    beds_health:'Health', beds_occupation:'Occupancy',
+    bed_occ_optimized:'\uD83C\uDF3F Optimized',
+    beds_ai_suggest:'AI: plant {icon} {name}',
+    beds_ai_history:' \u2014 {pct}% history',
+    beds_no_crops:'No crops in this space',
+    beds_families_current:'Current families:',
+    beds_families_prev:'Previous season families:',
+    beds_no_history:'No history',
+    beds_none:'None',
+    beds_rotation:'Rotation',
+    beds_add_crop:'+ Add a crop',
+    beds_err_display:'Space display error',
+    beds_modal_new:'New growing space', beds_modal_edit:'Edit growing space',
+    beds_lbl_name:'Name', beds_lbl_length:'Length (m)', beds_lbl_width:'Width (m)',
+    beds_lbl_notes:'Notes', beds_lbl_family:'Family',
+    beds_err_name:'Please enter a name for this space.',
+    beds_err_length:'Enter a valid length (e.g. 2.0 m).',
+    beds_err_width:'Enter a valid width (e.g. 1.0 m).',
+    beds_confirm_delete:'Delete this growing space and all its crops?',
+    beds_btn_move:'\u2194\uFE0F Move',
+    beds_btn_harvest:'\uD83C\uDF89 Harvest',
+    beds_btn_delete:'\uD83D\uDDD1\uFE0F Delete',
+    beds_stat_health:'Health /100',
+
+    // ── Crops ──
+    crops_header:'My Crops',
+    crops_empty:'No crops this season.<br>Start planting!',
+    crops_add_btn:'+ Add a crop',
+    crops_no_bed:'No bed',
+    stage_all:'All', stage_planned:'Planned', stage_seedling:'Seedling',
+    stage_growing:'Growing', stage_maturing:'Maturing',
+    stage_harvest:'Ready', stage_harvested:'Harvested',
+    crops_lbl_planned_plant:'\uD83D\uDCC5 Plant. planned: ',
+    crops_lbl_planted:'\uD83C\uDF31 Planted: ',
+    crops_lbl_harvest_date:'\uD83C\uDF81 Harvest: ',
+    crops_lbl_est_yield:' kg est.',
+    crops_lbl_real_yield:' \u2014 {kg} kg actual',
+    crops_btn_harvest:'\uD83C\uDF89 Harvest',
+    crops_btn_edit:'\u270F\uFE0F Edit',
+    crops_btn_move:'\u21D4\uFE0F Move',
+    crops_modal_new:'New crop', crops_modal_edit:'Edit crop',
+    crops_lbl_veggie:'Vegetable', crops_lbl_bed:'Bed',
+    crops_lbl_start_type:'Start type',
+    crops_lbl_date_plant:'Planting date',
+    crops_lbl_date_harvest:'Expected harvest',
+    crops_hint_days:'{name}: ~{days} days, yield {yield} kg/m\u00b2',
+    crops_hint_surface:'Available: {rem} m\u00b2 | This crop: {size} m\u00b2',
+    crops_err_qty:'Invalid quantity',
+    crops_err_veggie:'Invalid vegetable',
+    crops_err_surface:'Not enough space in this bed.\nAvailable: {rem} m\u00b2\nRequested: {size} m\u00b2',
+    crops_harvest_title:'\uD83C\uDF89 Harvest: {name}',
+    crops_lbl_real_yield_input:'Actual yield (kg)',
+    crops_lbl_estimate:'Estimate: {kg} kg',
+    crops_lbl_kg_harvested:'kg harvested',
+    crops_harvest_confirm:'Confirm harvest',
+    crops_harvest_partial:'\uD83D\uDCE6 Partial harvest',
+    crops_harvest_final:'\u2705 End season',
+    crops_harvest_partial_hint:'Crop stays active. Harvests accumulate.',
+    crops_harvest_final_hint:'Closes the season. Crop moves to harvested.',
+    crops_harvest_partial_confirm:'\uD83D\uDCE6 Partial harvest recorded!',
+    crops_harvest_final_confirm:'\u2705 Season complete. Great harvest!',
+    crops_partial_count:'{n} harvest{s} \u00b7 {kg} kg total',
+    crops_confirm_delete:'Delete this crop?',
+    crops_move_title:'Move {name}',
+    crops_move_subtitle:'Choose destination bed:',
+    crops_move_occupied:'% occupied',
+    crops_move_none:'No other bed available',
+    crops_rotation_warn:'Warning: {family} was in this bed in {season}. Rotation not recommended.',
+
+    // ── Planning / Today ──
+    plan_title:'Planning',
+    plan_filter_today:'Immediate actions for today',
+    plan_filter_week:'Week view',
+    plan_filter_all:'All actions and forecasts',
+    plan_filter_1m:'Next month anticipation',
+    plan_filter_2m:'2-month projection',
+    plan_filter_3m:'3-month projection',
+    plan_filter_next:'Next season preparation',
+    plan_filter_default:'Garden preparation and organization',
+    plan_new_season:'+ New season',
+    plan_btn_plan:'\uD83D\uDCC5 Schedule a crop',
+    plan_section_rotation:'\uD83D\uDD04 Rotation recommendations',
+    plan_section_suggestions:'\uD83D\uDCA1 Smart suggestions',
+    plan_rota_current:'Current season:',
+    plan_rota_prev:'Previous seasons:',
+    plan_rota_recommended:'\u2705 Recommended families:',
+    plan_rota_avoid:'\u274C Families to avoid:',
+    plan_rota_suggested:'\uD83D\uDCA1 Suggested vegetables:',
+    plan_sug_in:'in',
+    plan_sug_available:'m\u00b2 available',
+    plan_modal_title:'\uD83D\uDCC5 Schedule a crop',
+    plan_lbl_veggie:'Vegetable',
+    plan_lbl_in_season:'\u2705 = in season for',
+    plan_lbl_zone:'Growing space',
+    plan_lbl_zone_none:'No space',
+    plan_lbl_mode:'Mode',
+    plan_lbl_mode_plants:'By plants',
+    plan_lbl_mode_surface:'By surface (m\u00b2)',
+    plan_lbl_start_type:'Start type',
+    plan_lbl_young_plant:'Young plant',
+    plan_lbl_seed:'Seed',
+    plan_lbl_qty_plants:'Number of plants',
+    plan_lbl_qty_surface:'Surface (m\u00b2)',
+    plan_lbl_spacing:'Spacing (m\u00b2/plant)',
+    plan_lbl_date_plant:'Planned planting date',
+    plan_lbl_date_harvest:'Planned harvest',
+    plan_lbl_notes:'Notes',
+    plan_btn_plan_action:'Schedule',
+    plan_confirm_delete:'Delete this planned crop?',
+    plan_available:'m\u00b2 available',
+    plan_rotation_warn:'\u26A0\uFE0F Warning: {family} already present in this space. Rotation not recommended.',
+    plan_rotation_ok:'\u2705 {family}: good rotation for this space!',
+
+    // ── Today screen ──
+    today_loading:'Loading...',
+    today_all_done:'All done!',
+    today_count_one:'1 action today',
+    today_count_many:'{n} actions today',
+    today_progress_done:'{done}/{total} done',
+    today_group_urgent:'\uD83D\uDD34 Urgent ({n})',
+    today_group_important:'\uD83D\uDFE0 Important ({n})',
+    today_group_todo:'\uD83D\uDFE2 To do ({n})',
+    today_done_header:'\u2705 Completed tasks ({n})',
+    today_task_done:'Done',
+    today_empty:'No actions for today.\nYour garden is doing great!',
+    today_dry:'Dry',
+    today_alert_frost:'Frost risk \u2014 {temp}\u00b0C',
+    today_alert_frost_sub:'Protect all seedlings and sensitive crops',
+    today_alert_cold:'Low temperatures \u2014 {temp}\u00b0C',
+    today_alert_cold_sub:'Watch fragile plants tonight',
+    today_alert_heat:'Strong heat \u2014 {temp}\u00b0C',
+    today_alert_heat_sub:'Water early morning, shade if possible',
+    today_alert_rain:'Heavy rain \u2014 {mm}mm',
+    today_alert_rain_sub:'Skip watering, check drainage',
+    today_alert_wind:'Strong wind \u2014 {kmh} km/h',
+    today_alert_wind_sub:'Check stakes and supports',
+    today_harvest_btn:'\uD83C\uDF89 Harvest',
+
+    // ── Calendar ──
+    cal_veggie_col:'Vegetable',
+    cal_planting_legend:'\uD83D\uDFE9 Planting \u00a0\u00a0 \uD83D\uDFE7 Harvest',
+    cal_visual_title:'\uD83D\uDCCA Visual calendar',
+    cal_simple_title:'\uD83D\uDDD3\uFE0F Simple planting calendar',
+    cal_simple_desc:'Your vegetables sorted by planting month.',
+    cal_no_veggie_month:'No vegetables registered for this month.',
+
+    // ── Common modal / forms ──
+    btn_cancel:'Cancel', btn_add_label:'Add', btn_edit_label:'Edit',
+    lbl_placeholder_notes:'Notes...',
+    lbl_ex:'E.g.',
+
+    // ── Settings — vegetable reference ──
+    settings_lbl_vegetables:'vegetables',
+    settings_lbl_families:'families',
+    settings_lbl_in_season:'in season',
+    settings_in_season_badge:'in season',
+    settings_veggie_placeholder:'Search a vegetable\u2026',
+    settings_veggie_none:'No vegetable found',
+    settings_filter_all:'All',
+    settings_filter_easy:'\u2605 Easy',
+    settings_filter_summer:'\u2600\uFE0F Summer',
+    settings_filter_winter:'\u2744\uFE0F Winter',
+    settings_filter_dry:'\uD83D\uDCA7 Dry',
+    settings_filter_yield:'\uD83D\uDCC8 Yield',
+
+    // ── Settings — city modal ──
+    settings_search_city_title:'Search a city',
+    settings_search_city_input:'City name\u2026',
+
+    // ── Settings — vegetable modal ──
+    settings_veggie_modal_new:'New vegetable',
+    settings_veggie_modal_edit:'Edit vegetable',
+    settings_veggie_lbl_name:'Name',
+    settings_veggie_lbl_icon:'Icon',
+    settings_veggie_lbl_family:'Family',
+    settings_veggie_lbl_yield:'Yield/m\u00b2 (kg)',
+    settings_veggie_lbl_days:'Days to harvest',
+    settings_veggie_lbl_space:'Space/plant (m\u00b2)',
+    settings_veggie_lbl_sensitivity:'Sensitivities (1-10)',
+    settings_veggie_lbl_heat:'\u2600\uFE0F Heat',
+    settings_veggie_lbl_rain:'\uD83C\uDF27\uFE0F Rain',
+    settings_veggie_lbl_cold:'\u2744\uFE0F Cold',
+    settings_veggie_lbl_wind:'\uD83D\uDCA8 Wind',
+    settings_veggie_err_name:'Please enter a name',
+    settings_veggie_err_used:'Cannot delete this vegetable as it is used in existing crops.',
+    settings_veggie_confirm_delete:'Delete {name}?',
+
+    // ── Settings — seasons ──
+    settings_new_season_btn:'+ New season',
+    settings_new_season_prompt:'New season (e.g. {year}):',
+    settings_new_season_exists:'This season already exists.',
+
+    // ── Planning — timeline ──
+    plan_frise_today:'Today:',
+
+    // ── Planning — section titles ──
+    plan_section_prio:'Priority actions',
+    plan_section_frise:'\uD83D\uDCC5 Season timeline',
+    plan_section_smart_sug:'\uD83E\uDDE0 Smart suggestions',
+    plan_section_preparation:'\uD83D\uDDD3\uFE0F Season preparation',
+    plan_section_tasks:'\uD83D\uDCCB Tasks for today',
+
+    // ── Planning — actions ──
+    plan_prio_empty:'No urgent actions right now. Your garden is in order!',
+    plan_badge_urgent:'Urgent', plan_badge_important:'Important', plan_badge_suggestion:'Suggestion',
+    plan_btn_do_now:'Do it now \u2192',
+    plan_load_err:'Loading error.',
+    plan_sug_cta:'Schedule \u203A',
+    plan_sug_hist:'{pct}% history',
+
+    // ── Planning — frise labels ──
+    plan_frise_empty:'No crops this season.<br>Add crops to see the timeline.',
+    plan_frise_tab_full:'Full season',
+    plan_frise_tab_6m:'Next 6 months',
+    plan_frise_tab_3m:'Next 3 months',
+    plan_frise_leg_active:'Active',
+    plan_frise_leg_growing:'Growing',
+    plan_frise_leg_ready:'Ready to harvest',
+    plan_frise_leg_planned:'Planned',
+    plan_frise_leg_harvested:'Harvested',
+
+    // ── Planning — task texts ──
+    plan_tasks_empty:'No actions for now!',
+    plan_tasks_empty2:'No pending tasks.<br>Your garden is in good shape!',
+    task_cold_protect:'Protect {icon} {name} from cold ({temp}\u00b0C){seedling}',
+    task_cold_seedling:' - fragile seedlings!',
+    task_heat_protect:'Protect {icon} {name} from heat ({temp}\u00b0C) - shade recommended',
+    task_wind_stake:'Stake/protect {icon} {name} from wind ({speed}km/h)',
+    task_rain_protect:'Protect {icon} {name} from rain ({mm}mm){harvest}',
+    task_rain_harvest:' - harvest first if possible',
+    task_water:'Water {icon} {name}{intensive}',
+    task_water_intensive:' thoroughly',
+    task_frost_alert:'Frost alert: {temp}\u00b0C - protect all seedlings and sensitive crops',
+    task_harvest_ready:'{icon} {name} is ready to harvest!',
+    task_harvest_soon:'{icon} {name}: harvest in {n} days',
+    plan_reason_rotation:'Excellent rotation',
+
+    // ── Planning — smart actions descriptions ──
+    plan_action_harvest_title:'Harvest {name}',
+    plan_action_harvest_desc:'Crop at optimal maturity in {bed}',
+    plan_action_harvest_desc_nobed:'Crop at optimal maturity',
+    plan_action_overdue_title:'{name} overdue by {n}d',
+    plan_action_overdue_desc:'Harvest date passed. Check maturity.',
+    plan_action_overloaded_title:'{name} overloaded ({pct}%)',
+    plan_action_overloaded_desc:'Move a crop to optimize productivity.',
+    plan_action_plant_title:'Plant {name} in {bed}',
+    plan_action_plant_hist:' \u2014 {pct}% historical yield',
+    plan_action_replant_title:'Replant {name} (good history)',
+    plan_action_replant_desc:'{pct}% yield over {n} harvests. In season now.',
+    plan_action_exploit_title:'Use {name} ({pct}% only)',
+    plan_action_exploit_desc:'Suggestion: {icon} {vegname} \u2014 {reason}',
+    plan_loading:'Loading\u2026',
+    plan_cta_harvest:'Harvest', plan_cta_plant:'Schedule', plan_cta_fix:'Fix', plan_cta_act:'Act',
+    plan_badge_info:'Info',
+    plan_tasks_done:'Completed ({n})',
+    plan_sug_name:'{name} in {bed}',
+    plan_sug_m2:'m\u00b2 available',
+    plan_cat_harvest:'Harvest', plan_cat_water:'Watering', plan_cat_weather:'Weather protection',
+    plan_cat_stake:'Staking', plan_cat_maintenance:'Maintenance', plan_cat_rotation:'Rotation',
+    plan_reason_new_bed:'New bed',
+    plan_reason_good_companion:'{n} good neighbour(s)',
+    plan_reason_bad_companion:'Companion mismatch',
+    plan_reason_heat_sens:'Heat sensitive',
+    plan_reason_rain_sens:'Rain sensitive',
+    plan_reason_cold_sens:'Cold sensitive',
+    plan_reason_big_space:'Plenty of space',
+    plan_reason_good_space:'Good space available',
+    plan_reason_small_space:'Small space left',
+    task_rotation_bad:'{bed}: bad rotation ({n} families repeated)',
+    task_check_garden:'Check stakes and mulch',
+
+    // ── Intelligence — crop health ──
+    intel_health_section:'Crop health',
+    intel_health_empty:'No active crops this season.',
+    health_not_found:'Crop not found',
+    health_harvested_sug:'Crop successfully harvested.',
+    health_planned_sug:'Crop planned, awaiting planting.',
+    health_late_crit_risk:'Harvest {n} days overdue \u2014 quality degraded',
+    health_late_crit_sug:'Harvest immediately to prevent total loss.',
+    health_late_risk:'Harvest {n} days overdue',
+    health_late_sug:'Plan harvest within the next 2 days.',
+    health_ready_sug:'Crop at optimal maturity \u2014 ideal time to harvest.',
+    health_bed_overload_risk:'Bed {bed} saturated ({pct}%) \u2014 crop competition',
+    health_bed_overload_sug:'Move a crop to a less occupied bed.',
+    health_bed_full_risk:'Bed {bed} very full ({pct}%)',
+    health_bed_full_sug:'Watch for stress signs (yellowing, slowing growth).',
+    health_frost_risk:'Frost risk ({temp}\u00b0C) \u2014 cold sensitivity: {sens}/10',
+    health_frost_sug:'Cover with frost cloth or bring sensitive pots inside.',
+    health_cold_risk:'Low temperatures ({temp}\u00b0C)',
+    health_heat_risk:'Excessive heat ({temp}\u00b0C) \u2014 heat sensitivity: {sens}/10',
+    health_heat_sug:'Water early morning and create shade if possible.',
+    health_heat_mild_sug:'Water in the evening to limit evaporation.',
+    health_wind_risk:'Strong wind ({speed} km/h) \u2014 breakage risk',
+    health_wind_sug:'Stake or protect fragile stems.',
+    health_rain_risk:'High rainfall ({mm} mm) \u2014 root rot risk',
+    health_rain_sug:'Check bed drainage and raise lower leaves.',
+    health_dry_risk:'Hot and dry weather \u2014 water stress risk',
+    health_dry_sug:'Water regularly in the evening.',
+    health_slow_risk:'Slower growth than expected ({pct}% of cycle elapsed)',
+    health_slow_sug:'Check fertilization and sun exposure.',
+    health_poor_hist_risk:'{name} historically poor-performing ({pct}%)',
+    health_poor_hist_sug:'Try another bed or reduce density for this variety.',
+    health_ok_sug:'Healthy crop \u2014 continue regular care.',
+
+    // ── Intelligence — risks block ──
+    intel_risks_section:'Upcoming risks',
+    intel_risks_empty:'No risks detected in the next 7 days.',
+    intel_sev_high:'Critical', intel_sev_medium:'Moderate', intel_sev_low:'Low',
+
+    // ── Intelligence — opportunity block ──
+    intel_opp_section:'Opportunities',
+    intel_opp_empty:'No opportunities identified for now.',
+    intel_opp_yield:'+{kg} kg potential',
+    intel_opp_prio_high:'High priority', intel_opp_prio_medium:'Opportunity', intel_opp_prio_low:'Suggestion',
+
+    // ── Intelligence — season advisor ──
+    intel_adv_timing_now:'now', intel_adv_timing_next:'next month',
+    intel_adv_reason_now:'Now is the ideal time to plant {name}.',
+    intel_adv_reason_next:'Prepare to plant {name} for next month.',
+    intel_adv_toavoid:'{pct}% average yield over {n} harvests.',
+    intel_adv_prep_rotation:'Problematic rotation \u2014 same family too often.',
+    intel_adv_prep_rotation_act:'Plan a crop from a different family.',
+    intel_adv_prep_low:'Underused bed ({pct}% occupancy).',
+    intel_adv_prep_low_act:'Take advantage of the season to plant now.',
+    intel_adv_rot_crit:'Critical', intel_adv_rot_warn:'Watch out',
+    intel_adv_rot_tip:'Avoid {fams} in {bed} this season.',
+    intel_adv_opp_hist:' ({pct}% history)',
+
+    // ── Intelligence — yield optimization ──
+    intel_opt_density_title:'{name} occupies {pct}% of {bed}',
+    intel_opt_density_text:'A single dominant crop limits diversity. Consider a larger bed or reduction.',
+    intel_opt_placement_title:'{name} performs better in {bed}',
+    intel_opt_placement_text:'{pct}% yield in {bed} vs current placement. Consider moving.',
+    intel_opt_overload_title:'{bed} overloaded ({pct}%) \u2014 move {crop}',
+    intel_opt_overload_text:'Free up space by moving the least performing crop to another bed.',
+    intel_opt_timing_title:'Optimal window for {name} \u2014 don\'t miss it',
+    intel_opt_timing_text:'{pct}% historical yield. It\'s the right time.',
+
+    // ── Opportunities ──
+    opp_hist_pct:' \u00b7 {pct}% history',
+    opp_free_month:'this month',
+    opp_hi_suffix:'\u2014 excellent history',
+    opp_hi_text:'{pct}% average yield over {n} harvests. Ideal period. Suggested bed: {bed}.',
+    opp_sw_suffix_now:'\u2014 plant now',
+    opp_sw_suffix_prep:'\u2014 prepare',
+    opp_sw_text_now:'Ideal time to plant {name}. Estimated yield: {kg} kg.',
+    opp_sw_text_next:'Prepare to plant {name} for next month.',
+    opp_div_title:'Diversify with the {fam} family',
+    opp_div_text:'{name} can be planted now and improves your garden biodiversity.',
+
+    // ── Onboarding ──
+    onb_firstname_ph:'Your first name...',
+    onb_skill_label:'Gardening level:',
+    onb_space_pots:'Spaces / pots', onb_space_ground:'In-ground',
+    onb_space_mixed:'Mixed', onb_space_balcony:'Balcony',
+    onb_goal_yield:'Yield', onb_goal_autonomy:'Self-sufficiency',
+    onb_goal_pleasure:'Pleasure', onb_goal_learn:'Learn',
+    onb_city_lbl:'Current city:',
+    onb_use_gps:'\uD83D\uDCCD Use my location',
+    onb_search_city_btn:'\uD83D\uDD0D Search a city',
+    onb_tagline:'Your intelligent garden assistant',
+
+    // ── Calendar — fiche ──
+    cal_diff_easy:'Easy', cal_diff_medium:'Intermediate', cal_diff_hard:'Expert',
+    cal_water_high:'Water-hungry', cal_water_med:'Moderate watering', cal_water_low:'Very low water',
+    cal_sun_full:'Full sun', cal_sun_half:'Part sun', cal_sun_shade:'Part shade',
+    cal_per_m2:'per m\u00b2', cal_to_harvest:'to harvest', cal_per_plant:'per plant',
+    cal_legend_planting:'Planting', cal_legend_harvest:'Harvest',
+    cal_legend_task:'Task', cal_legend_urgent:'Urgent',
+    cal_section_sensib:'\uD83C\uDF21\uFE0F Sensitivities',
+    cal_section_assoc:'\uD83E\uDD1D Companions',
+    cal_section_diseases:'\uD83D\uDD0D Diseases & pests',
+    cal_section_tips:'\uD83D\uDCA1 My Garden Side tips',
+    cal_section_calendar:'\uD83D\uDCC5 Calendar',
+    cal_data_soon:'\uD83C\uDF31 Enhanced data coming soon',
+    cal_sensib_heat:'Heat', cal_sensib_rain:'Rain', cal_sensib_cold:'Cold', cal_sensib_wind:'Wind',
+    cal_assoc_good:'\u2714 Good companions', cal_assoc_bad:'\u2716 Avoid',
+    cal_evt_plant:'Plant {name}', cal_evt_harvest:'Harvest {name}',
+    cal_plant_sub:'Planting date', cal_harvest_planned:'Planned harvest',
+    cal_today_suffix:' \u2014 Today',
+    cal_no_event:'No events this day',
+    cal_loading:'Loading...',
+    cal_fiche_edit:'\u270F\uFE0F Edit', cal_fiche_delete:'\uD83D\uDDD1\uFE0F Delete',
+
+    // ── Learning — strengths / weaknesses ──
+    learn_str_good_yields:'Good steady yields',
+    learn_str_diversity:'Great crop diversity',
+    learn_str_experience:'Strong experience ({n} harvests)',
+    learn_str_progress:'Season currently improving',
+    learn_str_reliable:'{icon} {name} very reliable',
+    learn_weak_low_yields:'Yields often below estimates',
+    learn_weak_diversity:'Lacking diversity',
+    learn_weak_decline:'Performance drop this season',
+    learn_weak_difficult:'{icon} {name} hard to get yields from',
+
+    // ── Learning — next milestones ──
+    learn_mile_harvests:'Harvest {n} more crop(s) to refine advice',
+    learn_mile_diversity:'Add {n} new vegetable family',
+    learn_mile_ratio:'Improve your actual/estimated yield ratio',
+    learn_mile_season:'Complete a second season to see your progress',
+    learn_mile_perfect:'Keep up your excellent practices!',
+
+    // ── Learning — actionable insights ──
+    learn_ins_replant_now:'Replant {name} now',
+    learn_ins_replant_soon:'Replant {name} soon',
+    learn_ins_replant_text_now:'{pct}% average yield over {n} harvests. It\'s the right time.',
+    learn_ins_replant_text:'{pct}% average yield over {n} harvests. Good track record.',
+    learn_ins_density_title:'Reduce density of {name}',
+    learn_ins_density_text:'{pct}% average yield. Try fewer plants or a different bed.',
+    learn_ins_improving_title:'You\'re improving with {name}',
+    learn_ins_improving_text:'Yields trending up over your last {n} harvests. Keep it up!',
+    learn_ins_best_bed_title:'{name} is your best bed',
+    learn_ins_best_bed_text:'{pct1}% yield vs {pct2}% for {worst}. Focus your key crops here.',
+    learn_ins_rotation_title:'Avoid {fams} in {bed} next season',
+    learn_ins_rotation_same_fam:'the same families',
+    learn_ins_rotation_text:'Repeated rotation detected. Change family to preserve soil health.',
+    learn_ins_plant_title:'Plant {name} in {bed}',
+    learn_ins_plant_good_hist:' \u2014 good track record ({pct}%).',
+
+    // ── Learning — potential notifications (learning.js) ──
+    learn_notif_harvest_title:'{icon} {name} ready to harvest',
+    learn_notif_harvest_text:'Your {name} is at peak maturity.',
+    learn_notif_lowyield_title:'{icon} Recurring low yield: {name}',
+    learn_notif_lowyield_text:'Only {pct}% of your estimates achieved on average.',
+    learn_notif_replant_title:'{icon} Good time to replant {name}',
+    learn_notif_replant_text:'It\'s the ideal time and your track record is excellent ({pct}%).',
+    learn_notif_rotation_title:'\uD83D\uDD04 Rotation to fix in {bed}',
+    learn_notif_rotation_text:'Same family planted several seasons in a row. Risk of soil exhaustion.',
+
+    // ── Learning-notifications ──
+    learn_notif_ready_title:'Harvest ready',
+    learn_notif_ready_msg:'{name} in {bed} may be ready (based on history)',
+    learn_notif_yield_title:'Low yield detected',
+    learn_notif_yield_msg:'{name}: average yield of {pct}%',
+
+    // ── Crops — render error ──
+    crops_err_render:'Render error:',
+
+    // ── Learning — section render ──
+    learn_empty_state:'Harvest at least 2 crops with a real yield so the system can learn from your garden.<br><br>The more you use the app, the more personalised the advice will be.',
+    learn_conf_fort:'High confidence',
+    learn_conf_moyen:'Medium confidence',
+    learn_conf_low:'To confirm',
+    learn_section_veggie:'\uD83E\uDD6C Performance by vegetable',
+    learn_section_bed:'\uD83C\uDF31 Performance by bed',
+    learn_section_reco:'\uD83D\uDCA1 Personalised tips',
+    learn_trend_hausse:'up',
+    learn_trend_baisse:'down',
+    learn_trend_stable:'stable',
+    learn_proven_title:'{name} \u2014 proven in your garden',
+    learn_proven_text:'{pct}% average yield over {count} harvests.',
+
+    // ── Dashboard — score progression ──
+    dash_score_lbl:'Score',
+
+    // ── Settings — UI messages ──
+    settings_no_result:'No results',
+    settings_search_err:'Search error',
+    settings_geo_unavail:'Geolocation not available',
+    settings_my_location:'My location',
+    settings_geo_error:'Unable to get location',
+    settings_import_ok:'Data imported successfully!',
+    settings_clear_confirm1:'Erase ALL data? This action is irreversible!',
+    settings_clear_confirm2:'Are you really sure?',
+
+    // ── Start types ──
+    start_type_seed:'Seeding',
+    start_type_plant:'Young plant',
+
+    // ── Confidence text ──
+    lbl_n_harvests:'{n}\u00a0harvests',
+    lbl_one_harvest:'1\u00a0harvest',
+
+    // ── Learning patterns — titles/texts ──
+    pat_top_veg_title:'{name}: reliable crop',
+    pat_top_veg_text:'{pct}% of estimated yield reached on average over {conf}.',
+    pat_low_veg_title:'{name}: often disappointing yield',
+    pat_low_veg_text:'Only {pct}% of forecasts reached over {conf}. Review density or placement.',
+    pat_decline_title:'{name}: downward trend',
+    pat_decline_text:'The last {n} harvests show declining performance. Consider: rotation, soil, spacing.',
+    pat_improve_title:'{name}: you\'re improving!',
+    pat_improve_text:'Yields up over the last {n} harvests. Keep it up!',
+    pat_top_bed_title:'{name}: very productive bed',
+    pat_top_bed_text:'{pct}% of estimated yields achieved. This bed is working well.',
+    pat_low_bed_title:'{name}: low-productivity bed',
+    pat_low_bed_text:'Only {pct}% of forecasts reached over {conf}. Analyse soil and rotation.',
+    pat_rotation_title:'Repetitive rotation \u2014 {name}',
+    pat_rotation_text:'{n} family/ies repeated: {fams}. Risk of soil fatigue.',
+    pat_late_title:'{name}: often late harvests',
+    pat_late_text:'You harvest on average in {avg} vs {est} estimated. Watch for ripeness earlier.',
+    pat_density_title:'{name}: density possibly too high',
+    pat_density_text:'Recurring low yield and long cycles. Try wider spacing or fewer plants.',
+    pat_bed_full_title:'{name}: recurring overload',
+    pat_bed_full_text:'This bed has been heavily loaded over {n} seasons. Consider enlarging it or spreading crops.',
+    pat_bac_pref_title:'{name} prefers {bed}',
+    pat_bac_pref_text:'{pct}% yield in this space vs {pct2}% elsewhere. Focus plantings there.',
+
+    // ── Progression block (learning-render) ──
+    lrn_prog_no_data:'Not enough data to analyse progression.',
+    lrn_prog_title_section:'Seasonal progression',
+    lrn_prog_up:'Improvement',
+    lrn_prog_down:'Decline',
+    lrn_prog_stable:'Stable',
+    lrn_prog_season_row:'Season {s}: {pct}% of estimated yield',
+    lrn_prog_vs_prev:'{trend} vs {prev} ({diff}%)',
+    lrn_prog_total_row:'Total harvests: {n} ({kg}\u00a0kg)',
+
+    // ── Actionable insights block (learning-render) ──
+    lrn_insights_none:'No particular insight at the moment.',
+    lrn_insights_title:'\uD83D\uDCA1 Actionable insights',
+
+    // ── Predictive section (analysis) ──
+    pred_section_yield:'Season yield',
+    pred_lbl_harvested:'Harvested',
+    pred_lbl_projected:'Projected',
+    pred_lbl_total:'Total',
+    pred_kg_est:'kg est.',
+    pred_today:'Today',
+    pred_tomorrow:'Tomorrow',
+    pred_in_days:'in {n}d',
+  }
+};
+
+/** Traduit une clé. Fallback: fr, puis la clé brute. */
+function t(key) {
+  var lang;
+  // Use getAppState (direct access, no Proxy) when available (after core.js loads)
+  if (typeof getAppState === 'function') {
+    lang = getAppState('language');
+  } else if (typeof _APP !== 'undefined') {
+    lang = _APP.language;
+  }
+  lang = lang || 'fr';
+  return (I18N[lang] && I18N[lang][key]) || (I18N.fr && I18N.fr[key]) || key;
+}
+
 /**
- * Green Vibes — service-worker.js
- * Version : 2.0.0
- *
- * Corrections v2 vs v1 :
- *   - Chemins RELATIFS (sans / préfixe) — compatibles tout hébergement
- *   - 12 nouveaux fichiers ajoutés (intelligence, risk-engine, opportunities,
- *     profiles, profile-rules, logo.svg, 6 icônes PNG)
- *   - CACHE_NAME incrémenté → invalide proprement le cache v1
- *   - Fallback offline corrigé (chemin relatif)
- *   - Stratégie Network First pour météo (inchangée)
- *
- * Stratégie : Cache First pour tous les assets statiques.
- *             Network Only pour les APIs météo (jamais en cache).
+ * Traduit un nom de légume (stocké en FR dans data.js).
+ * Utilise un dictionnaire FR→EN embarqué.
  */
+var _VEGGIE_EN = {
+  'Tomate':'Tomato','Poivron':'Bell pepper','Aubergine':'Eggplant',
+  'Piment':'Chili pepper','Pomme de terre':'Potato',
+  'Courgette':'Zucchini','Concombre':'Cucumber','Melon':'Melon',
+  'Potiron':'Pumpkin','Potimarron':'Red kuri squash','Pasteque':'Watermelon',
+  'Courge butternut':'Butternut squash',
+  'Salade':'Lettuce','Chicorie':'Chicory','Endive':'Endive',
+  'Topinambour':'Jerusalem artichoke','Estragon':'Tarragon','Artichaut':'Artichoke',
+  'Radis':'Radish','Chou':'Cabbage','Navet':'Turnip','Roquette':'Arugula',
+  'Cresson':'Watercress','Kale':'Kale','Pak choi':'Bok choy',
+  'Radis noir':'Black radish','Chou-fleur':'Cauliflower','Brocoli':'Broccoli',
+  'Chou rouge':'Red cabbage','Chou de Bruxelles':'Brussels sprouts',
+  'Carotte':'Carrot','Persil':'Parsley','Celeri-rave':'Celeriac',
+  'Panais':'Parsnip','Aneth':'Dill','Coriandre':'Coriander',
+  'Fenouil':'Fennel','Celeri branche':'Celery',
+  'Oignon':'Onion','Poireau':'Leek','Ail':'Garlic',
+  'Echalote':'Shallot','Ciboulette':'Chives',
+  'Haricot':'Bean','Petit pois':'Garden pea','Feve':'Broad bean',
+  'Pois gourmand':'Sugar snap pea','Haricot vert':'Green bean',
+  'Pois mange-tout':'Snow pea',
+  'Epinard':'Spinach','Betterave':'Beetroot','Blette':'Swiss chard',
+  'Mache':'Lamb\'s lettuce',
+  'Basilic':'Basil','Menthe':'Mint','Thym':'Thyme','Romarin':'Rosemary',
+  'Sauge':'Sage','Origan':'Oregano',
+  'Fraise':'Strawberry','Framboise':'Raspberry',
+  'Mais doux':'Sweet corn','Patate douce':'Sweet potato',
+  'Asperge':'Asparagus','Groseille':'Currant'
+};
 
-var CACHE_NAME    = 'gv-v48';
-var CACHE_VERSION = '38.0.0';
-
-// ---- Assets statiques à mettre en cache (chemins RELATIFS) ----
-// Important : pas de / en préfixe — fonctionne quel que soit
-// le sous-dossier ou le protocole d'hébergement (file://, http://, etc.)
-var STATIC_ASSETS = [
-  'index.html',
-
-  // Styles
-  'style.css',
-
-  // Scripts core
-  'app.js',
-  'core.js',
-  'data.js',
-  'ui-menu-plus.js',
-
-  // Utils
-  'utils/storage.js',
-  'utils/weather.js',
-  'utils/calculations.js',
-
-  // Modules — chargés dans l'ordre de index.html
-  'modules/i18n.js',
-  'modules/learning.js',
-  'modules/learning-memory.js',
-  'modules/learning-history.js',
-  'modules/learning-calculations.js',
-  'modules/learning-render.js',
-  'modules/learning-notifications.js',
-  'modules/learning-insights.js',
-  'modules/notifications.js',
-  'modules/onboarding.js',
-  'modules/predictive.js',
-  'modules/dashboard.js',
-  'modules/beds.js',
-  'modules/crops.js',
-  'modules/planning.js',
-  'modules/analysis.js',
-  'modules/settings.js',
-  'modules/calendar.js',
-
-  // Modules intelligence (ajoutés v22)
-  'modules/intelligence.js',
-  'modules/risk-engine.js',
-  'modules/opportunities.js',
-
-  // Modules profils (ajoutés v22)
-  'modules/profiles.js',
-  'modules/profile-rules.js',
-
-  // Modules utilitaires
-  'modules/export.js',
-  'modules/backup.js',
-  'modules/pwa.js',
-
-  // Assets visuels
-  'assets/garden-visuals.js',
-  'assets/veggie-visuals.js',
-
-  // Photos dashboard (converties en WebP v31)
-  'assets/heros-meteo.webp',
-  'assets/carte-mon-jardin.webp',
-  'assets/carte-culture.webp',
-  'assets/carte-action.webp',
-
-  // Photos multi-pages (converties en WebP v31)
-  'assets/vue-potager.webp',
-  'assets/lifestyle-lits.webp',
-  'assets/recolte-panier.webp',
-  'assets/gros-plan-tomate.webp',
-  'assets/semis-jeunes.webp',
-  'assets/feuille-malade.webp',
-  'assets/matin-brumeux.webp',
-  'manifest.json',
-  'logo.svg',
-
-  // Icônes PWA (ajoutées étape 1)
-  'icon-72.png',
-  'icon-96.png',
-  'icon-128.png',
-  'icon-144.png',
-  'icon-192.png',
-  'icon-512.png'
-];
-
-// ---- Domaines réseau uniquement (jamais mis en cache) ----
-var NETWORK_ONLY_DOMAINS = [
-  'api.open-meteo.com',
-  'geocoding-api.open-meteo.com',
-  'fonts.googleapis.com',
-  'fonts.gstatic.com'
-];
-
-
-// ========== INSTALLATION ==========
-// Mise en cache de tous les assets au premier chargement.
-// On utilise Promise.allSettled pour ne pas bloquer si un fichier
-// est temporairement indisponible — l'app se dégrade gracieusement.
-self.addEventListener('install', function(event) {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(function(cache) {
-      return Promise.allSettled(
-        STATIC_ASSETS.map(function(url) {
-          return cache.add(url).catch(function() {});
-        })
-      );
-    })
-  );
-  self.skipWaiting();
-});
-
-
-// ========== ACTIVATION ==========
-// Supprime tous les anciens caches (gvp-v1, etc.) pour libérer de l'espace
-// et éviter des conflits de version.
-self.addEventListener('activate', function(event) {
-  event.waitUntil(
-    caches.keys().then(function(keys) {
-      return Promise.all(
-        keys
-          .filter(function(key) { return key !== CACHE_NAME; })
-          .map(function(key) { return caches.delete(key); })
-      );
-    }).then(function() {
-      return self.clients.claim();
-    })
-  );
-});
-
-
-// ========== INTERCEPTION DES REQUÊTES ==========
-self.addEventListener('fetch', function(event) {
-  var url;
-  try {
-    url = new URL(event.request.url);
-  } catch(e) {
-    // URL invalide — laisser passer
-    return;
+/** Traduit un nom de légume selon la langue active. */
+function tVeg(frName) {
+  var lang;
+  if (typeof getAppState === 'function') {
+    lang = getAppState('language');
+  } else if (typeof _APP !== 'undefined') {
+    lang = _APP.language;
   }
-
-  // ---- Domaines réseau uniquement → pas d'interception ----
-  var isNetworkOnly = NETWORK_ONLY_DOMAINS.some(function(domain) {
-    return url.hostname.includes(domain);
-  });
-  if (isNetworkOnly) {
-    return; // Le browser gère la requête directement
-  }
-
-  // ---- Requêtes non-GET → pas d'interception ----
-  if (event.request.method !== 'GET') {
-    return;
-  }
-
-  // ---- Cache First avec fallback réseau ----
-  event.respondWith(
-    caches.match(event.request).then(function(cached) {
-
-      // Trouvé en cache → servir immédiatement
-      if (cached) {
-        return cached;
-      }
-
-      // Pas en cache → aller chercher sur le réseau
-      return fetch(event.request).then(function(response) {
-
-        // Mettre en cache si réponse valide
-        if (
-          response &&
-          response.status === 200 &&
-          response.type !== 'opaque' // Ne pas cacher les réponses cross-origin opaques
-        ) {
-          var responseClone = response.clone();
-          caches.open(CACHE_NAME).then(function(cache) {
-            cache.put(event.request, responseClone);
-          });
-        }
-
-        return response;
-
-      }).catch(function() {
-        // Hors ligne + pas en cache
-        // Pour les navigations → renvoyer index.html depuis le cache
-        if (event.request.mode === 'navigate') {
-          return caches.match('index.html').then(function(fallback) {
-            if (fallback) {
-              return fallback;
-            }
-            // index.html pas en cache non plus → réponse d'erreur minimale
-            return new Response(
-              '<!DOCTYPE html><html><head><meta charset="utf-8">' +
-              '<meta name="viewport" content="width=device-width">' +
-              '<title>My Garden Side</title></head><body>' +
-              '<div style="font-family:sans-serif;text-align:center;padding:60px 20px;">' +
-              '<div style="font-size:3rem;margin-bottom:16px;">🌱</div>' +
-              '<h2 style="color:#0B5D47;margin-bottom:8px;">My Garden Side</h2>' +
-              '<p style="color:#6B7A66;margin-bottom:24px;">Connexion requise pour le premier chargement.</p>' +
-              '<p style="color:#9aab94;font-size:0.85rem;">Reconnectez-vous pour accéder à votre jardin.</p>' +
-              '</div></body></html>',
-              {
-                status: 503,
-                statusText: 'Service Unavailable',
-                headers: { 'Content-Type': 'text/html; charset=utf-8' }
-              }
-            );
-          });
-        }
-
-        // Pour les autres ressources (JS, CSS, images) → erreur silencieuse
-        return new Response('', { status: 503, statusText: 'Offline' });
-      });
-    })
-  );
-});
+  lang = lang || 'fr';
+  if (lang === 'fr') return frName;
+  return _VEGGIE_EN[frName] || frName;
+}
