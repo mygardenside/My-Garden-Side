@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Garden Side</title>
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0B5D47">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="My Garden Side">
+<link rel="icon" href="icon-192.png" sizes="192x192">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!-- ========== SPLASH SCREEN ========== -->
+<div id="splashScreen" class="splash-screen">
+  <div class="splash-inner">
+    <img src="icon-192.png" alt="" class="splash-logo-img">
+    <h1 class="splash-title">My Garden Side</h1>
+    <p class="splash-sub">Votre jardin intelligent</p>
+    <div class="splash-dots">
+      <span class="splash-dot"></span>
+      <span class="splash-dot"></span>
+      <span class="splash-dot"></span>
+    </div>
+  </div>
+</div>
+<!-- ========== HEADER ========== -->
+<header class="app-header">
+  <button class="header-back" id="headerBack" onclick="goBack()">&#8249;</button>
+  <button class="header-hamburger" id="headerHamburger" onclick="togglePlusMenu()" aria-label="Menu">
+    <span class="hbg-line"></span>
+    <span class="hbg-line"></span>
+    <span class="hbg-line"></span>
+  </button>
+  <div class="header-logo-wrap" id="headerLogoWrap">
+    <div class="header-brand-icon" aria-hidden="true">
+      <img src="icon-192.png" alt="" class="header-brand-img">
+    </div>
+    <h1 id="headerTitle" class="header-title-text">My Garden Side</h1>
+  </div>
+<span class="header-season" id="headerSeason"></span>
+</header>
+<!-- ========== PAGES ========== -->
+<main id="appMain">
+  <div class="page" id="pageDashboard"></div>
+  <div class="page" id="pageBeds"></div>
+  <div class="page" id="pageCrops"></div>
+  <div class="page" id="pageToday"></div>
+  <div class="page" id="pageCalendar"></div>
+  <div class="page" id="pagePlanning"></div>
+  <div class="page" id="pageAnalysis"></div>
+  <div class="page" id="pageSettings"></div>
+  <div class="page" id="pageNotifications"></div>
+  <div class="page" id="pageAi"></div>
+  <div class="page" id="pageVeggieref"></div>
+</main>
+<!-- ========== BOTTOM NAV ========== -->
+<nav class="bottom-nav">
+  <button class="nav-item active" data-page="dashboard" onclick="navigate('dashboard')">
+    <div class="nav-icon-wrap"><span class="nav-icon">🏠</span></div><span data-i18n="nav_home">Accueil</span>
+  </button>
+  <button class="nav-item" data-page="beds" onclick="navigate('beds')">
+    <div class="nav-icon-wrap"><span class="nav-icon">🌿</span></div><span data-i18n="nav_beds">Mon jardin</span>
+  </button>
+  <button class="nav-item" data-page="today" onclick="navigate('today')">
+    <div class="nav-icon-wrap"><span class="nav-icon">☀️</span></div><span data-i18n="nav_today">Aujourd'hui</span>
+  </button>
+  <button class="nav-item" data-page="calendar" onclick="navigate('calendar')">
+    <div class="nav-icon-wrap"><span class="nav-icon">📅</span></div><span data-i18n="nav_calendar">Calendrier</span>
+  </button>
+</nav>
+
+<!-- ========== MENU HAMBURGER (dropdown premium) ========== -->
+<div class="plus-overlay" id="plusOverlay" onclick="closePlusMenu(event)">
+  <div class="hbg-dropdown">
+    <div class="hbg-menu-item" onclick="navigateFromPlus('crops')">
+      <span class="hbg-menu-icon">🥬</span>
+      <span class="hbg-menu-label" data-i18n="nav_crops">Cultures</span>
+      <span class="hbg-menu-arrow">›</span>
+    </div>
+    <div class="hbg-menu-item" onclick="navigateFromPlus('planning')">
+      <span class="hbg-menu-icon">📊</span>
+      <span class="hbg-menu-label" data-i18n="nav_planning">Planning</span>
+      <span class="hbg-menu-arrow">›</span>
+    </div>
+    <div class="hbg-menu-item" onclick="navigateFromPlus('analysis')">
+      <span class="hbg-menu-icon">📈</span>
+      <span class="hbg-menu-label" data-i18n="nav_analysis">Analyse</span>
+      <span class="hbg-menu-arrow">›</span>
+    </div>
+    <div class="hbg-menu-item" onclick="navigateFromPlus('ai')">
+      <span class="hbg-menu-icon">🧠</span>
+      <span class="hbg-menu-label" data-i18n="nav_ai">AI</span>
+      <span class="hbg-menu-arrow">›</span>
+    </div>
+    <div class="hbg-menu-item" onclick="navigateFromPlus('veggieref')">
+      <span class="hbg-menu-icon">🥦</span>
+      <span class="hbg-menu-label" data-i18n="nav_veggieref">Référentiel légumes</span>
+      <span class="hbg-menu-arrow">›</span>
+    </div>
+    <div class="hbg-menu-item" onclick="navigateFromPlus('notifications')">
+      <span class="hbg-menu-icon">🔔</span>
+      <span class="hbg-menu-label" data-i18n="nav_notifications">Notifications</span>
+      <span class="hbg-menu-arrow">›</span>
+    </div>
+    <div class="hbg-menu-item" onclick="navigateFromPlus('settings')">
+      <span class="hbg-menu-icon">⚙️</span>
+      <span class="hbg-menu-label" data-i18n="nav_settings">Réglages</span>
+      <span class="hbg-menu-arrow">›</span>
+    </div>
+  </div>
+</div>
+<!-- ========== MODAL ========== -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modalContent"></div>
+</div>
+<!-- ========== FAB ========== -->
+<button class="fab" id="fab" onclick="handleFab()" style="display:none;">+</button>  <!-- ===================================================
+       MY GARDEN SIDE — Ordre de chargement scripts
+       Règle : chaque fichier ne dépend que des fichiers
+       chargés AVANT lui. Ne pas modifier cet ordre.
+       =================================================== -->
+
+  <!-- 0. ASSETS VISUELS (SVG inline, pas de dépendances) -->
+  <script src="assets/garden-visuals.js"></script>
+  <script src="assets/veggie-visuals.js"></script>
+
+  <!-- 1. DONNÉES STATIQUES (pas de dépendances) -->
+  <script src="data.js"></script>
+
+  <!-- 2. INTERNATIONALISATION (dépend de : rien) -->
+  <script src="modules/i18n.js"></script>
+
+  <!-- 3. PERSISTANCE (dépend de : APP dans core.js → chargé avant via window) -->
+  <script src="utils/storage.js"></script>
+
+  <!-- 4. MÉTÉO (dépend de : APP, escH) -->
+  <script src="utils/weather.js"></script>
+
+  <!-- 5. CALCULS MÉTIER (dépend de : APP, data.js) -->
+  <script src="utils/calculations.js"></script>
+
+  <!-- 6. MOTEUR D'APPRENTISSAGE (dépend de : calculations, storage) -->
+  <script src="modules/learning.js"></script>
+  <script src="modules/learning-memory.js"></script>
+  <script src="modules/learning-history.js"></script>
+  <script src="modules/learning-calculations.js"></script>
+  <script src="modules/learning-render.js"></script>
+  <script src="modules/learning-notifications.js"></script>
+  <script src="modules/learning-insights.js"></script>
+
+  <!-- 7. MODULES SECONDAIRES (dépend de : learning, calculations) -->
+  <script src="modules/notifications.js"></script>
+  <script src="modules/onboarding.js"></script>
+  <script src="modules/predictive.js"></script>
+
+  <!-- 8. MODULES PAGES (dépend de : tout ce qui précède) -->
+  <script src="modules/dashboard.js"></script>
+  <script src="modules/beds.js"></script>
+  <script src="modules/crops.js"></script>
+  <script src="modules/planning.js"></script>
+  <script src="modules/analysis.js"></script>
+  <script src="modules/settings.js"></script>
+  <script src="modules/calendar.js"></script>
+
+  <!-- 8b. COUCHE INTELLIGENCE MÉTIER (dépend de : learning, calculations, weather) -->
+  <script src="modules/intelligence.js"></script>
+  <script src="modules/risk-engine.js"></script>
+  <script src="modules/opportunities.js"></script>
+
+  <!-- 8c. COUCHE PROFILS UTILISATEUR (dépend de : APP, learning) -->
+  <script src="modules/profiles.js"></script>
+  <script src="modules/profile-rules.js"></script>
+
+  <!-- 9. CORE : APP state + navigation + init — TOUJOURS EN DERNIER -->
+  <script src="core.js"></script>
+
+  <!-- 10. MODULES PUBLICATION (export, backup, pwa — après core) -->
+  <script src="modules/export.js"></script>
+  <script src="modules/backup.js"></script>
+  <script src="modules/pwa.js"></script>
+
+  <!-- 11. BOOTSTRAP (documentation uniquement, aucune logique) -->
+  <script src="app.js"></script>
+
+  <!-- 12. TESTS (optionnel, pour développement) -->
+  <!-- La charge automatique de tests est désactivée en runtime normal. -->
+  <!-- Pour debug manuel, décommentez la ligne suivante ou exécutez runTests() depuis la console. -->
+  <!-- <script src="tests.js"></script> -->
+</body>
+</html>
