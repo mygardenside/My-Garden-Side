@@ -204,12 +204,17 @@ var GeoCalendar = (function () {
         indoorMonths.push(_doyToMonth(indoorDOY));
       }
 
-      // Plantation extérieure : après dernière gelée, quand le sol EST assez chaud
-      // _soilEst() applique l'inertie thermique (délai de 3-4 semaines)
-      for (var pm2 = lastFrostMonth; pm2 <= lastFrostMonth + 3; pm2++) {
+      // Plantation extérieure : après dernière gelée, quand le sol EST assez chaud.
+      // Les transplants (indoorWeeks > 0) tolèrent ~3°C de moins que le seuil de
+      // germination stricte (le plant est déjà établi, pas une graine nue).
+      var soilThreshold = pheno.indoorWeeks > 0
+        ? Math.max(10, pheno.minSoilTemp - 3)
+        : pheno.minSoilTemp;
+      // Boucle jusqu'à +5 mois depuis la dernière gelée (couvre mai-juillet pour Seysses)
+      for (var pm2 = lastFrostMonth; pm2 <= lastFrostMonth + 5; pm2++) {
         var mo       = _addM(pm2, 0);
         var soilEst2 = _soilEst(monthly, mo - 1);
-        if (soilEst2 >= pheno.minSoilTemp) plantMonths.push(mo);
+        if (soilEst2 >= soilThreshold) plantMonths.push(mo);
       }
 
       // Vérification GDD disponibles sur la saison
@@ -258,8 +263,11 @@ var GeoCalendar = (function () {
       // Inertie thermique : sol suit l'air avec 3-4 sem de délai
       var soilEst = _soilEst(monthly, m - 1);
       var tmean   = mt.tmean;
-      // tmean >= 3 : sol travaillable ; soilEst >= minSoilTemp : germination possible
-      if (soilEst >= pheno.minSoilTemp && tmean >= 3 && tmean <= maxAirTemp) {
+      // Risque de montée-en-graine : utilise la moyenne tmean+tmax (plus représentative
+      // des pics de chaleur journaliers que le simple tmean)
+      var heatIndex = (mt.tmean + mt.tmax) / 2;
+      // tmean >= 3 : sol travaillable ; heatIndex <= maxAirTemp : pas de bolting
+      if (soilEst >= pheno.minSoilTemp && tmean >= 3 && heatIndex <= maxAirTemp) {
         plantMonths.push(m);
         var dailyGdd = Math.max(0.5, (mt.tmax + mt.tmin) / 2 - pheno.gddBase);
         var days     = Math.ceil(pheno.gddRequired / dailyGdd);
@@ -278,8 +286,6 @@ var GeoCalendar = (function () {
     var indoorWeeks   = pheno.indoorWeeks || 0;
     var lastFrostDOY  = climate.lastFrostDOY;
     var firstFrostDOY = climate.firstFrostDOY;
-    // Plancher pratique : 8°C pour éviter une germination trop aléatoire en plein air
-    var minSoil = Math.max(pheno.minSoilTemp, 8);
 
     // Semis intérieur stocké séparément (ne doit pas figurer en "plantation extérieure")
     if (indoorWeeks > 0 && lastFrostDOY) {
@@ -287,11 +293,16 @@ var GeoCalendar = (function () {
       indoorMonths.push(_doyToMonth(indoorDOY));
     }
 
-    for (var m = 1; m <= 12; m++) {
+    // Pour les cultures avec semis intérieur, la plantation extérieure ne commence
+    // qu'à partir de la dernière gelée (le transplant est prêt à ce moment-là).
+    // Pour les semis directs, on part du mois 1 (hiver possible pour résistants au gel).
+    var startM = (indoorWeeks > 0 && lastFrostDOY) ? _doyToMonth(lastFrostDOY) : 1;
+
+    for (var m = startM; m <= 12; m++) {
       var mt2      = monthly[m - 1];
       // Inertie thermique : sol suit l'air avec 3-4 sem de délai
       var soilEst2 = _soilEst(monthly, m - 1);
-      if (soilEst2 >= minSoil) {
+      if (soilEst2 >= pheno.minSoilTemp) {
         var mo = m;
         if (firstFrostDOY) {
           var ffm = _doyToMonth(firstFrostDOY);
