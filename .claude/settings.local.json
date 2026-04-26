@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node --check modules/planning.js)",
+      "Bash(node --check \"c:/Users/BESSE/Desktop/green vibes/modules/planning.js\")",
+      "Bash(python3)",
+      "Bash(python3 -c ':*)",
+      "Bash(grep -r \"getStageName\\\\|tVeg\\\\|escH\\\\|getAppState\\\\|updateAppState\" modules/*.js --files-with-matches)",
+      "Bash(grep -n \"function getStageName\\\\|function tVeg\\\\|function escH\\\\|function getAppState\\\\|function t\\(\" modules/*.js utils/*.js)",
+      "Bash(grep -r \"plan_lbl_young_plant\\\\|plan_lbl_seed\\\\|plan_lbl_mode\\\\|plan_lbl_mode_plants\\\\|plan_lbl_mode_surface\\\\|plan_lbl_qty_plants\\\\|plan_lbl_qty_surface\\\\|plan_lbl_spacing\\\\|btn_add_label\\\\|btn_edit_label\" modules/*.js --files-with-matches)",
+      "Bash(grep -n \"function renderNotifications\\\\|function renderToday\\\\|function renderAnalysis\\\\|function renderPlanning\\\\|function refreshCropStatuses\" modules/*.js)",
+      "Bash(ls -la modules/*.js)",
+      "Bash(ls modules/*.js)"
+    ]
+  }
+}

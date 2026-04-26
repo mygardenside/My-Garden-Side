@@ -302,16 +302,29 @@ var ClimateModule = (function () {
       var frostL  = c.lastFrostDOY  ? _doyToStr(c.lastFrostDOY, lng)  : t('settings_climate_none_frost');
       var frostF  = c.firstFrostDOY ? _doyToStr(c.firstFrostDOY, lng) : t('settings_climate_none_frost');
       var season  = c.growingSeasonDays + (lng === 'en' ? ' days' : ' jours');
-      var koppen  = c.koppen + ' — ' + self.koppenLabel(c.koppen);
+      var koppenLabel = self.koppenLabel(c.koppen);
+      var gddLabel = (function() {
+        var g = c.gdd10Annual || 0;
+        if (lng === 'en') {
+          if (g < 800)  return 'Cool season (' + g + ')';
+          if (g < 1500) return 'Moderate (' + g + ')';
+          if (g < 2500) return 'Warm season (' + g + ')';
+          return 'Hot season (' + g + ')';
+        }
+        if (g < 800)  return 'Fraîche (' + g + ')';
+        if (g < 1500) return 'Modérée (' + g + ')';
+        if (g < 2500) return 'Chaude (' + g + ')';
+        return 'Très chaude (' + g + ')';
+      }());
 
       row('🏔️', 'settings_climate_altitude',  altStr);
-      row('🌡️', 'settings_climate_zone',      koppen);
-      row('🛡️', 'settings_climate_hardiness', 'USDA ' + c.hardinessZone);
+      row('🌡️', 'settings_climate_zone',      koppenLabel);
+      row('🛡️', 'settings_climate_hardiness', 'Zone ' + c.hardinessZone);
       row('❄️',       'settings_climate_lastfrost',  frostL);
       row('🍂',       'settings_climate_firstfrost', frostF);
       row('🌱',       'settings_climate_season',     season);
       row('🌧️', 'settings_climate_rain',       c.avgAnnualRainfall + ' mm');
-      row('☀️',       'settings_climate_gdd',        c.gdd10Annual + ' GDD');
+      row('☀️',       'settings_climate_gdd',        gddLabel);
 
       var updStr = '';
       if (c.fetchedAt) {

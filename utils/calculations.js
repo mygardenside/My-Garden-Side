@@ -245,8 +245,8 @@ function getRotationBadge(bed) {
     var body;
     if (a.humidRisk) {
       body = isEn
-        ? 'Your climate (' + a.koppen + ') increases residual disease risk: ' + a.disease + '. Recommended rest: <strong>' + a.restYears + ' years</strong>.'
-        : 'Votre climat (' + a.koppen + ') aggrave le risque résiduel : ' + a.disease + '. Repos recommandé : <strong>' + a.restYears + ' ans</strong>.';
+        ? 'Your humid climate increases residual disease risk: ' + a.disease + '. Recommended rest: <strong>' + a.restYears + ' years</strong>.'
+        : 'Votre zone humide aggrave le risque résiduel : ' + a.disease + '. Repos recommandé : <strong>' + a.restYears + ' ans</strong>.';
     } else {
       body = isEn
         ? 'Risk of ' + a.disease + '. Recommended rest: <strong>' + a.restYears + ' years</strong>.'

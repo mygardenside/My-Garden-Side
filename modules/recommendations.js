@@ -141,8 +141,8 @@ var RecommendationsModule = (function () {
     return {
       priority: 2,
       icon: '⏱️',
-      title: en ? 'Short growing season' : 'Saison trop courte',
-      body: (en ? 'May not have enough GDD to mature: ' : 'GDD insuffisants pour mûrir : ') +
+      title: en ? 'Season too short for some crops' : 'Saison trop courte pour certaines cultures',
+      body: (en ? 'May not get warm enough long enough to mature: ' : 'Risque de ne pas mûrir avant les gelées : ') +
             struggling.slice(0, 3).join(', ') +
             (en ? '. Prefer short-season varieties.' : '. Préférez des variétés hâtives.'),
       action: 'crops',

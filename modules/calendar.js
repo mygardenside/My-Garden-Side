@@ -1136,25 +1136,30 @@ function ouvrirFicheVeggie(veggieId) {
         var _suf    = GeoCalendar.isSeasonSufficient(veg, _climate);
         var _koppen = _climate.koppen || '';
         var _icon, _color, _msg;
+        var _pct = Math.round(_suf.ratio * 100);
         if (!_suf.ok) {
           _icon = '⚠️'; _color = '#b05000';
           _msg  = _isEn
-            ? 'Season too short: ' + _suf.gddAccumulated + ' / ' + _suf.gddRequired + ' GDD. Choose an early-season variety.'
-            : 'Saison trop courte : ' + _suf.gddAccumulated + ' / ' + _suf.gddRequired + ' GDD. Préférez une variété hâtive.';
+            ? 'Your season covers only ' + _pct + '% of this crop\'s heat needs. Choose an early-season variety.'
+            : 'Votre saison couvre seulement ' + _pct + '% des besoins en chaleur de cette culture. Préférez une variété hâtive.';
         } else if (_suf.ratio < 1.3) {
           _icon = '⏱️'; _color = '#7a5a00';
           _msg  = _isEn
-            ? 'Season just sufficient: ' + _suf.gddAccumulated + ' / ' + _suf.gddRequired + ' GDD. Plant as early as possible.'
-            : 'Saison juste suffisante : ' + _suf.gddAccumulated + ' / ' + _suf.gddRequired + ' GDD. Plantez dès que possible.';
+            ? 'Season just long enough (' + _pct + '% of heat needs met). Plant as early as possible.'
+            : 'Saison tout juste suffisante (' + _pct + '% des besoins en chaleur). Plantez dès que possible.';
         } else {
           _icon = '✅'; _color = '#2d7a3a';
           _msg  = _isEn
-            ? 'Season well suited — ' + _suf.gddAccumulated + ' GDD available.'
-            : 'Saison bien adaptée — ' + _suf.gddAccumulated + ' GDD disponibles.';
+            ? 'Your season is well suited to this crop (' + _pct + '% of heat needs met).'
+            : 'Votre saison convient bien à cette culture (' + _pct + '% des besoins en chaleur couverts).';
         }
+        var _koppenLabel = (typeof ClimateModule !== 'undefined' && _koppen)
+          ? ClimateModule.koppenLabel(_koppen) : '';
         var _note = (cal && cal.adjusted)
           ? '<div style="margin-top:3px;font-size:0.75rem;color:#666;">📍 ' +
-            (_isEn ? 'Calendar adapted to your climate (' + _koppen + ').' : 'Calendrier adapté à votre profil (' + _koppen + ').') +
+            (_isEn
+              ? 'Calendar adapted to your location' + (_koppenLabel ? ' (' + _koppenLabel + ')' : '') + '.'
+              : 'Calendrier adapté à votre localisation' + (_koppenLabel ? ' (' + _koppenLabel + ')' : '') + '.') +
             '</div>'
           : '';
         gddHtml = '<div style="margin-top:10px;padding:9px 12px;background:#f4fbf4;border-left:3px solid ' + _color + ';border-radius:6px;font-size:0.82rem;">' +

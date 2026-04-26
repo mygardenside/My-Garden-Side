@@ -175,13 +175,13 @@ var I18N = {
     settings_climate_none_frost:'Aucune',
     settings_climate_unknown:'Inconnue',
     settings_climate_altitude:'Altitude',
-    settings_climate_zone:'Zone climatique',
-    settings_climate_hardiness:'Zone de rusticité',
+    settings_climate_zone:'Type de climat',
+    settings_climate_hardiness:'Résistance au froid',
     settings_climate_lastfrost:'Dernière gelée printanière',
     settings_climate_firstfrost:'Première gelée automnale',
     settings_climate_season:'Saison de jardinage',
     settings_climate_rain:'Pluie annuelle',
-    settings_climate_gdd:'Degrés-jours de croissance',
+    settings_climate_gdd:'Chaleur estivale',
     settings_climate_updated:'Calculé le',
 
     // ── Export / Import ──
@@ -1032,13 +1032,13 @@ var I18N = {
     settings_climate_none_frost:'None',
     settings_climate_unknown:'Unknown',
     settings_climate_altitude:'Altitude',
-    settings_climate_zone:'Climate zone',
-    settings_climate_hardiness:'Hardiness zone',
+    settings_climate_zone:'Climate type',
+    settings_climate_hardiness:'Frost tolerance',
     settings_climate_lastfrost:'Last spring frost',
     settings_climate_firstfrost:'First fall frost',
     settings_climate_season:'Growing season',
     settings_climate_rain:'Annual rainfall',
-    settings_climate_gdd:'Growing degree days',
+    settings_climate_gdd:'Summer warmth',
     settings_climate_updated:'Calculated on',
 
     // ── Export / Import ──
