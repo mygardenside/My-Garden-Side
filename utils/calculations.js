@@ -221,10 +221,46 @@ function getRotationScore(bed) {
   return { score: 'bad', repeated: repeated };
 }
 function getRotationBadge(bed) {
-  var r = getRotationScore(bed);
-  if (r.score === 'good') return '<span class="badge badge-green">🟢 Rotation OK</span>';
-  if (r.score === 'warning') return '<span class="badge badge-orange">🟠 Attention rotation</span>';
-  return '<span class="badge badge-red">🔴 Rotation mauvaise</span>';
+  var r   = getRotationScore(bed);
+  var lng = typeof getAppState === 'function' ? (getAppState('language') || 'fr') : 'fr';
+  var isEn = lng === 'en';
+
+  var badge;
+  if (r.score === 'good')    badge = '<span class="badge badge-green">🟢 ' + (isEn ? 'Rotation OK' : 'Rotation OK') + '</span>';
+  else if (r.score === 'warning') badge = '<span class="badge badge-orange">🟠 ' + (isEn ? 'Rotation warning' : 'Attention rotation') + '</span>';
+  else                       badge = '<span class="badge badge-red">🔴 '   + (isEn ? 'Poor rotation' : 'Rotation mauvaise') + '</span>';
+
+  // Alertes climatiques (V3.4)
+  if (typeof GeoCalendar === 'undefined') return badge;
+  var alerts = GeoCalendar.getRotationAlert(bed);
+  if (!alerts || !alerts.length) return badge;
+
+  var alertHtml = '<div style="margin-top:10px;">';
+  alerts.forEach(function (a) {
+    var color  = a.humidRisk ? '#b05000' : '#8a6000';
+    var icon   = a.humidRisk ? '💧🔴' : '🔴';
+    var title  = isEn
+      ? icon + ' <strong>' + a.consecutive + ' consecutive seasons</strong> of ' + a.family
+      : icon + ' <strong>' + a.consecutive + ' saisons consécutives</strong> de ' + a.family;
+    var body;
+    if (a.humidRisk) {
+      body = isEn
+        ? 'Your climate (' + a.koppen + ') increases residual disease risk: ' + a.disease + '. Recommended rest: <strong>' + a.restYears + ' years</strong>.'
+        : 'Votre climat (' + a.koppen + ') aggrave le risque résiduel : ' + a.disease + '. Repos recommandé : <strong>' + a.restYears + ' ans</strong>.';
+    } else {
+      body = isEn
+        ? 'Risk of ' + a.disease + '. Recommended rest: <strong>' + a.restYears + ' years</strong>.'
+        : 'Risque de ' + a.disease + '. Repos recommandé : <strong>' + a.restYears + ' ans</strong>.';
+    }
+    alertHtml +=
+      '<div style="margin-top:8px;padding:8px 10px;background:#fff8e6;border-left:3px solid ' + color + ';border-radius:4px;font-size:0.8rem;color:' + color + ';">' +
+        '<div>' + title + '</div>' +
+        '<div style="margin-top:2px;color:#555;">' + body + '</div>' +
+      '</div>';
+  });
+  alertHtml += '</div>';
+
+  return badge + alertHtml;
 }
 
 /** Échappe une chaîne pour attribut HTML onclick (guillemets simples). */

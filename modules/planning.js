@@ -49,7 +49,9 @@ function getPlantableVegetables(month) {
   for (var i = 0; i < vkeys.length; i++) {
     var vid = vkeys[i];
     var veg = APP.vegetables[vid];
-    var cal = getPlantingCalendarForVeggie(veg);
+    var cal = (typeof GeoCalendar !== 'undefined')
+      ? GeoCalendar.getCalendarForVeggie(veg)
+      : getPlantingCalendarForVeggie(veg);
     if (cal && cal.plantMonths && cal.plantMonths.indexOf(month) >= 0) {
       result.push(vid);
     }

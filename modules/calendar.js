@@ -27,8 +27,10 @@ function renderVisualCalendar() {
   for (var i = 0; i < keys.length; i++) {
     var id = keys[i];
     var veg = APP.vegetables[id];
-    var cal = getPlantingCalendarForVeggie(veg);
     if (!veg) continue;
+    var cal = (typeof GeoCalendar !== 'undefined')
+      ? GeoCalendar.getCalendarForVeggie(veg)
+      : getPlantingCalendarForVeggie(veg);
     html += '<tr>';
     // Nom legume
     html += '<td style="text-align:left;padding:4px;">' +
@@ -70,7 +72,9 @@ function renderSimplePlantingCalendar() {
     for (var i = 0; i < keys.length; i++) {
       var id = keys[i];
       var veg = APP.vegetables[id];
-      var cal = getPlantingCalendarForVeggie(veg);
+      var cal = (typeof GeoCalendar !== 'undefined')
+        ? GeoCalendar.getCalendarForVeggie(veg)
+        : getPlantingCalendarForVeggie(veg);
       if (!veg || !cal || !cal.plantMonths) continue;
       if (cal.plantMonths.indexOf(month) >= 0) {
         veggiesForMonth.push({
@@ -1069,7 +1073,9 @@ function ouvrirFicheVeggie(veggieId) {
     }
   }
 
-  var cal = getPlantingCalendarForVeggie(veg);
+  var cal = (typeof GeoCalendar !== 'undefined')
+    ? GeoCalendar.getCalendarForVeggie(veg)
+    : getPlantingCalendarForVeggie(veg);
   var moisLettre = ['J','F','M','A','M','J','J','A','S','O','N','D'];
 
   // ---- Hero premium ----
@@ -1118,6 +1124,47 @@ function ouvrirFicheVeggie(veggieId) {
     '<div class="fiche-cal-legende-item"><div class="fiche-cal-legende-dot" style="background:var(--green-500)"></div>' + t('cal_legend_planting') + '</div>' +
     '<div class="fiche-cal-legende-item"><div class="fiche-cal-legende-dot" style="background:var(--orange)"></div>' + t('cal_legend_harvest') + '</div>' +
   '</div>';
+
+  // ---- Bloc GDD adaptatif (V3.2) ----
+  var _isEn  = (getAppState('language') || 'fr') === 'en';
+  var gddHtml = '';
+  if (typeof GeoCalendar !== 'undefined' && typeof ClimateModule !== 'undefined') {
+    var _climate = ClimateModule.get();
+    if (_climate) {
+      var _pheno = GeoCalendar.getPhenology(veg);
+      if (_pheno) {
+        var _suf    = GeoCalendar.isSeasonSufficient(veg, _climate);
+        var _koppen = _climate.koppen || '';
+        var _icon, _color, _msg;
+        if (!_suf.ok) {
+          _icon = '⚠️'; _color = '#b05000';
+          _msg  = _isEn
+            ? 'Season too short: ' + _suf.gddAccumulated + ' / ' + _suf.gddRequired + ' GDD. Choose an early-season variety.'
+            : 'Saison trop courte : ' + _suf.gddAccumulated + ' / ' + _suf.gddRequired + ' GDD. Préférez une variété hâtive.';
+        } else if (_suf.ratio < 1.3) {
+          _icon = '⏱️'; _color = '#7a5a00';
+          _msg  = _isEn
+            ? 'Season just sufficient: ' + _suf.gddAccumulated + ' / ' + _suf.gddRequired + ' GDD. Plant as early as possible.'
+            : 'Saison juste suffisante : ' + _suf.gddAccumulated + ' / ' + _suf.gddRequired + ' GDD. Plantez dès que possible.';
+        } else {
+          _icon = '✅'; _color = '#2d7a3a';
+          _msg  = _isEn
+            ? 'Season well suited — ' + _suf.gddAccumulated + ' GDD available.'
+            : 'Saison bien adaptée — ' + _suf.gddAccumulated + ' GDD disponibles.';
+        }
+        var _note = (cal && cal.adjusted)
+          ? '<div style="margin-top:3px;font-size:0.75rem;color:#666;">📍 ' +
+            (_isEn ? 'Calendar adapted to your climate (' + _koppen + ').' : 'Calendrier adapté à votre profil (' + _koppen + ').') +
+            '</div>'
+          : '';
+        gddHtml = '<div style="margin-top:10px;padding:9px 12px;background:#f4fbf4;border-left:3px solid ' + _color + ';border-radius:6px;font-size:0.82rem;">' +
+          '<span style="color:' + _color + ';font-weight:600;">' + _icon + ' ' + _msg + '</span>' + _note + '</div>';
+      }
+    } else {
+      gddHtml = '<div style="margin-top:10px;padding:8px 10px;background:#f5f5f5;border-radius:6px;font-size:0.78rem;color:#888;">📍 ' +
+        (_isEn ? 'Add your location in Settings for a climate-adapted calendar.' : 'Ajoutez votre localisation dans Paramètres pour un calendrier adapté.') + '</div>';
+    }
+  }
 
   // ---- Sensibilites ----
   var sensib = veg.sensitivity || {};
@@ -1204,7 +1251,7 @@ function ouvrirFicheVeggie(veggieId) {
   openModal(
     heroHTML +
     statsHTML +
-    '<div class="fiche-section"><div class="fiche-section-titre">' + t('cal_section_calendar') + '</div>' + calHTML + '</div>' +
+    '<div class="fiche-section"><div class="fiche-section-titre">' + t('cal_section_calendar') + '</div>' + calHTML + gddHtml + '</div>' +
     sensibHTML +
     assocHTML +
     maladiesHTML +

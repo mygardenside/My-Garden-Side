@@ -14,8 +14,8 @@
  *             Network Only pour les APIs météo (jamais en cache).
  */
 
-var CACHE_NAME    = 'gv-v48';
-var CACHE_VERSION = '38.0.0';
+var CACHE_NAME    = 'gv-v52';
+var CACHE_VERSION = '42.0.0';
 
 // ---- Assets statiques à mettre en cache (chemins RELATIFS) ----
 // Important : pas de / en préfixe — fonctionne quel que soit
@@ -56,6 +56,7 @@ var STATIC_ASSETS = [
   'modules/analysis.js',
   'modules/settings.js',
   'modules/calendar.js',
+  'modules/geo-calendar.js',
 
   // Modules intelligence (ajoutés v22)
   'modules/intelligence.js',

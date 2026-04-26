@@ -177,15 +177,6 @@ function drawBed(ctx, el, selected) {
   }
   ctx.globalAlpha = 1;
 
-  // Cultures
-  if (el.crops && el.crops.length > 0) {
-    el.crops.forEach(function(crop) {
-      var cx2 = hx + frame + crop.position.x * (w - frame * 2);
-      var cy2 = hy + frame + crop.position.y * (h - frame * 2);
-      renderCropSymbol(ctx, crop.type, cx2, cy2, 4.5);
-    });
-  }
-
   ctx.restore(); // fin clip
 
   // Contour sélection

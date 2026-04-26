@@ -294,21 +294,44 @@ function updateCropDefaultSpace(force) {
   }
 }
 function updateCropAutoHarvest(force) {
-  var vid = document.getElementById('cropVeggie').value;
-  var dp = document.getElementById('cropDatePlant').value;
-  var v = APP.vegetables[vid];
+  var vid  = document.getElementById('cropVeggie').value;
+  var dp   = document.getElementById('cropDatePlant').value;
+  var v    = APP.vegetables[vid];
   var dhEl = document.getElementById('cropDateHarvest');
 
-  if (v && dp) {
-    var harvestDate = new Date(dp);
-    harvestDate.setDate(harvestDate.getDate() + v.daysToHarvest);
+  if (!v || !dp) return;
 
-    if (force || !dhEl.value) {
-      dhEl.value = harvestDate.toISOString().split('T')[0];
-    }
+  // Prédiction GDD si profil climatique disponible
+  var gddDate = null;
+  if (typeof GeoCalendar !== 'undefined' && typeof ClimateModule !== 'undefined') {
+    var _cl = ClimateModule.get();
+    if (_cl) gddDate = GeoCalendar.predictHarvestDate(dp, v, _cl);
+  }
 
-    document.getElementById('cropCalcHint').textContent =
-      t('crops_hint_days').replace('{name}', tVeg(v.name)).replace('{days}', v.daysToHarvest).replace('{yield}', v.yieldPerM2);
+  var harvestDate = gddDate || (function () {
+    var d = new Date(dp);
+    d.setDate(d.getDate() + v.daysToHarvest);
+    return d;
+  }());
+
+  if (force || !dhEl.value) {
+    dhEl.value = harvestDate.toISOString().split('T')[0];
+  }
+
+  var isEn = typeof getAppState === 'function' && getAppState('language') === 'en';
+  var hintEl = document.getElementById('cropCalcHint');
+  if (gddDate) {
+    var days = Math.round((gddDate - new Date(dp)) / 86400000);
+    hintEl.textContent = isEn
+      ? tVeg(v.name) + ' · ' + days + ' days (GDD estimate) · ~' + v.yieldPerM2 + ' kg/m²'
+      : tVeg(v.name) + ' · ' + days + ' j estimés (GDD) · ~' + v.yieldPerM2 + ' kg/m²';
+    hintEl.style.color = 'var(--brand-700, #2d7a3a)';
+  } else {
+    hintEl.textContent = t('crops_hint_days')
+      .replace('{name}', tVeg(v.name))
+      .replace('{days}', v.daysToHarvest)
+      .replace('{yield}', v.yieldPerM2);
+    hintEl.style.color = '';
   }
 }
 function updateCropSpaceHint() {
