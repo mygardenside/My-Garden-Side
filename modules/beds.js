@@ -249,10 +249,24 @@ function renderBedDetail(bedId) {
     '</div></div>' +
     (bed.notes ? '<div style="padding:0 16px 12px;font-size:0.85rem;color:var(--text-light);">' + escH(bed.notes) + '</div>' : '') +
     '</div>' +
-    '<div class="stats-grid" style="grid-template-columns:repeat(3,1fr);">' +
-    '<div class="stat-card"><div class="stat-value">' + occ + '%</div><div class="stat-label">' + t('stat_occupation') + '</div></div>' +
-    '<div class="stat-card"><div class="stat-value">' + healthScore + '</div><div class="stat-label">' + t('beds_stat_health') + '</div></div>' +
-    '<div class="stat-card"><div class="stat-value">' + activeCrops.length + '</div><div class="stat-label">' + t('stat_crops') + '</div></div></div>' +
+    (function () {
+      var irrNeed = typeof IrrigationModule !== 'undefined' ? IrrigationModule.getBedWaterNeed(bed) : null;
+      var isEn = typeof getAppState === 'function' && getAppState('language') === 'en';
+      var irrVal, irrLbl, irrColor;
+      if (!irrNeed) {
+        irrVal = '–'; irrLbl = isEn ? 'Irrigation' : 'Arrosage'; irrColor = '';
+      } else if (!irrNeed.deficit) {
+        irrVal = '✓'; irrLbl = isEn ? 'No deficit' : 'Pas de déficit'; irrColor = 'color:#16a34a;';
+      } else {
+        irrVal = irrNeed.litersPerWeek + ' L'; irrLbl = isEn ? 'Deficit /week' : 'Déficit /sem.'; irrColor = 'color:#d97706;';
+      }
+      return '<div class="stats-grid" style="grid-template-columns:repeat(4,1fr);">' +
+        '<div class="stat-card"><div class="stat-value">' + occ + '%</div><div class="stat-label">' + t('stat_occupation') + '</div></div>' +
+        '<div class="stat-card"><div class="stat-value">' + healthScore + '</div><div class="stat-label">' + t('beds_stat_health') + '</div></div>' +
+        '<div class="stat-card"><div class="stat-value">' + activeCrops.length + '</div><div class="stat-label">' + t('stat_crops') + '</div></div>' +
+        '<div class="stat-card"><div class="stat-value" style="font-size:1rem;' + irrColor + '">' + irrVal + '</div><div class="stat-label">💧 ' + irrLbl + '</div></div>' +
+        '</div>';
+    }()) +
     '<div class="card"><div style="font-weight:700;margin-bottom:8px;">' + t('beds_rotation') + '</div>' +
     getRotationBadge(bed) +
     '<div style="margin-top:8px;"><span style="font-size:0.85rem;font-weight:600;">' + t('beds_families_current') + '</span><br>' +

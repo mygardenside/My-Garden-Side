@@ -51,12 +51,14 @@ async function renderDashboard() {
     var weatherB = _homeWeatherBanner(weather);
     var garden   = _homeGardenSection(data);
     var actions  = _homeActionsSection(data.smartActs, data.tasks);
+    var irrigation = _homeIrrigationCard(data.irr);
     var insight  = _homeInsightSection(weather);
 
     el.innerHTML =
       '<div class="mgs-home fade-in">' +
         hero +
         weatherB +
+        irrigation +
         actions +
         garden +
         insight +
@@ -106,6 +108,7 @@ function calculateDashboardData(weather) {
 
   var tasks = (typeof generateTasks === 'function') ? generateTasks(weather).slice(0, 8) : [];
   var smartActs = (typeof getSmartActions === 'function') ? getSmartActions(weather) : [];
+  var irr = (typeof IrrigationModule !== 'undefined') ? IrrigationModule.getSummary() : null;
 
   return {
     totalBeds: totalBeds,
@@ -115,7 +118,8 @@ function calculateDashboardData(weather) {
     occPct: occPct,
     totalSurf: totalSurf,
     tasks: tasks,
-    smartActs: smartActs
+    smartActs: smartActs,
+    irr: irr,
   };
 }
 
@@ -226,6 +230,40 @@ function _homeWeatherBanner(weather) {
 }
 
 /* ============================================================
+   IRRIGATION CARD (V4.2)
+============================================================ */
+function _homeIrrigationCard(irr) {
+  if (!irr) return ''; // pas de profil climatique
+
+  var isEn   = typeof getAppState === 'function' && getAppState('language') === 'en';
+  var noNeed = !irr.totalLiters;
+
+  var color  = noNeed ? '#16a34a' : (irr.deficitBeds > 2 ? '#dc2626' : '#d97706');
+  var icon   = noNeed ? '💧' : '🌿';
+  var label  = noNeed
+    ? (isEn ? 'No watering needed this week' : 'Pas d\'arrosage nécessaire cette semaine')
+    : (isEn
+        ? '~' + irr.totalLiters + ' L needed this week (' + irr.deficitBeds + ' bed' + (irr.deficitBeds > 1 ? 's' : '') + ')'
+        : '~' + irr.totalLiters + ' L à apporter cette semaine (' + irr.deficitBeds + ' carré' + (irr.deficitBeds > 1 ? 's' : '') + ')');
+
+  return (
+    '<section style="margin:0 16px 10px;padding:10px 14px;background:#fff;border-radius:14px;' +
+    'box-shadow:0 1px 4px rgba(0,0,0,.07);display:flex;align-items:center;gap:10px;">' +
+      '<span style="font-size:1.4rem;flex-shrink:0;">' + icon + '</span>' +
+      '<div style="flex:1;min-width:0;">' +
+        '<div style="font-size:0.72rem;font-weight:600;color:var(--text-light);text-transform:uppercase;letter-spacing:.05em;">' +
+          (isEn ? 'Irrigation' : 'Arrosage') +
+        '</div>' +
+        '<div style="font-size:0.85rem;font-weight:600;color:' + color + ';margin-top:1px;">' +
+          label +
+        '</div>' +
+      '</div>' +
+      '<button onclick="navigate(\'beds\')" style="background:none;border:none;color:var(--brand-600);font-size:0.8rem;cursor:pointer;padding:4px 0;flex-shrink:0;">›</button>' +
+    '</section>'
+  );
+}
+
+/* ============================================================
    GARDEN SECTION
 ============================================================ */
 function _homeGardenSection(data) {
@@ -284,6 +322,11 @@ function _homeBedCard(bed) {
 
   var zoneVisual = (typeof getZoneVisual === 'function') ? getZoneVisual(bed.id) : '';
 
+  var irrNeed = typeof IrrigationModule !== 'undefined' ? IrrigationModule.getBedWaterNeed(bed) : null;
+  var irrBadge = (irrNeed && irrNeed.deficit)
+    ? '<span style="font-size:0.7rem;font-weight:600;color:#d97706;margin-left:4px;">💧 ' + irrNeed.litersPerWeek + ' L</span>'
+    : '';
+
   return (
     '<article class="mgs-home-bed-card" onclick="navigate(\'beds\');setTimeout(function(){showBedDetail(\'' + bed.id + '\')},50)">' +
       '<div class="mgs-home-bed-media">' +
@@ -291,7 +334,7 @@ function _homeBedCard(bed) {
         '<div class="mgs-home-bed-overlay"></div>' +
       '</div>' +
       '<div class="mgs-home-bed-body">' +
-        '<div class="mgs-home-bed-name">' + escH(bed.name) + '</div>' +
+        '<div class="mgs-home-bed-name">' + escH(bed.name) + irrBadge + '</div>' +
         '<div class="mgs-home-bed-sub">' +
           (firstVeg ? escH(firstVeg) : t('dash_zone_free')) +
         '</div>' +
@@ -381,7 +424,7 @@ function _homeActionsSection(smartActs, tasks) {
 }
 
 /* ============================================================
-   INSIGHTS SECTION
+   INSIGHTS SECTION — V4.3 Recommandations IA contextualisées
 ============================================================ */
 function _homeInsightSection(weather) {
   var header =
@@ -393,33 +436,60 @@ function _homeInsightSection(weather) {
       '<button class="mgs-home-section-link" onclick="navigateFromPlus(\'analysis\')">' + t('dash_see_analysis') + '</button>' +
     '</div>';
 
-  var insightText = '';
-  var insightIcon = '🌿';
-
-  try {
-    var actionable = getActionableInsights();
-    if (actionable && actionable.length) {
-      insightText = actionable[0].text || actionable[0].title || '';
-      insightIcon = actionable[0].icon || '💡';
-    }
-  } catch (e) {}
-
-  if (!insightText) {
-    try {
-      var recs = getSmartRecommendationsV2(weather);
-      if (recs && recs.length) {
-        insightText = recs[0].text || recs[0].title || '';
-        insightIcon = recs[0].icon || '🌱';
-      }
-    } catch (e) {}
+  // V4.3 : RecommendationsModule en priorité
+  var tips = [];
+  if (typeof RecommendationsModule !== 'undefined') {
+    tips = RecommendationsModule.generate(weather);
   }
 
-  if (!insightText) insightText = t('conseil_empty');
+  // Fallback : anciens systèmes de conseil
+  if (!tips.length) {
+    var fallbackText = '', fallbackIcon = '🌿';
+    try {
+      var actionable = getActionableInsights();
+      if (actionable && actionable.length) {
+        fallbackText = actionable[0].text || actionable[0].title || '';
+        fallbackIcon = actionable[0].icon || '💡';
+      }
+    } catch (e) {}
+    if (!fallbackText) {
+      try {
+        var recs = getSmartRecommendationsV2(weather);
+        if (recs && recs.length) {
+          fallbackText = recs[0].text || recs[0].title || '';
+          fallbackIcon = recs[0].icon || '🌱';
+        }
+      } catch (e) {}
+    }
+    if (!fallbackText) fallbackText = t('conseil_empty');
+    return (
+      '<section class="mgs-home-panel">' +
+        header +
+        _homeInsightCard(t('dash_section_conseil'), fallbackText, fallbackIcon) +
+      '</section>'
+    );
+  }
+
+  // Afficher jusqu'à 3 recommandations sous forme de cartes liste
+  var rows = tips.slice(0, 3).map(function (tip) {
+    var nav = tip.action || 'beds';
+    var onClick = 'navigate(\'' + nav + '\')';
+    return (
+      '<div class="mgs-home-list-card" onclick="' + onClick + '">' +
+        '<div class="mgs-home-list-icon">' + (tip.icon || '🌿') + '</div>' +
+        '<div class="mgs-home-list-body">' +
+          '<div class="mgs-home-list-title">' + escH(tip.title) + '</div>' +
+          '<div class="mgs-home-list-sub">' + escH(tip.body) + '</div>' +
+        '</div>' +
+        '<div class="mgs-home-list-arrow">›</div>' +
+      '</div>'
+    );
+  }).join('');
 
   return (
     '<section class="mgs-home-panel">' +
       header +
-      _homeInsightCard(t('dash_section_conseil'), insightText, insightIcon) +
+      '<div class="mgs-home-list">' + rows + '</div>' +
     '</section>'
   );
 }
