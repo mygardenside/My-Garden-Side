@@ -63,6 +63,16 @@ function renderSettings() {
     '</div>' +
     '<div id="geoStatus" style="margin-top:8px;font-size:0.82rem;text-align:center;min-height:20px;"></div>' +
 
+    // --- Profil climatique ---
+    '<div class="section-title">🌡️ ' + t('settings_climate') + '</div>' +
+    '<div class="prem-settings-group">' +
+      ClimateModule.renderCard() +
+    '</div>' +
+    '<div class="prem-settings-btn-group">' +
+      '<button class="btn btn-secondary" style="touch-action:manipulation;" onclick="_refreshClimate()">' + t('settings_climate_refresh') + '</button>' +
+    '</div>' +
+    '<div id="climateStatus" style="margin-top:4px;margin-bottom:4px;font-size:0.82rem;text-align:center;min-height:18px;"></div>' +
+
     // --- Saisons ---
     '<div class="section-title">' + t('settings_seasons_title') + '</div>' +
     '<div class="prem-settings-group">' +
@@ -317,12 +327,17 @@ function searchCity() {
 function selectCity(index) {
   var r = _citySearchResults[index];
   if (!r) return;
-  APP.location = { lat: r.latitude, lon: r.longitude, name: r.name };
+  APP.location = { lat: r.latitude, lon: r.longitude, name: r.name, altitude: r.elevation || null };
   APP.weather = null;
   APP.weatherLastFetch = null;
   saveData();
   closeModal();
   renderSettings();
+  _geoSetStatus(t('settings_climate_calculating'), 'var(--text-light)');
+  ClimateModule.refresh(function(profile, err) {
+    if (err) { _geoSetStatus(t('settings_climate_error'), 'var(--red)'); }
+    else      { renderSettings(); }
+  });
 }
 
 function _geoSetStatus(msg, color) {
@@ -345,11 +360,17 @@ function useGeolocation() {
     function(pos) {
       var lat = parseFloat(pos.coords.latitude.toFixed(4));
       var lon = parseFloat(pos.coords.longitude.toFixed(4));
-      APP.location = { lat: lat, lon: lon, name: t('settings_my_location') };
+      var alt = pos.coords.altitude ? Math.round(pos.coords.altitude) : null;
+      APP.location = { lat: lat, lon: lon, name: t('settings_my_location'), altitude: alt };
       APP.weather = null;
       APP.weatherLastFetch = null;
       saveData();
       renderSettings();
+      _geoSetStatus(t('settings_climate_calculating'), 'var(--text-light)');
+      ClimateModule.refresh(function(profile, err) {
+        if (err) { _geoSetStatus(t('settings_climate_error'), 'var(--red)'); }
+        else      { renderSettings(); }
+      });
     },
     function(err) {
       if (btn) { btn.textContent = t('settings_my_position'); btn.disabled = false; }
@@ -370,6 +391,17 @@ function resetLocation() {
   APP.weatherLastFetch = null;
   saveData();
   renderSettings();
+}
+function _setClimateStatus(msg, color) {
+  var el = document.getElementById('climateStatus');
+  if (el) { el.textContent = msg; el.style.color = color || 'var(--text-light)'; }
+}
+function _refreshClimate() {
+  _setClimateStatus(t('settings_climate_calculating'));
+  ClimateModule.refresh(function(profile, err) {
+    if (err) { _setClimateStatus(t('settings_climate_error'), 'var(--red)'); }
+    else      { renderSettings(); }
+  });
 }
 // ========== VEGGIE MANAGEMENT ==========
 function openVeggieModal(editId) {
@@ -485,6 +517,7 @@ function normalizeImportedData(data) {
       : { lat: 43.4984, lon: 1.3139, name: 'Seysses' },
     weather: null,
     weatherLastFetch: null,
+    climate: data.climate || null,
     completedTasks: Array.isArray(data.completedTasks) ? data.completedTasks : [],
     settings: data.settings || { theme: 'default' }
   };
@@ -584,7 +617,7 @@ function clearAllData() {
     vegetables: JSON.parse(JSON.stringify(DEFAULT_VEGETABLES)),
     beds: [], crops: [], seasons: ['2026'], currentSeason: '2026',
     location: { lat: 43.4984, lon: 1.3139, name: 'Seysses' },
-    weather: null, weatherLastFetch: null, completedTasks: [],
+    weather: null, weatherLastFetch: null, climate: null, completedTasks: [],
     settings: { theme: 'default' }
   };
   saveData();

@@ -120,7 +120,7 @@ function renderBedCard(bed) {
       '<div class="prem-bed-hero-top" style="position:relative;z-index:2;">' +
         '<div>' +
           '<div class="prem-bed-name">' + escH(bed.name) + '</div>' +
-          '<div class="prem-bed-surface">' + bed.length + 'm \u00D7 ' + bed.width + 'm \u2014 ' + surface.toFixed(1) + ' m\u00B2</div>' +
+          '<div class="prem-bed-surface">' + bed.length + 'm \u00D7 ' + bed.width + 'm \u2014 ' + surface.toFixed(1) + ' m\u00B2' + (bed.gardenElId ? ' 🗺️' : '') + '</div>' +
         '</div>' +
         '<div class="prem-bed-occ-badge ' + premCls + '">' + (occ >= 90 ? t('bed_occ_optimized') : occ + '%') + '</div>' +
       '</div>' +

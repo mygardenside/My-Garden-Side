@@ -17,6 +17,7 @@ let _APP = {
   location: { lat: 43.4984, lon: 1.3139, name: 'Seysses' },
   weather: null,
   weatherLastFetch: null,
+  climate: null,
   completedTasks: [],
   settings: { theme: 'default', languageChosen: false },
   language: 'fr',
@@ -33,7 +34,7 @@ function getAppState(key) {
 function updateAppState(key, value) {
   _APP[key] = value;
   // Sauvegarde automatique pour clés critiques
-  if (['vegetables', 'beds', 'crops', 'seasons', 'currentSeason', 'location', 'settings', 'language', 'userProfile', 'notificationsRead', 'notificationsIgnored'].includes(key)) {
+  if (['vegetables', 'beds', 'crops', 'seasons', 'currentSeason', 'location', 'settings', 'language', 'userProfile', 'notificationsRead', 'notificationsIgnored', 'climate'].includes(key)) {
     saveData();
   }
 }
@@ -90,13 +91,15 @@ function navigate(page, push) {
   if (modalOv && (Date.now() - _modalOpenTime > 600)) modalOv.classList.remove('active');
   currentPage = page;
   detailView = null;
+  // Mode plein écran jardin sur mobile : masque header + bottom-nav
+  document.body.classList.toggle('gd-garden-active', page === 'garden');
   document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
   document.querySelectorAll('.nav-item').forEach(function(n) { n.classList.remove('active'); });
   var pageEl = document.getElementById('page' + page.charAt(0).toUpperCase() + page.slice(1));
   if (pageEl) { pageEl.classList.add('active'); pageEl.classList.add('fade-in'); }
   var navEl = document.querySelector('.nav-item[data-page="' + page + '"]');
   if (navEl) navEl.classList.add('active');
-  var titles = { dashboard:'My Garden Side', beds:t('nav_beds'), crops:t('nav_crops'), today:t('nav_today'), calendar:t('nav_calendar'), planning:t('nav_planning'), analysis:t('nav_analysis'), settings:t('nav_settings'), notifications:t('nav_notifications'), ai:t('nav_ai'), veggieref:t('nav_veggieref') };
+  var titles = { dashboard:'My Garden Side', beds:t('nav_beds'), crops:t('nav_crops'), today:t('nav_today'), calendar:t('nav_calendar'), planning:t('nav_planning'), analysis:t('nav_analysis'), settings:t('nav_settings'), notifications:t('nav_notifications'), ai:t('nav_ai'), veggieref:t('nav_veggieref'), garden:t('nav_garden') };
   document.getElementById('headerTitle').textContent = titles[page] || 'My Garden Side';
   document.getElementById('headerBack').classList.remove('visible');
   document.getElementById('headerSeason').textContent = getAppState('currentSeason');
@@ -145,6 +148,7 @@ function renderPage(page) {
     case 'notifications': renderNotifications(); break;
     case 'ai': renderAi(); break;
     case 'veggieref': renderVeggieRef(); break;
+    case 'garden': renderGarden(); break;
   }
 }
 
@@ -167,10 +171,13 @@ function closeModalOverlay(e) {
 }
 // ========== NAV LABELS (i18n) ==========
 function refreshNavLabels() {
-  // Update every element carrying a data-i18n attribute (nav + plus menu)
   document.querySelectorAll('[data-i18n]').forEach(function(el) {
     var key = el.getAttribute('data-i18n');
     if (key) el.textContent = t(key);
+  });
+  document.querySelectorAll('[data-i18n-title]').forEach(function(el) {
+    var key = el.getAttribute('data-i18n-title');
+    if (key) el.title = t(key);
   });
 }
 
@@ -184,6 +191,10 @@ function changeLanguage(lang) {
 
 // ========== INIT ==========
 loadData();
+// Calcul automatique du profil climatique si absent (appel silencieux en arrière-plan)
+if (!getAppState('climate') && (getAppState('location') || {}).lat) {
+  if (typeof ClimateModule !== 'undefined') ClimateModule.refresh(function() {});
+}
 cleanOrphanVeggies();
 refreshCropStatuses();
 pruneOrphanHistory();

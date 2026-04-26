@@ -11,6 +11,7 @@ var I18N = {
     nav_calendar:'Calendrier', nav_more:'Plus', nav_crops:'Cultures',
     nav_planning:'Planning', nav_analysis:'Analyse', nav_settings:'R\u00e9glages',
     nav_notifications:'Notifications', nav_ai:'AI', nav_veggieref:'R\u00e9f\u00e9rentiel l\u00e9gumes',
+    nav_garden:'Vue Jardin',
 
     // ── Jours ──
     day_0:'Dimanche', day_1:'Lundi', day_2:'Mardi', day_3:'Mercredi',
@@ -164,6 +165,24 @@ var I18N = {
     settings_reset_location:'\u21A9\uFE0F R\u00e9init.',
     settings_seasons_title:'\uD83D\uDCC5 Saisons',
     settings_my_garden:'Mon Jardin',
+
+    // ── Profil climatique ──
+    settings_climate:'Profil climatique',
+    settings_climate_refresh:'Recalculer',
+    settings_climate_calculating:'Calcul du profil en cours…',
+    settings_climate_error:'Erreur de connexion. Vérifiez votre réseau et réessayez.',
+    settings_climate_none:'Aucun profil calculé. Cliquez sur « Recalculer ».',
+    settings_climate_none_frost:'Aucune',
+    settings_climate_unknown:'Inconnue',
+    settings_climate_altitude:'Altitude',
+    settings_climate_zone:'Zone climatique',
+    settings_climate_hardiness:'Zone de rusticité',
+    settings_climate_lastfrost:'Dernière gelée printanière',
+    settings_climate_firstfrost:'Première gelée automnale',
+    settings_climate_season:'Saison de jardinage',
+    settings_climate_rain:'Pluie annuelle',
+    settings_climate_gdd:'Degrés-jours de croissance',
+    settings_climate_updated:'Calculé le',
 
     // ── Export / Import ──
     export_full:'Exporter (complet)', export_light:'Export l\u00e9ger', import_btn:'Importer (JSON)',
@@ -810,10 +829,43 @@ var I18N = {
     pred_today:'Aujourd\'hui',
     pred_tomorrow:'Demain',
     pred_in_days:'dans {n}j',
+
+    // ── Vue Jardin ──
+    add:'Ajouter', select_tool:'Sélectionner', options:'Options', snap_grid:'Snap grille',
+    tool_bed:'Zone', tool_serre:'Serre', tool_house:'Maison',
+    tool_tree:'Arbre', tool_path:'Chemin', tool_fence:'Clôture',
+    fab_bed:'Espace de culture', fab_serre:'Serre', fab_tree:'Arbre',
+    fab_house:'Maison', fab_path:'Chemin', fab_fence:'Clôture',
+    tool_select:'Sélection / déplacer',
+    save:'Sauvegarder', undo:'↩ Annuler', delete_btn:'🗑️ Supprimer',
+    load_demo:'📦 Exemple', reset_garden:'🗑 Tout effacer',
+    mode_select:'Sélection', mode_create:'Création',
+    hint_create:'Cliquer sur le terrain pour placer',
+    hint_create_bed:'Toucher pour placer un espace de culture',
+    hint_create_serre:'Cliquer pour placer une serre',
+    hint_create_house:'Cliquer pour placer la maison',
+    hint_create_tree:'Cliquer pour planter un arbre',
+    hint_create_path:'Cliquer pour placer un chemin',
+    hint_create_fence:'Cliquer pour ajouter un point  •  1er point = fermer',
+    fence_hint:'Cliquer pour ajouter des points  •  1er point = fermer',
+    fence_done:'✓ Terminer', fence_cancel:'✕ Annuler',
+    properties:'Propriétés', no_sel:'Sélectionnez un élément',
+    prop_name:'Nom', prop_width:'Largeur (m)', prop_height:'Hauteur (m)',
+    prop_rotation:'Rotation (°)', prop_soil:'Type de sol', prop_sun:'Ensoleillement',
+    prop_surface:'Surface', prop_closed:'Fermée', prop_style:'Style', prop_type:'Type',
+    soil_loam:'Terre franche', soil_clay:'Argileuse', soil_sandy:'Sableuse', soil_rich:'Riche (compost)',
+    sun_full:'Plein soleil', sun_partial:'Mi-ombre', sun_shade:'Ombre',
+    fence_wood:'Bois', fence_wire:'Grillage', fence_hedge:'Haie', fence_stone:'Pierre',
+    path_gravel:'Gravier', path_stone:'Pierre', path_wood:'Bois', path_grass:'Herbe',
+    tree_generic:'Générique', tree_fruit:'Fruitier', tree_shrub:'Arbuste',
+    tree_conifer:'Conifère', tree_deciduous:'Feuillus',
+    label_bed:'Zone', label_serre:'Serre', label_house:'Maison',
+    label_tree:'Arbre', label_path:'Chemin', label_fence:'Clôture',
+    saved:'Sauvegardé !',
   },
   en: {
     // ── Navigation ──
-    nav_home:'Home', nav_beds:'My garden', nav_today:'Today',
+    nav_home:'Home', nav_beds:'My garden', nav_today:'Today', nav_garden:'Garden map',
     nav_calendar:'Calendar', nav_more:'More', nav_crops:'Crops',
     nav_planning:'Planning', nav_analysis:'Analysis', nav_settings:'Settings',
     nav_notifications:'Notifications', nav_ai:'AI', nav_veggieref:'Veggie Reference',
@@ -970,6 +1022,24 @@ var I18N = {
     settings_reset_location:'\u21A9\uFE0F Reset',
     settings_seasons_title:'\uD83D\uDCC5 Seasons',
     settings_my_garden:'My Garden',
+
+    // ── Climate profile ──
+    settings_climate:'Climate profile',
+    settings_climate_refresh:'Recalculate',
+    settings_climate_calculating:'Calculating climate profile…',
+    settings_climate_error:'Connection error. Check your network and try again.',
+    settings_climate_none:'No profile yet. Click "Recalculate".',
+    settings_climate_none_frost:'None',
+    settings_climate_unknown:'Unknown',
+    settings_climate_altitude:'Altitude',
+    settings_climate_zone:'Climate zone',
+    settings_climate_hardiness:'Hardiness zone',
+    settings_climate_lastfrost:'Last spring frost',
+    settings_climate_firstfrost:'First fall frost',
+    settings_climate_season:'Growing season',
+    settings_climate_rain:'Annual rainfall',
+    settings_climate_gdd:'Growing degree days',
+    settings_climate_updated:'Calculated on',
 
     // ── Export / Import ──
     export_full:'Export (full)', export_light:'Light export', import_btn:'Import (JSON)',
@@ -1615,8 +1685,44 @@ var I18N = {
     pred_today:'Today',
     pred_tomorrow:'Tomorrow',
     pred_in_days:'in {n}d',
+
+    // ── Garden map ──
+    add:'Add', select_tool:'Select', options:'Options', snap_grid:'Snap grid',
+    tool_bed:'Bed', tool_serre:'Greenhouse', tool_house:'House',
+    tool_tree:'Tree', tool_path:'Path', tool_fence:'Fence',
+    fab_bed:'Growing space', fab_serre:'Greenhouse', fab_tree:'Tree',
+    fab_house:'House', fab_path:'Path', fab_fence:'Fence',
+    tool_select:'Select / move',
+    save:'Save', undo:'↩ Undo', delete_btn:'🗑️ Delete',
+    load_demo:'📦 Example', reset_garden:'🗑 Clear all',
+    mode_select:'Select', mode_create:'Create',
+    hint_create:'Click on the terrain to place',
+    hint_create_bed:'Tap to place a growing space',
+    hint_create_serre:'Click to place a greenhouse',
+    hint_create_house:'Click to place the house',
+    hint_create_tree:'Click to plant a tree',
+    hint_create_path:'Click to place a path',
+    hint_create_fence:'Click to add a point  •  Click first point to close',
+    fence_hint:'Click to add points  •  Click first point to close',
+    fence_done:'✓ Done', fence_cancel:'✕ Cancel',
+    properties:'Properties', no_sel:'Select an element',
+    prop_name:'Name', prop_width:'Width (m)', prop_height:'Height (m)',
+    prop_rotation:'Rotation (°)', prop_soil:'Soil type', prop_sun:'Sun exposure',
+    prop_surface:'Surface', prop_closed:'Closed', prop_style:'Style', prop_type:'Type',
+    soil_loam:'Loam', soil_clay:'Clay', soil_sandy:'Sandy', soil_rich:'Rich (compost)',
+    sun_full:'Full sun', sun_partial:'Partial shade', sun_shade:'Shade',
+    fence_wood:'Wood', fence_wire:'Wire', fence_hedge:'Hedge', fence_stone:'Stone',
+    path_gravel:'Gravel', path_stone:'Stone', path_wood:'Wood', path_grass:'Grass',
+    tree_generic:'Generic', tree_fruit:'Fruit tree', tree_shrub:'Shrub',
+    tree_conifer:'Conifer', tree_deciduous:'Deciduous',
+    label_bed:'Bed', label_serre:'Greenhouse', label_house:'House',
+    label_tree:'Tree', label_path:'Path', label_fence:'Fence',
+    saved:'Saved!',
   }
 };
+
+// Shim pour les modules jardin qui appellent I18N.t(key)
+I18N.t = function(key) { return t(key); };
 
 /** Traduit une clé. Fallback: fr, puis la clé brute. */
 function t(key) {
