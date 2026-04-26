@@ -1114,6 +1114,7 @@ function ouvrirFicheVeggie(veggieId) {
   // ---- Calendrier 12 cases ----
   var calHTML = '<div class="fiche-cal-strip">';
   var hasIndoor = cal && cal.indoorMonths && cal.indoorMonths.length > 0;
+  var hasBoth   = false;
   for (var m = 1; m <= 12; m++) {
     var isPlant   = cal && cal.plantMonths   && cal.plantMonths.indexOf(m)   >= 0;
     var isHarvest = cal && cal.harvestMonths && cal.harvestMonths.indexOf(m) >= 0;
@@ -1123,6 +1124,7 @@ function ouvrirFicheVeggie(veggieId) {
             : isPlant   ? 'plant'
             : isHarvest ? 'harvest'
             : 'none';
+    if (cls === 'both') hasBoth = true;
     calHTML += '<div class="fiche-cal-case ' + cls + '">' + moisLettre[m-1] + '</div>';
   }
   calHTML += '</div>';
@@ -1130,10 +1132,12 @@ function ouvrirFicheVeggie(veggieId) {
   if (hasIndoor) {
     calHTML += '<div class="fiche-cal-legende-item"><div class="fiche-cal-legende-dot" style="background:#7c3aed"></div>' + t('cal_legend_indoor') + '</div>';
   }
-  calHTML +=
-    '<div class="fiche-cal-legende-item"><div class="fiche-cal-legende-dot" style="background:var(--green-500)"></div>' + t('cal_legend_planting') + '</div>' +
-    '<div class="fiche-cal-legende-item"><div class="fiche-cal-legende-dot" style="background:var(--orange)"></div>' + t('cal_legend_harvest') + '</div>' +
-  '</div>';
+  calHTML += '<div class="fiche-cal-legende-item"><div class="fiche-cal-legende-dot" style="background:var(--green-500)"></div>' + t('cal_legend_planting') + '</div>';
+  if (hasBoth) {
+    calHTML += '<div class="fiche-cal-legende-item"><div class="fiche-cal-legende-dot" style="background:var(--brand-900)"></div>' + t('cal_legend_both') + '</div>';
+  }
+  calHTML += '<div class="fiche-cal-legende-item"><div class="fiche-cal-legende-dot" style="background:var(--orange)"></div>' + t('cal_legend_harvest') + '</div>';
+  calHTML += '</div>';
 
   // ---- Bloc GDD adaptatif (V3.2) ----
   var _isEn  = (getAppState('language') || 'fr') === 'en';
