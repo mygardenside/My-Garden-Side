@@ -1113,14 +1113,24 @@ function ouvrirFicheVeggie(veggieId) {
 
   // ---- Calendrier 12 cases ----
   var calHTML = '<div class="fiche-cal-strip">';
+  var hasIndoor = cal && cal.indoorMonths && cal.indoorMonths.length > 0;
   for (var m = 1; m <= 12; m++) {
     var isPlant   = cal && cal.plantMonths   && cal.plantMonths.indexOf(m)   >= 0;
     var isHarvest = cal && cal.harvestMonths && cal.harvestMonths.indexOf(m) >= 0;
-    var cls = isPlant && isHarvest ? 'both' : isPlant ? 'plant' : isHarvest ? 'harvest' : 'none';
+    var isIndoor  = cal && cal.indoorMonths  && cal.indoorMonths.indexOf(m)  >= 0;
+    var cls = isPlant && isHarvest ? 'both'
+            : isIndoor  ? 'indoor'
+            : isPlant   ? 'plant'
+            : isHarvest ? 'harvest'
+            : 'none';
     calHTML += '<div class="fiche-cal-case ' + cls + '">' + moisLettre[m-1] + '</div>';
   }
   calHTML += '</div>';
-  calHTML += '<div class="fiche-cal-legende">' +
+  calHTML += '<div class="fiche-cal-legende">';
+  if (hasIndoor) {
+    calHTML += '<div class="fiche-cal-legende-item"><div class="fiche-cal-legende-dot" style="background:#7c3aed"></div>' + t('cal_legend_indoor') + '</div>';
+  }
+  calHTML +=
     '<div class="fiche-cal-legende-item"><div class="fiche-cal-legende-dot" style="background:var(--green-500)"></div>' + t('cal_legend_planting') + '</div>' +
     '<div class="fiche-cal-legende-item"><div class="fiche-cal-legende-dot" style="background:var(--orange)"></div>' + t('cal_legend_harvest') + '</div>' +
   '</div>';

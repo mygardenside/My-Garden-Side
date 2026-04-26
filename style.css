@@ -877,6 +877,7 @@ a { text-decoration: none; color: inherit; }
 .fiche-cal-case.plant   { background:var(--brand-500); color:white; }
 .fiche-cal-case.harvest { background:var(--orange); color:white; }
 .fiche-cal-case.both    { background:var(--brand-900); color:white; }
+.fiche-cal-case.indoor  { background:#7c3aed; color:white; }
 .fiche-cal-case.none    { background:var(--cream); color:var(--text-light); }
 .fiche-cal-legende { display:flex; gap:10px; font-size:0.67rem; color:var(--text-light); margin-bottom:12px; }
 .fiche-cal-legende-item { display:flex; align-items:center; gap:4px; }

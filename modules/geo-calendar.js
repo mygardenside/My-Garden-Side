@@ -160,26 +160,29 @@ var GeoCalendar = (function () {
     return Math.max(0, avg - base) * 30;
   }
 
+  // Température sol estimée avec inertie thermique :
+  // le sol suit l'air avec 3-4 semaines de décalage → moyenne mois précédent + mois courant
+  function _soilEst(monthly, mIdx) { // mIdx : 0-based (0=jan … 11=dec)
+    var prev = mIdx === 0 ? 11 : mIdx - 1;
+    return (monthly[prev].tmean + monthly[mIdx].tmean) / 2;
+  }
+
   // ── Cultures de saison chaude (frostKill = true) ────────────
   function _warmSeason(pheno, climate) {
     var monthly       = climate.monthly;
     var lastFrostDOY  = climate.lastFrostDOY;
     var firstFrostDOY = climate.firstFrostDOY;
     var plantMonths   = [];
+    var indoorMonths  = []; // semis sous abri — séparé de la plantation extérieure
     var harvestMonths = [];
     var warnings      = [];
 
     if (!lastFrostDOY) {
       // Zone tropicale / pas de gelée → planter quand le sol est assez chaud
       for (var m = 1; m <= 12; m++) {
-        var mt = monthly[m - 1];
-        // Sol ≈ 60 % Tmax + 40 % Tmin (estimé)
-        var soilEst = mt.tmin * 0.4 + mt.tmax * 0.6;
-        if (soilEst >= pheno.minSoilTemp) plantMonths.push(m);
+        if (_soilEst(monthly, m - 1) >= pheno.minSoilTemp) plantMonths.push(m);
       }
-      if (plantMonths.length === 0)
-        warnings.push({ type: 'unsuitable_climate' });
-      // Récolte : nbMois après plantation selon GDD
+      if (plantMonths.length === 0) warnings.push({ type: 'unsuitable_climate' });
       var avgGddPerDay = 0;
       plantMonths.forEach(function (pm) {
         var mmt = monthly[pm - 1];
@@ -194,20 +197,22 @@ var GeoCalendar = (function () {
       var lastFrostMonth  = _doyToMonth(lastFrostDOY);
       var firstFrostMonth = firstFrostDOY ? _doyToMonth(firstFrostDOY) : 12;
 
-      // Semis intérieur
+      // Semis intérieur (conservateur de la dernière gelée)
+      // Stocké séparément — jamais confondu avec la plantation en plein air
       if (pheno.indoorWeeks > 0) {
         var indoorDOY = Math.max(1, lastFrostDOY - pheno.indoorWeeks * 7);
-        plantMonths.push(_doyToMonth(indoorDOY));
+        indoorMonths.push(_doyToMonth(indoorDOY));
       }
 
-      // Plantation extérieure : dès lastFrostMonth, si sol assez chaud
-      for (var pm2 = lastFrostMonth; pm2 <= lastFrostMonth + 2; pm2++) {
-        var mo = _addM(pm2, 0);
-        var soilEst2 = monthly[mo - 1].tmin * 0.4 + monthly[mo - 1].tmax * 0.6;
+      // Plantation extérieure : après dernière gelée, quand le sol EST assez chaud
+      // _soilEst() applique l'inertie thermique (délai de 3-4 semaines)
+      for (var pm2 = lastFrostMonth; pm2 <= lastFrostMonth + 3; pm2++) {
+        var mo       = _addM(pm2, 0);
+        var soilEst2 = _soilEst(monthly, mo - 1);
         if (soilEst2 >= pheno.minSoilTemp) plantMonths.push(mo);
       }
 
-      // Vérification GDD disponibles entre lastFrost et firstFrost
+      // Vérification GDD disponibles sur la saison
       var gddAcc = 0;
       var gStart = lastFrostMonth;
       var gEnd   = firstFrostDOY ? firstFrostMonth - 1 : 12;
@@ -215,26 +220,31 @@ var GeoCalendar = (function () {
       for (var gm = gStart; gm <= gEnd; gm++) {
         gddAcc += _monthGDD(monthly[_addM(gm, 0) - 1], pheno.gddBase);
       }
-      var ratio = gddAcc / pheno.gddRequired;
-      if (ratio < 0.8) warnings.push({ type: 'short_season', ratio: ratio });
+      if (gddAcc / pheno.gddRequired < 0.8)
+        warnings.push({ type: 'short_season', ratio: gddAcc / pheno.gddRequired });
 
-      // Date de récolte estimée (GDD mensuels cumulés depuis plantation)
+      // Récolte estimée (GDD mensuels depuis la plantation)
       var totalMonthlyGdd = 0, cntGm = 0;
       for (var hm = lastFrostMonth; hm <= lastFrostMonth + 5; hm++) {
         totalMonthlyGdd += _monthGDD(monthly[_addM(hm, 0) - 1], pheno.gddBase);
         cntGm++;
       }
-      var avgMonthlyGdd     = cntGm ? totalMonthlyGdd / cntGm : 150;
-      var monthsToHarvest   = avgMonthlyGdd > 0 ? Math.round(pheno.gddRequired / avgMonthlyGdd) : 3;
-      var harvestStartMonth = _addM(lastFrostMonth + 1, monthsToHarvest);
+      var avgMonthlyGdd   = cntGm ? totalMonthlyGdd / cntGm : 150;
+      var monthsToHarvest = avgMonthlyGdd > 0 ? Math.round(pheno.gddRequired / avgMonthlyGdd) : 3;
+      var harvestStart    = _addM(lastFrostMonth + 1, monthsToHarvest);
       for (var hhm = 0; hhm < 3; hhm++) {
-        var hmo = _addM(harvestStartMonth, hhm);
+        var hmo = _addM(harvestStart, hhm);
         if (firstFrostDOY && hmo >= firstFrostMonth) break;
         harvestMonths.push(hmo);
       }
     }
 
-    return { plantMonths: _uniq(plantMonths), harvestMonths: _uniq(harvestMonths), warnings: warnings };
+    return {
+      plantMonths:  _uniq(plantMonths),
+      indoorMonths: _uniq(indoorMonths),
+      harvestMonths: _uniq(harvestMonths),
+      warnings: warnings,
+    };
   }
 
   // ── Cultures de saison fraîche (maxAirTemp = seuil de montée-en-graine) ──
@@ -245,11 +255,12 @@ var GeoCalendar = (function () {
 
     for (var m = 1; m <= 12; m++) {
       var mt      = monthly[m - 1];
-      var soilEst = mt.tmin * 0.4 + mt.tmax * 0.6;
+      // Inertie thermique : sol suit l'air avec 3-4 sem de délai
+      var soilEst = _soilEst(monthly, m - 1);
       var tmean   = mt.tmean;
-      if (soilEst >= pheno.minSoilTemp && tmean <= maxAirTemp) {
+      // tmean >= 3 : sol travaillable ; soilEst >= minSoilTemp : germination possible
+      if (soilEst >= pheno.minSoilTemp && tmean >= 3 && tmean <= maxAirTemp) {
         plantMonths.push(m);
-        // Récolte : daysToHarvest ≈ gddRequired / GDD_jour
         var dailyGdd = Math.max(0.5, (mt.tmax + mt.tmin) / 2 - pheno.gddBase);
         var days     = Math.ceil(pheno.gddRequired / dailyGdd);
         var hm       = _doyToMonth(_monthMidDoy(m) + days);
@@ -257,26 +268,30 @@ var GeoCalendar = (function () {
       }
     }
 
-    return { plantMonths: _uniq(plantMonths), harvestMonths: _uniq(harvestMonths), warnings: [] };
+    return { plantMonths: _uniq(plantMonths), indoorMonths: [], harvestMonths: _uniq(harvestMonths), warnings: [] };
   }
 
   // ── Cultures tolérantes au froid, semis intérieur possible ──
   function _generalCrop(pheno, climate) {
-    var monthly     = climate.monthly;
-    var plantMonths = [], harvestMonths = [];
-    var indoorWeeks = pheno.indoorWeeks || 0;
+    var monthly       = climate.monthly;
+    var plantMonths   = [], harvestMonths = [], indoorMonths = [];
+    var indoorWeeks   = pheno.indoorWeeks || 0;
     var lastFrostDOY  = climate.lastFrostDOY;
     var firstFrostDOY = climate.firstFrostDOY;
+    // Plancher pratique : 8°C pour éviter une germination trop aléatoire en plein air
+    var minSoil = Math.max(pheno.minSoilTemp, 8);
 
+    // Semis intérieur stocké séparément (ne doit pas figurer en "plantation extérieure")
     if (indoorWeeks > 0 && lastFrostDOY) {
       var indoorDOY = Math.max(1, lastFrostDOY - indoorWeeks * 7);
-      plantMonths.push(_doyToMonth(indoorDOY));
+      indoorMonths.push(_doyToMonth(indoorDOY));
     }
 
     for (var m = 1; m <= 12; m++) {
-      var mt2     = monthly[m - 1];
-      var soilEst2 = mt2.tmin * 0.4 + mt2.tmax * 0.6;
-      if (soilEst2 >= pheno.minSoilTemp) {
+      var mt2      = monthly[m - 1];
+      // Inertie thermique : sol suit l'air avec 3-4 sem de délai
+      var soilEst2 = _soilEst(monthly, m - 1);
+      if (soilEst2 >= minSoil) {
         var mo = m;
         if (firstFrostDOY) {
           var ffm = _doyToMonth(firstFrostDOY);
@@ -289,7 +304,7 @@ var GeoCalendar = (function () {
       }
     }
 
-    return { plantMonths: _uniq(plantMonths), harvestMonths: _uniq(harvestMonths), warnings: [] };
+    return { plantMonths: _uniq(plantMonths), indoorMonths: _uniq(indoorMonths), harvestMonths: _uniq(harvestMonths), warnings: [] };
   }
 
   // ── Cultures à plantation automnale (ail, fève, échalote…) ──
@@ -331,7 +346,7 @@ var GeoCalendar = (function () {
       harvestMonths.push(_addM(pm, harvestOffset + 1));
     });
 
-    return { plantMonths: _uniq(plantMonths), harvestMonths: _uniq(harvestMonths), warnings: [] };
+    return { plantMonths: _uniq(plantMonths), indoorMonths: [], harvestMonths: _uniq(harvestMonths), warnings: [] };
   }
 
   // ── Risques de rotation par famille botanique ───────────────
