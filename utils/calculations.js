@@ -226,7 +226,7 @@ function getRotationBadge(bed) {
   var isEn = lng === 'en';
 
   var badge;
-  if (r.score === 'good')    badge = '<span class="badge badge-green">🟢 ' + (isEn ? 'Rotation OK' : 'Rotation OK') + '</span>';
+  if (r.score === 'good')    badge = '<span class="badge badge-green">🟢 ' + (isEn ? 'Rotation OK' : 'Rotation optimale') + '</span>';
   else if (r.score === 'warning') badge = '<span class="badge badge-orange">🟠 ' + (isEn ? 'Rotation warning' : 'Attention rotation') + '</span>';
   else                       badge = '<span class="badge badge-red">🔴 '   + (isEn ? 'Poor rotation' : 'Rotation mauvaise') + '</span>';
 

@@ -299,7 +299,7 @@ function updateCropAutoHarvest(force) {
   var v    = APP.vegetables[vid];
   var dhEl = document.getElementById('cropDateHarvest');
 
-  if (!v || !dp) return;
+  if (!v || !dp || !dhEl) return;
 
   // Prédiction GDD si profil climatique disponible
   var gddDate = null;

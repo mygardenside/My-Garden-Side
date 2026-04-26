@@ -218,19 +218,17 @@ var GeoCalendar = (function () {
       var ratio = gddAcc / pheno.gddRequired;
       if (ratio < 0.8) warnings.push({ type: 'short_season', ratio: ratio });
 
-      // Date de récolte estimée (GDD depuis plantation)
-      var plantDOY    = lastFrostDOY + 14;
-      var sumGdd = 0, cntM = 0;
-      for (var hm = lastFrostMonth; hm <= Math.min(lastFrostMonth + 4, 12); hm++) {
-        sumGdd += Math.max(0, (monthly[_addM(hm, 0) - 1].tmax + monthly[_addM(hm, 0) - 1].tmin) / 2 - pheno.gddBase);
-        cntM++;
+      // Date de récolte estimée (GDD mensuels cumulés depuis plantation)
+      var totalMonthlyGdd = 0, cntGm = 0;
+      for (var hm = lastFrostMonth; hm <= lastFrostMonth + 5; hm++) {
+        totalMonthlyGdd += _monthGDD(monthly[_addM(hm, 0) - 1], pheno.gddBase);
+        cntGm++;
       }
-      var avgDailyGdd = cntM ? sumGdd / cntM : 5;
-      var daysToHarvest = avgDailyGdd > 0 ? Math.ceil(pheno.gddRequired / avgDailyGdd) : 90;
-      var harvestStartDOY   = plantDOY + daysToHarvest;
-      var harvestStartMonth = _doyToMonth(harvestStartDOY);
-      for (var hhm = harvestStartMonth; hhm <= harvestStartMonth + 3; hhm++) {
-        var hmo = _addM(hhm, 0);
+      var avgMonthlyGdd     = cntGm ? totalMonthlyGdd / cntGm : 150;
+      var monthsToHarvest   = avgMonthlyGdd > 0 ? Math.round(pheno.gddRequired / avgMonthlyGdd) : 3;
+      var harvestStartMonth = _addM(lastFrostMonth + 1, monthsToHarvest);
+      for (var hhm = 0; hhm < 3; hhm++) {
+        var hmo = _addM(harvestStartMonth, hhm);
         if (firstFrostDOY && hmo >= firstFrostMonth) break;
         harvestMonths.push(hmo);
       }
@@ -246,9 +244,10 @@ var GeoCalendar = (function () {
     var plantMonths = [], harvestMonths = [];
 
     for (var m = 1; m <= 12; m++) {
-      var mt    = monthly[m - 1];
-      var tmean = mt.tmean;
-      if (tmean >= pheno.minSoilTemp && tmean <= maxAirTemp) {
+      var mt      = monthly[m - 1];
+      var soilEst = mt.tmin * 0.4 + mt.tmax * 0.6;
+      var tmean   = mt.tmean;
+      if (soilEst >= pheno.minSoilTemp && tmean <= maxAirTemp) {
         plantMonths.push(m);
         // Récolte : daysToHarvest ≈ gddRequired / GDD_jour
         var dailyGdd = Math.max(0.5, (mt.tmax + mt.tmin) / 2 - pheno.gddBase);
@@ -275,15 +274,16 @@ var GeoCalendar = (function () {
     }
 
     for (var m = 1; m <= 12; m++) {
-      var tmean = monthly[m - 1].tmean;
-      if (tmean >= pheno.minSoilTemp) {
+      var mt2     = monthly[m - 1];
+      var soilEst2 = mt2.tmin * 0.4 + mt2.tmax * 0.6;
+      if (soilEst2 >= pheno.minSoilTemp) {
         var mo = m;
         if (firstFrostDOY) {
           var ffm = _doyToMonth(firstFrostDOY);
           if (mo > ffm) continue;
         }
         plantMonths.push(mo);
-        var dailyGdd = Math.max(0.5, (monthly[m-1].tmax + monthly[m-1].tmin) / 2 - pheno.gddBase);
+        var dailyGdd = Math.max(0.5, (mt2.tmax + mt2.tmin) / 2 - pheno.gddBase);
         var days     = Math.ceil(pheno.gddRequired / dailyGdd);
         harvestMonths.push(_doyToMonth(_monthMidDoy(m) + days));
       }
