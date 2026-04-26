@@ -197,13 +197,6 @@ var GeoCalendar = (function () {
       var lastFrostMonth  = _doyToMonth(lastFrostDOY);
       var firstFrostMonth = firstFrostDOY ? _doyToMonth(firstFrostDOY) : 12;
 
-      // Semis intérieur (conservateur de la dernière gelée)
-      // Stocké séparément — jamais confondu avec la plantation en plein air
-      if (pheno.indoorWeeks > 0) {
-        var indoorDOY = Math.max(1, lastFrostDOY - pheno.indoorWeeks * 7);
-        indoorMonths.push(_doyToMonth(indoorDOY));
-      }
-
       // Plantation extérieure : après dernière gelée, quand le sol EST assez chaud.
       // Les transplants (indoorWeeks > 0) tolèrent ~3°C de moins que le seuil de
       // germination stricte (le plant est déjà établi, pas une graine nue).
@@ -215,6 +208,16 @@ var GeoCalendar = (function () {
         var mo       = _addM(pm2, 0);
         var soilEst2 = _soilEst(monthly, mo - 1);
         if (soilEst2 >= soilThreshold) plantMonths.push(mo);
+      }
+
+      // Semis intérieur : ancré sur le 1er mois de plantation extérieure réelle
+      // (pas sur la dernière gelée moyenne, qui peut être très en avance sur quand
+      // le sol est réellement prêt pour des cultures gélives exigeantes en chaleur)
+      if (pheno.indoorWeeks > 0) {
+        var firstOutdoorM   = plantMonths.length > 0 ? plantMonths[0] : _addM(lastFrostMonth, 2);
+        var firstOutdoorDOY = _monthMidDoy(firstOutdoorM);
+        var indoorTargetDOY = Math.max(1, firstOutdoorDOY - pheno.indoorWeeks * 7);
+        indoorMonths.push(_doyToMonth(indoorTargetDOY));
       }
 
       // Vérification GDD disponibles sur la saison
