@@ -2178,6 +2178,36 @@ body {
   margin: 16px 0 8px; cursor: pointer; padding: 0 2px;
 }
 
+/* ── V5 Aujourd'hui — Pourquoi ? ── */
+.prem-today-why-btn {
+  display: inline-flex; align-items: center; gap: 3px;
+  margin-top: 5px; padding: 2px 9px;
+  font-size: 0.72rem; font-weight: 600; color: var(--brand-600);
+  background: var(--brand-50); border: 1px solid rgba(11,93,71,0.15);
+  border-radius: 20px; cursor: pointer; transition: background 0.15s;
+}
+.prem-today-why-btn::before { content: '?'; font-weight: 800; }
+.prem-today-why-btn.open { background: var(--brand-100); }
+.prem-today-why-panel {
+  display: none; margin-top: 6px; padding: 8px 11px;
+  background: #f0faf5; border-left: 3px solid var(--brand-400);
+  border-radius: 0 8px 8px 0; font-size: 0.76rem; color: var(--text-light);
+  line-height: 1.4;
+}
+.prem-today-why-panel.open { display: block; }
+
+/* ── V5 Aujourd'hui — Pas maintenant ── */
+.prem-today-group-notnow { color: #9f3a3a; }
+.prem-today-group-notnow::after { background: #f5c6c6; }
+.prem-today-notnow {
+  display: flex; align-items: flex-start; gap: 10px;
+  background: #fff5f5; border-radius: 14px;
+  border-left: 4px solid #e63946; padding: 11px 13px;
+  margin-bottom: 7px;
+}
+.prem-today-notnow .prem-today-task-text { color: #9f3a3a; }
+.prem-today-notnow .prem-today-task-sub  { color: #b05555; }
+
 /* ============================================================
    CALENDRIER — grille et événements premium
    ============================================================ */

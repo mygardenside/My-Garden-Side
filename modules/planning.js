@@ -540,10 +540,10 @@ function generateTasks(weather) {
   var today = new Date();
   var todayStr = today.toISOString().split('T')[0];
 
-  function addTask(key, text, category, priority) {
+  function addTask(key, text, category, priority, reason) {
     if (seen[key]) return;
     seen[key] = true;
-    tasks.push({ key: key, text: text, category: category, priority: priority });
+    tasks.push({ key: key, text: text, category: category, priority: priority, reason: reason || '' });
   }
 
   var activeCrops = APP.crops.filter(function(c) {
@@ -555,6 +555,24 @@ function generateTasks(weather) {
     APP.completedTasks
       .filter(function(t) { return t.date === todayStr; })
       .forEach(function(t) { completedKeys[t.key] = true; });
+  }
+
+  // ── Prévision pluie sur les 3 prochains jours ─────────────────
+  var rainNext3Days = 0;
+  var rainDayLabel = '';
+  if (weather && weather.daily && weather.daily.precipitation_sum) {
+    var sums = weather.daily.precipitation_sum;
+    var times = weather.daily.time || [];
+    for (var ri = 1; ri <= 3 && ri < sums.length; ri++) {
+      rainNext3Days += sums[ri] || 0;
+    }
+    // Trouver le premier jour avec pluie significative
+    for (var rj = 1; rj <= 3 && rj < sums.length; rj++) {
+      if ((sums[rj] || 0) >= 5) {
+        rainDayLabel = times[rj] ? getDayName(times[rj]) : '';
+        break;
+      }
+    }
   }
 
   if (weather && weather.current) {
@@ -582,9 +600,10 @@ function generateTasks(weather) {
         if (coldEff > 6) {
           addTask(
             'cold-' + crop.id,
-            t('task_cold_protect').replace('{icon}', v.icon).replace('{name}', tVeg(v.name)).replace('{temp}', temp).replace('{seedling}', stage === 'seedling' ? t('task_cold_seedling') : ''),
+            t('task_cold_protect').replace('{icon}', v.icon).replace('{name}', tVeg(v.name)).replace('{temp}', Math.round(temp)).replace('{seedling}', stage === 'seedling' ? t('task_cold_seedling') : ''),
             'Protection meteo',
-            coldEff > 10 ? 'urgent' : 'important'
+            coldEff > 10 ? 'urgent' : 'important',
+            t('task_reason_cold').replace('{temp}', Math.round(temp)).replace('{name}', tVeg(v.name)).replace('{cold}', cold)
           );
         }
       }
@@ -594,9 +613,10 @@ function generateTasks(weather) {
         if (heatEff > 6) {
           addTask(
             'heat-' + crop.id,
-            t('task_heat_protect').replace('{icon}', v.icon).replace('{name}', tVeg(v.name)).replace('{temp}', temp),
+            t('task_heat_protect').replace('{icon}', v.icon).replace('{name}', tVeg(v.name)).replace('{temp}', Math.round(temp)),
             'Protection meteo',
-            heatEff > 10 ? 'urgent' : 'important'
+            heatEff > 10 ? 'urgent' : 'important',
+            t('task_reason_heat').replace('{temp}', Math.round(temp)).replace('{name}', tVeg(v.name))
           );
         }
       }
@@ -609,7 +629,8 @@ function generateTasks(weather) {
             'wind-' + crop.id,
             t('task_wind_stake').replace('{icon}', v.icon).replace('{name}', tVeg(v.name)).replace('{speed}', Math.round(wind)),
             'Tuteurage',
-            windEff > 10 ? 'urgent' : 'important'
+            windEff > 10 ? 'urgent' : 'important',
+            t('task_reason_wind').replace('{speed}', Math.round(wind)).replace('{name}', tVeg(v.name))
           );
         }
       }
@@ -620,30 +641,56 @@ function generateTasks(weather) {
         if (rainEff > 6) {
           addTask(
             'rain-' + crop.id,
-            t('task_rain_protect').replace('{icon}', v.icon).replace('{name}', tVeg(v.name)).replace('{mm}', precip).replace('{harvest}', stage === 'harvest' ? t('task_rain_harvest') : ''),
+            t('task_rain_protect').replace('{icon}', v.icon).replace('{name}', tVeg(v.name)).replace('{mm}', Math.round(precip)).replace('{harvest}', stage === 'harvest' ? t('task_rain_harvest') : ''),
             'Protection meteo',
-            rainEff > 10 ? 'urgent' : 'important'
+            rainEff > 10 ? 'urgent' : 'important',
+            t('task_reason_rain').replace('{mm}', Math.round(precip)).replace('{name}', tVeg(v.name))
           );
         }
-      }
-
-      if (precip < 1 && temp >= 20) {
-        addTask(
-          'water-' + crop.id,
-          t('task_water').replace('{icon}', v.icon).replace('{name}', tVeg(v.name)).replace('{intensive}', temp >= 30 ? t('task_water_intensive') : ''),
-          'Arrosage',
-          temp >= 30 ? 'important' : 'info'
-        );
       }
     }
 
     if (temp <= 2) {
       addTask(
         'frost-general',
-        t('task_frost_alert').replace('{temp}', temp),
+        t('task_frost_alert').replace('{temp}', Math.round(temp)),
         'Protection meteo',
-        'urgent'
+        'urgent',
+        t('task_reason_frost').replace('{temp}', Math.round(temp))
       );
+    }
+  }
+
+  // ── Arrosage intelligent par bac (IrrigationModule + pluie prévue) ──
+  if (typeof IrrigationModule !== 'undefined') {
+    for (var bi = 0; bi < APP.beds.length; bi++) {
+      var irrigBed = APP.beds[bi];
+      var waterNeed = IrrigationModule.getBedWaterNeed(irrigBed);
+      if (!waterNeed || !waterNeed.deficit) continue;
+
+      var liters = waterNeed.litersPerWeek;
+      if (rainNext3Days >= 10) {
+        // Pluie suffisante prévue → pas besoin d'arroser
+        if (!seen['water-rain-ok']) {
+          seen['water-rain-ok'] = true;
+          addTask(
+            'water-rain-' + irrigBed.id,
+            t('task_water_rain_ok').replace('{mm}', Math.round(rainNext3Days)).replace('{day}', rainDayLabel),
+            'Arrosage',
+            'info',
+            t('task_reason_water_rain').replace('{et0}', waterNeed.et0Week).replace('{mm}', Math.round(rainNext3Days))
+          );
+        }
+      } else {
+        var waterPriority = waterNeed.netMmPerM2 >= 15 ? 'important' : 'info';
+        addTask(
+          'water-bed-' + irrigBed.id,
+          t('task_water_bed').replace('{bed}', escH(irrigBed.name)).replace('{liters}', liters),
+          'Arrosage',
+          waterPriority,
+          t('task_reason_water_bed').replace('{et0}', waterNeed.et0Week).replace('{rain}', waterNeed.rainWeek).replace('{kc}', waterNeed.avgKC)
+        );
+      }
     }
   }
 
@@ -655,7 +702,13 @@ function generateTasks(weather) {
     var st = getCropStage(cr);
 
     if (st === 'harvest') {
-      addTask('harvest-' + cr.id, t('task_harvest_ready').replace('{icon}', vg.icon).replace('{name}', tVeg(vg.name)), 'Recolte', 'urgent');
+      addTask(
+        'harvest-' + cr.id,
+        t('task_harvest_ready').replace('{icon}', vg.icon).replace('{name}', tVeg(vg.name)),
+        'Recolte',
+        'urgent',
+        t('task_reason_harvest').replace('{name}', tVeg(vg.name))
+      );
     }
 
     if (cr.dateHarvest) {
@@ -665,27 +718,29 @@ function generateTasks(weather) {
           'near-harvest-' + cr.id,
           t('task_harvest_soon').replace('{icon}', vg.icon).replace('{name}', tVeg(vg.name)).replace('{n}', daysLeft),
           'Recolte',
-          daysLeft <= 3 ? 'important' : 'info'
+          daysLeft <= 3 ? 'important' : 'info',
+          t('task_reason_harvest_soon').replace('{name}', tVeg(vg.name)).replace('{n}', daysLeft)
         );
       }
     }
   }
 
   for (var k = 0; k < APP.beds.length; k++) {
-    var bed = APP.beds[k];
-    var r = getRotationScore(bed);
+    var rotBed = APP.beds[k];
+    var r = getRotationScore(rotBed);
     if (r.score === 'bad') {
       addTask(
-        'rotation-' + bed.id,
-        t('task_rotation_bad').replace('{bed}', bed.name).replace('{n}', r.repeated),
+        'rotation-' + rotBed.id,
+        t('task_rotation_bad').replace('{bed}', rotBed.name).replace('{n}', r.repeated),
         'Rotation',
-        'important'
+        'important',
+        t('task_reason_rotation').replace('{bed}', rotBed.name)
       );
     }
   }
 
   if (activeCrops.length > 0) {
-    addTask('entretien', t('task_check_garden'), 'Entretien', 'info');
+    addTask('entretien', t('task_check_garden'), 'Entretien', 'info', t('task_reason_entretien'));
   }
 
   return tasks.filter(function(t) {
@@ -769,12 +824,18 @@ async function renderToday() {
     var isRecolte = tache.key.indexOf('harvest-') === 0;
     var cropId = isRecolte ? tache.key.replace('harvest-', '') : '';
     var btnRecolte = isRecolte ? '<div style="margin-top:8px;"><button class="btn btn-sm btn-primary" onclick="event.stopPropagation();harvestCrop(\'' + cropId + '\')">' + t('today_harvest_btn') + '</button></div>' : '';
+    var whyId = 'why-' + tache.key.replace(/[^a-z0-9]/gi, '-');
+    var btnWhy = tache.reason
+      ? '<button class="prem-today-why-btn" onclick="event.stopPropagation();toggleWhyPanel(\'' + whyId + '\')">' + t('task_why_btn') + '</button>' +
+        '<div class="prem-today-why-panel" id="' + whyId + '">' + escH(tache.reason) + '</div>'
+      : '';
     return '<div class="prem-today-task ' + priorityCls + '" onclick="validerTache(\'' + tache.key + '\')">' +
       '<div class="prem-today-task-circle"></div>' +
       '<div class="prem-today-task-icon">' + icone + '</div>' +
       '<div style="flex:1;min-width:0;">' +
         '<div class="prem-today-task-text">' + escH(tache.text) + '</div>' +
         '<div class="prem-today-task-sub">' + escH(nomCategorie[tache.category] || tache.category) + '</div>' +
+        btnWhy +
         btnRecolte +
       '</div>' +
     '</div>';
@@ -835,6 +896,65 @@ async function renderToday() {
     weatherInfo = weather.current.precipitation > 0 ? weather.current.precipitation + 'mm' : t('today_dry');
   }
 
+  // ── Section "Pas maintenant" — cultures planifiées hors fenêtre ──
+  var pasMaintenantHTML = '';
+  if (typeof GeoCalendar !== 'undefined') {
+    var climate = typeof ClimateModule !== 'undefined' ? ClimateModule.get() : null;
+    var currentMonth = today.getMonth() + 1; // 1-12
+    var plannedCrops = APP.crops.filter(function(c) {
+      return c.season === APP.currentSeason && c.status === 'planned';
+    });
+    var warnings = [];
+    plannedCrops.forEach(function(c) {
+      var veg = APP.vegetables[c.veggieId];
+      if (!veg) return;
+      var cal = GeoCalendar.getCalendarForVeggie(veg);
+      if (!cal || !cal.plantMonths || !cal.plantMonths.length) return;
+      if (cal.plantMonths.indexOf(currentMonth) >= 0) return; // dans la fenêtre
+      // Trouver le prochain mois de plantation
+      var nextM = null;
+      for (var nm = currentMonth + 1; nm <= 12; nm++) {
+        if (cal.plantMonths.indexOf(nm) >= 0) { nextM = nm; break; }
+      }
+      if (!nextM) {
+        for (var nm2 = 1; nm2 < currentMonth; nm2++) {
+          if (cal.plantMonths.indexOf(nm2) >= 0) { nextM = nm2; break; }
+        }
+      }
+      var monthNames = [t('month_0'),t('month_1'),t('month_2'),t('month_3'),t('month_4'),t('month_5'),t('month_6'),t('month_7'),t('month_8'),t('month_9'),t('month_10'),t('month_11')];
+      var nextLabel = nextM ? monthNames[nextM - 1] : '';
+      // Vérifier si sol trop froid via phénologie
+      var pheno = GeoCalendar.getPhenology(veg);
+      var soilReason = '';
+      if (pheno && climate && climate.monthly) {
+        var soilEst = (climate.monthly[currentMonth > 1 ? currentMonth - 2 : 11].tmean + climate.monthly[currentMonth - 1].tmean) / 2;
+        if (soilEst < (pheno.minSoilTemp || 10)) {
+          soilReason = t('task_notnow_cold_soil').replace('{soil}', Math.round(soilEst)).replace('{min}', pheno.minSoilTemp);
+        }
+      }
+      warnings.push({
+        icon: veg.icon,
+        name: tVeg(veg.name),
+        reason: soilReason || t('task_notnow_out_of_window'),
+        nextM: nextLabel,
+      });
+    });
+
+    if (warnings.length) {
+      pasMaintenantHTML = '<div class="prem-today-group prem-today-group-notnow">' + t('today_group_notnow') + '</div>';
+      warnings.forEach(function(w) {
+        pasMaintenantHTML +=
+          '<div class="prem-today-notnow">' +
+            '<div class="prem-today-task-icon">' + w.icon + '</div>' +
+            '<div style="flex:1;min-width:0;">' +
+              '<div class="prem-today-task-text">' + escH(t('task_notnow_title').replace('{name}', w.name)) + '</div>' +
+              '<div class="prem-today-task-sub">' + escH(w.reason) + (w.nextM ? ' · ' + t('task_notnow_wait').replace('{month}', w.nextM) : '') + '</div>' +
+            '</div>' +
+          '</div>';
+      });
+    }
+  }
+
   el.innerHTML = '<div class="fade-in">' +
     '<div class="prem-today-hero">' +
       '<div class="prem-today-hero-left">' +
@@ -854,8 +974,17 @@ async function renderToday() {
       '</div>' : '') +
     alertesHTML +
     tachesHTML +
+    pasMaintenantHTML +
     termeesHTML +
   '</div>';
+}
+
+function toggleWhyPanel(id) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.classList.toggle('open');
+  var btn = el.previousElementSibling;
+  if (btn) btn.classList.toggle('open');
 }
 
 function validerTache(key) {

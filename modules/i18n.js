@@ -580,6 +580,28 @@ var I18N = {
     task_rotation_bad:'{bed}\u00a0: rotation mauvaise ({n} familles r\u00e9p\u00e9t\u00e9es)',
     task_check_garden:'V\u00e9rifier les tuteurs et paillis',
 
+    // ── V5 Aujourd'hui — raisons & arrosage intelligent ──
+    task_why_btn:'Pourquoi ?',
+    task_reason_cold:'Sol à {temp}°C : {name} est sensible au froid (indice {cold}/10). Protéger avec un voile ou rentrer les jeunes plants.',
+    task_reason_heat:'Température {temp}°C : {name} subit un stress thermique. Ombrer et arroser le matin.',
+    task_reason_wind:'Rafales à {speed} km/h : risque de verse pour {name}. Vérifier les tuteurs.',
+    task_reason_rain:'Pluie {mm} mm : {name} est sensible à l'excès d'eau. Prévenir les maladies fongiques.',
+    task_reason_frost:'Température {temp}°C : risque de gel sur les cultures sensibles. Rentrer les potées, couvrir les jeunes plants.',
+    task_reason_harvest:'Stade de maturité atteint pour {name} : récoltez maintenant avant que la qualité baisse.',
+    task_reason_harvest_soon:'{name} sera prête dans {n} jour(s). Préparez votre récolte.',
+    task_reason_rotation:'Même famille botanique dans {bed} deux saisons de suite. Changer réduit les maladies telluriques.',
+    task_reason_entretien:'Inspection hebdomadaire : vérifier tuteurs, paillis et signes de ravageurs.',
+    task_water_bed:'{bed} : arroser environ {liters} L cette semaine',
+    task_reason_water_bed:'ET0 = {et0} mm/sem · pluie efficace = {rain} mm · KC moyen = {kc}. Déficit hydrique calculé via Hargreaves-Samani.',
+    task_water_rain_ok:'Pluie prévue ({mm} mm) — pas besoin d'arroser avant {day}',
+    task_reason_water_rain:'ET0 = {et0} mm/sem mais {mm} mm de pluie attendus : le déficit sera couvert par les précipitations.',
+    today_group_notnow:'⛔ Pas conseillé maintenant',
+    task_notnow_title:'Ne pas planter {name} maintenant',
+    task_notnow_out_of_window:'Hors de la fenêtre de plantation pour ta zone',
+    task_notnow_cold_soil:'Sol estimé à {soil}°C — minimum requis : {min}°C',
+    task_notnow_wait:'Attends {month}',
+
+
     // ── Intelligence — crop health ──
     intel_health_section:'Sant\u00e9 des cultures',
     intel_health_empty:'Aucune culture active cette saison.',
@@ -1435,6 +1457,28 @@ var I18N = {
     plan_reason_small_space:'Small space left',
     task_rotation_bad:'{bed}: bad rotation ({n} families repeated)',
     task_check_garden:'Check stakes and mulch',
+
+    // ── V5 Today — reasons & smart irrigation ──
+    task_why_btn:'Why?',
+    task_reason_cold:'Temperature {temp}°C: {name} is cold-sensitive (index {cold}/10). Cover with fleece or bring seedlings indoors.',
+    task_reason_heat:'Temperature {temp}°C: {name} is under heat stress. Shade and water in the morning.',
+    task_reason_wind:'Gusts at {speed} km/h: {name} may topple. Check stakes.',
+    task_reason_rain:'Rain {mm} mm: {name} is sensitive to excess water. Prevent fungal disease.',
+    task_reason_frost:'Temperature {temp}°C: frost risk on sensitive crops. Bring pots inside, cover seedlings.',
+    task_reason_harvest:'Maturity stage reached for {name}: harvest now before quality drops.',
+    task_reason_harvest_soon:'{name} will be ready in {n} day(s). Prepare your harvest.',
+    task_reason_rotation:'Same botanical family in {bed} for two seasons. Rotating reduces soil-borne diseases.',
+    task_reason_entretien:'Weekly check: stakes, mulch, and signs of pests or disease.',
+    task_water_bed:'{bed}: water approx. {liters} L this week',
+    task_reason_water_bed:'ET0 = {et0} mm/wk · effective rain = {rain} mm · avg KC = {kc}. Hargreaves-Samani water deficit.',
+    task_water_rain_ok:'Rain forecast ({mm} mm) — no need to water before {day}',
+    task_reason_water_rain:'ET0 = {et0} mm/wk but {mm} mm of rain expected: deficit will be covered.',
+    today_group_notnow:'⛔ Not recommended now',
+    task_notnow_title:'Do not plant {name} now',
+    task_notnow_out_of_window:'Outside planting window for your zone',
+    task_notnow_cold_soil:'Soil estimated at {soil}°C — minimum required: {min}°C',
+    task_notnow_wait:'Wait until {month}',
+
 
     // ── Intelligence — crop health ──
     intel_health_section:'Crop health',
