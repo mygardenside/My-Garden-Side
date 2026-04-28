@@ -743,6 +743,43 @@ function generateTasks(weather) {
     addTask('entretien', t('task_check_garden'), 'Entretien', 'info', t('task_reason_entretien'));
   }
 
+  // ── Successions de semis ─────────────────────────────────────
+  // Pour chaque culture récoltée dans les 45 prochains jours,
+  // vérifier si une suite de la même culture est déjà planifiée.
+  // Sinon, suggérer de ressemer maintenant.
+  var allCropsSeason = APP.crops.filter(function(c) {
+    return c.season === APP.currentSeason && (c.status === 'active' || c.status === 'planned');
+  });
+  for (var si = 0; si < activeCrops.length; si++) {
+    var sc = activeCrops[si];
+    if (!sc.dateHarvest) continue;
+    var daysToHarvest = Math.floor((new Date(sc.dateHarvest) - today) / 86400000);
+    if (daysToHarvest < 0 || daysToHarvest > 45) continue;
+    var sv = APP.vegetables[sc.veggieId];
+    if (!sv) continue;
+    // Vérifier si une autre culture du même légume continue après
+    var hasSuccessor = allCropsSeason.some(function(other) {
+      if (other.id === sc.id || other.veggieId !== sc.veggieId) return false;
+      if (!other.datePlant) return other.status === 'planned';
+      return new Date(other.datePlant) > new Date(sc.dateHarvest);
+    });
+    if (!hasSuccessor) {
+      // Vérifier que la saison de semis est encore ouverte (calendrier géolocalisé)
+      var calSuc = typeof GeoCalendar !== 'undefined' ? GeoCalendar.getCalendarForVeggie(sv) : null;
+      var curM = today.getMonth() + 1;
+      var canSowNow = !calSuc || !calSuc.plantMonths || !calSuc.plantMonths.length ||
+        calSuc.plantMonths.indexOf(curM) >= 0 || (calSuc.indoorMonths && calSuc.indoorMonths.indexOf(curM) >= 0);
+      if (!canSowNow) continue;
+      addTask(
+        'succession-' + sc.veggieId,
+        t('task_succession').replace('{icon}', sv.icon).replace('{name}', tVeg(sv.name)),
+        'Succession',
+        daysToHarvest <= 21 ? 'important' : 'info',
+        t('task_reason_succession').replace('{name}', tVeg(sv.name)).replace('{days}', daysToHarvest)
+      );
+    }
+  }
+
   return tasks.filter(function(t) {
     return !completedKeys[t.key];
   });
@@ -815,8 +852,8 @@ async function renderToday() {
   var infos       = toutesLesTaches.filter(function(t) { return t.priority === 'info'; });
 
   // Icones par categorie
-  var iconeCategorie = { 'Recolte':'🎉', 'Arrosage':'💧', 'Protection meteo':'🛡️', 'Tuteurage':'🌿', 'Entretien':'🔧', 'Rotation':'🔄' };
-  var nomCategorie = { 'Recolte': t('plan_cat_harvest'), 'Arrosage': t('plan_cat_water'), 'Protection meteo': t('plan_cat_weather'), 'Tuteurage': t('plan_cat_stake'), 'Entretien': t('plan_cat_maintenance'), 'Rotation': t('plan_cat_rotation') };
+  var iconeCategorie = { 'Recolte':'🎉', 'Arrosage':'💧', 'Protection meteo':'🛡️', 'Tuteurage':'🌿', 'Entretien':'🔧', 'Rotation':'🔄', 'Succession':'🔁' };
+  var nomCategorie = { 'Recolte': t('plan_cat_harvest'), 'Arrosage': t('plan_cat_water'), 'Protection meteo': t('plan_cat_weather'), 'Tuteurage': t('plan_cat_stake'), 'Entretien': t('plan_cat_maintenance'), 'Rotation': t('plan_cat_rotation'), 'Succession': t('plan_cat_succession') };
 
   function buildTacheHTML(tache) {
     var icone = iconeCategorie[tache.category] || '📌';

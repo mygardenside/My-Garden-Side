@@ -256,6 +256,7 @@ function openCropModal(editId, presetBedId, presetVeggieId) {
     '</div>' +
     '<div class="form-group"><label class="form-label">' + t('beds_lbl_notes') + '</label><textarea class="form-textarea" id="cropNotes">' + (crop ? escH(crop.notes || '') : '') + '</textarea></div>' +
     '<div id="cropRotationWarning"></div>' +
+    '<div id="cropCompanionInfo"></div>' +
     '<div class="modal-actions">' +
     '<button class="btn btn-secondary" onclick="closeModal()">' + t('btn_cancel') + '</button>' +
     '<button class="btn btn-primary" onclick="saveCrop(\'' + (editId || '') + '\')">' + (crop ? t('btn_edit_label') : t('btn_add_label')) + '</button>' +
@@ -271,12 +272,15 @@ function openCropModal(editId, presetBedId, presetVeggieId) {
   document.getElementById('cropVeggie').addEventListener('change', function() {
     updateCropDefaultSpace(true);
     updateCropAutoHarvest(true);
+    updateCropCompanion();
   });
+  document.getElementById('cropBed').addEventListener('change', updateCropCompanion);
   document.getElementById('cropDatePlant').addEventListener('change', function() {
     updateCropAutoHarvest(true);
   });
   if (!crop) updateCropDefaultSpace();
   checkCropRotation();
+  updateCropCompanion();
 
   updateCropSpaceHint();
 }
@@ -367,6 +371,53 @@ function updateCropSpaceHint() {
   hintEl.textContent =
     t('crops_hint_surface').replace('{rem}', remaining.toFixed(2)).replace('{size}', cropSurface.toFixed(2));
 }
+function updateCropCompanion() {
+  var el = document.getElementById('cropCompanionInfo');
+  if (!el) return;
+  var vid = document.getElementById('cropVeggie') ? document.getElementById('cropVeggie').value : '';
+  var bid = document.getElementById('cropBed') ? document.getElementById('cropBed').value : '';
+  if (!vid) { el.innerHTML = ''; return; }
+  var v = APP.vegetables[vid];
+  if (!v) { el.innerHTML = ''; return; }
+
+  // Chercher les données de compagnonnage dans VEGGIE_ENRICHI
+  var enrichi = typeof VEGGIE_ENRICHI !== 'undefined' ? VEGGIE_ENRICHI : {};
+  var norm = function(s) { return (s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').trim(); };
+  var key = Object.keys(enrichi).find(function(k) { return norm(k) === norm(v.name); });
+  if (!key || !enrichi[key] || !enrichi[key].associations) { el.innerHTML = ''; return; }
+
+  var bons    = enrichi[key].associations.bons    || [];
+  var mauvais = enrichi[key].associations.mauvais || [];
+
+  // Cultures actuellement dans le bac sélectionné
+  var bedCropNames = [];
+  if (bid) {
+    APP.crops.filter(function(c) {
+      return c.bedId === bid && c.season === APP.currentSeason && c.status === 'active';
+    }).forEach(function(c) {
+      var cv = APP.vegetables[c.veggieId];
+      if (cv) bedCropNames.push(norm(cv.name));
+    });
+  }
+
+  var inBedGood = bons.filter(function(n) { return bedCropNames.indexOf(norm(n)) >= 0; });
+  var inBedBad  = mauvais.filter(function(n) { return bedCropNames.indexOf(norm(n)) >= 0; });
+  var suggest   = bons.filter(function(n) { return bedCropNames.indexOf(norm(n)) < 0; }).slice(0, 4);
+
+  var html = '<div class="crop-companion-panel">';
+  if (inBedBad.length) {
+    html += '<div class="crop-companion-row bad">⚠️ ' + escH(t('companion_conflict').replace('{names}', inBedBad.join(', '))) + '</div>';
+  }
+  if (inBedGood.length) {
+    html += '<div class="crop-companion-row good">✅ ' + escH(t('companion_present').replace('{names}', inBedGood.join(', '))) + '</div>';
+  }
+  if (suggest.length) {
+    html += '<div class="crop-companion-row suggest">💡 ' + escH(t('companion_suggest').replace('{names}', suggest.join(', '))) + '</div>';
+  }
+  html += '</div>';
+  el.innerHTML = (inBedBad.length || inBedGood.length || suggest.length) ? html : '';
+}
+
 function checkCropRotation() {
   var vid = document.getElementById('cropVeggie') ? document.getElementById('cropVeggie').value : '';
   var bid = document.getElementById('cropBed') ? document.getElementById('cropBed').value : '';

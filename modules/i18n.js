@@ -568,6 +568,14 @@ var I18N = {
     plan_sug_m2:'m\u00b2 dispo',
     plan_cat_harvest:'R\u00e9colte', plan_cat_water:'Arrosage', plan_cat_weather:'Protection m\u00e9t\u00e9o',
     plan_cat_stake:'Tuteurage', plan_cat_maintenance:'Entretien', plan_cat_rotation:'Rotation',
+
+    // ── V5.1 Compagnonnage & Successions ──
+    companion_conflict:'Association déconseillée avec {names} (présent dans ce bac)',
+    companion_present:'Bonne association avec {names} (présent dans ce bac)',
+    companion_suggest:'À planter à côté : {names}',
+    task_succession:'{icon} Ressemer {name} pour assurer la continuité',
+    task_reason_succession:'{name} sera récoltée dans {days} jour(s). Sans nouveau semis, vous aurez un trou de production. Semez maintenant pour une récolte continue.',
+    plan_cat_succession:'Succession de semis',
     plan_reason_new_bed:'Nouveau carr\u00e9',
     plan_reason_good_companion:'{n} bon(s) voisin(s)',
     plan_reason_bad_companion:'Voisinage d\u00e9conseill\u00e9',
@@ -1446,6 +1454,14 @@ var I18N = {
     plan_sug_m2:'m\u00b2 available',
     plan_cat_harvest:'Harvest', plan_cat_water:'Watering', plan_cat_weather:'Weather protection',
     plan_cat_stake:'Staking', plan_cat_maintenance:'Maintenance', plan_cat_rotation:'Rotation',
+
+    // ── V5.1 Companion planting & Successions ──
+    companion_conflict:'Bad companion: {names} (present in this bed)',
+    companion_present:'Good companion: {names} (present in this bed)',
+    companion_suggest:'Plant nearby: {names}',
+    task_succession:'{icon} Re-sow {name} for continuous harvest',
+    task_reason_succession:'{name} will be harvested in {days} day(s). Without a new sowing, there will be a production gap. Sow now for continuous harvest.',
+    plan_cat_succession:'Sowing succession',
     plan_reason_new_bed:'New bed',
     plan_reason_good_companion:'{n} good neighbour(s)',
     plan_reason_bad_companion:'Companion mismatch',

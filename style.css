@@ -2178,6 +2178,18 @@ body {
   margin: 16px 0 8px; cursor: pointer; padding: 0 2px;
 }
 
+/* ── V5.1 Compagnonnage dans le modal culture ── */
+.crop-companion-panel {
+  margin: 6px 0 10px; display: flex; flex-direction: column; gap: 5px;
+}
+.crop-companion-row {
+  font-size: 0.78rem; padding: 7px 11px; border-radius: 10px;
+  line-height: 1.4;
+}
+.crop-companion-row.bad     { background: #fff0f0; color: #9f3a3a; border-left: 3px solid #e63946; }
+.crop-companion-row.good    { background: #f0faf5; color: var(--brand-800); border-left: 3px solid var(--brand-500); }
+.crop-companion-row.suggest { background: var(--brand-50); color: var(--brand-700); border-left: 3px solid var(--brand-300); }
+
 /* ── V5 Aujourd'hui — Pourquoi ? ── */
 .prem-today-why-btn {
   display: inline-flex; align-items: center; gap: 3px;
