@@ -860,7 +860,7 @@ async function renderToday() {
     var priorityCls = tache.priority === 'urgent' ? 'urgent' : tache.priority === 'important' ? 'important' : 'info';
     var isRecolte = tache.key.indexOf('harvest-') === 0;
     var cropId = isRecolte ? tache.key.replace('harvest-', '') : '';
-    var btnRecolte = isRecolte ? '<div style="margin-top:8px;"><button class="btn btn-sm btn-primary" onclick="event.stopPropagation();harvestCrop(\'' + cropId + '\')">' + t('today_harvest_btn') + '</button></div>' : '';
+    var btnRecolte = isRecolte ? '<div style="margin-top:8px;"><button class="btn btn-sm btn-primary" onclick="event.stopPropagation();quickHarvestCrop(\'' + cropId + '\')">' + t('today_harvest_btn') + '</button></div>' : '';
     var whyId = 'why-' + tache.key.replace(/[^a-z0-9]/gi, '-');
     var btnWhy = tache.reason
       ? '<button class="prem-today-why-btn" onclick="event.stopPropagation();toggleWhyPanel(\'' + whyId + '\')">' + t('task_why_btn') + '</button>' +
@@ -932,6 +932,70 @@ async function renderToday() {
     weatherTemp = Math.round(weather.current.temperature_2m) + '\u00B0C';
     weatherInfo = weather.current.precipitation > 0 ? weather.current.precipitation + 'mm' : t('today_dry');
   }
+
+  // ── Bloc stats récoltes ────────────────────────────────────────
+  var harvestStatsHTML = '';
+  (function() {
+    var seasonCrops = APP.crops.filter(function(c) { return c.season === APP.currentSeason; });
+    // Total saison (cultures récoltées + partielles)
+    var totalKg = 0;
+    var totalEst = 0;
+    var recentEntries = []; // { icon, name, kg, date }
+    var sevenDaysAgo = new Date(today); sevenDaysAgo.setDate(today.getDate() - 7);
+
+    seasonCrops.forEach(function(c) {
+      var vg = APP.vegetables[c.veggieId];
+      if (!vg) return;
+      var partials = c.partialHarvests || [];
+      partials.forEach(function(h) {
+        totalKg += h.kg || 0;
+        recentEntries.push({ icon: vg.icon, name: tVeg(vg.name), kg: h.kg || 0, date: h.date });
+      });
+      if (c.status === 'harvested' && c.yieldReal && !partials.length) {
+        totalKg += c.yieldReal;
+        recentEntries.push({ icon: vg.icon, name: tVeg(vg.name), kg: c.yieldReal, date: c.dateHarvest || todayStr });
+      }
+      totalEst += getCropEstimatedYield(c);
+    });
+
+    if (totalKg <= 0) return; // Rien récolté — ne pas afficher
+
+    // Trier les entrées récentes par date décroissante et prendre les 4 dernières
+    recentEntries.sort(function(a, b) { return (b.date || '').localeCompare(a.date || ''); });
+    var shown = recentEntries.slice(0, 4);
+
+    var pct = totalEst > 0 ? Math.min(100, Math.round(totalKg / totalEst * 100)) : null;
+    var barW = pct !== null ? pct : 100;
+
+    // Construire les entrées récentes
+    var entriesHTML = shown.map(function(e) {
+      var daysAgo = Math.floor((today - new Date(e.date)) / 86400000);
+      var dateStr = daysAgo === 0 ? t('today_harvest_today')
+                  : daysAgo === 1 ? t('today_harvest_yesterday')
+                  : t('today_harvest_days_ago').replace('{n}', daysAgo);
+      return '<div class="today-harvest-entry">' +
+        '<span class="today-harvest-entry-icon">' + e.icon + '</span>' +
+        '<span class="today-harvest-entry-name">' + escH(e.name) + '</span>' +
+        '<span class="today-harvest-entry-kg">' + e.kg.toFixed(1) + ' kg</span>' +
+        '<span class="today-harvest-entry-date">' + dateStr + '</span>' +
+      '</div>';
+    }).join('');
+
+    harvestStatsHTML =
+      '<div class="today-harvest-stats">' +
+        '<div class="today-harvest-stats-head">' +
+          '<span class="today-harvest-stats-title">🏆 ' + t('today_harvest_title') + '</span>' +
+          '<span class="today-harvest-stats-total">' + totalKg.toFixed(1) + ' kg</span>' +
+        '</div>' +
+        (pct !== null ?
+          '<div class="today-harvest-bar-wrap">' +
+            '<div class="today-harvest-bar"><div class="today-harvest-bar-fill" style="width:' + barW + '%"></div></div>' +
+            '<span class="today-harvest-bar-label">' + t('today_harvest_pct').replace('{pct}', pct).replace('{est}', totalEst.toFixed(1)) + '</span>' +
+          '</div>'
+        : '') +
+        (entriesHTML ? '<div class="today-harvest-entries">' + entriesHTML + '</div>' : '') +
+      '</div>';
+  }());
 
   // ── Section "Pas maintenant" — cultures planifiées hors fenêtre ──
   var pasMaintenantHTML = '';
@@ -1013,6 +1077,7 @@ async function renderToday() {
     tachesHTML +
     pasMaintenantHTML +
     termeesHTML +
+    harvestStatsHTML +
   '</div>';
 }
 

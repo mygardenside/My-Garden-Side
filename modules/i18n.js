@@ -430,6 +430,13 @@ var I18N = {
     today_group_todo:'\uD83D\uDFE2 \u00c0 faire ({n})',
     today_done_header:'\u2705 T\u00e2ches termin\u00e9es ({n})',
     today_task_done:'Termin\u00e9',
+
+    // ── V5.2 Journal de récolte ──
+    today_harvest_title:'Récoltes cette saison',
+    today_harvest_pct:'{pct}% de l'objectif ({est} kg estimés)',
+    today_harvest_today:'aujourd'hui',
+    today_harvest_yesterday:'hier',
+    today_harvest_days_ago:'il y a {n} j',
     today_empty:'Aucune action pour aujourd\'hui.\nVotre jardin est en pleine forme\u00a0!',
     today_dry:'Sec',
     today_alert_frost:'Risque de gel \u2014 {temp}\u00b0C',
@@ -1316,6 +1323,13 @@ var I18N = {
     today_group_todo:'\uD83D\uDFE2 To do ({n})',
     today_done_header:'\u2705 Completed tasks ({n})',
     today_task_done:'Done',
+
+    // ── V5.2 Harvest journal ──
+    today_harvest_title:'Harvests this season',
+    today_harvest_pct:'{pct}% of target ({est} kg estimated)',
+    today_harvest_today:'today',
+    today_harvest_yesterday:'yesterday',
+    today_harvest_days_ago:'{n} days ago',
     today_empty:'No actions for today.\nYour garden is doing great!',
     today_dry:'Dry',
     today_alert_frost:'Frost risk \u2014 {temp}\u00b0C',

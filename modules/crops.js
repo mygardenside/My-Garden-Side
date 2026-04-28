@@ -626,6 +626,32 @@ function harvestCrop(id) {
     '</div>'
   );
 }
+// Récolte rapide : modal simplifié sans étape de preview — 2 taps depuis "Aujourd'hui"
+function quickHarvestCrop(id) {
+  var crop = APP.crops.find(function(c) { return c.id === id; });
+  if (!crop) return;
+  var v = APP.vegetables[crop.veggieId];
+  var est = getCropEstimatedYield(crop);
+  var cumul = (crop.partialHarvests || []).reduce(function(s, h) { return s + (h.kg || 0); }, 0);
+  var prefill = cumul > 0 ? '0.0' : est.toFixed(1);
+  var icon = v ? vIcon(v, crop.veggieId, 56) : '<span style="font-size:2.5rem;">🌱</span>';
+  var name = v ? escH(tVeg(v.name)) : '?';
+  openModal(
+    '<div class="modal-header"><div class="modal-title">' + (v ? v.icon + ' ' : '') + name + '</div>' +
+    '<button class="modal-close" onclick="closeModal()">&times;</button></div>' +
+    '<div style="text-align:center;margin:12px 0 16px;">' + icon + '</div>' +
+    '<div class="form-group">' +
+    '<label class="form-label">' + t('crops_lbl_real_yield_input') + '</label>' +
+    '<input type="number" step="0.1" class="form-input" id="harvestYield" value="' + prefill + '" style="font-size:1.3rem;text-align:center;">' +
+    '<div class="form-hint">' + t('crops_lbl_estimate').replace('{kg}', est.toFixed(1)) + (cumul > 0 ? ' · ' + t('crops_partial_count').replace('{n}', (crop.partialHarvests||[]).length).replace('{kg}', cumul.toFixed(1)) : '') + '</div>' +
+    '</div>' +
+    '<div class="modal-actions">' +
+    '<button class="btn btn-secondary" onclick="confirmPartialHarvest(\'' + id + '\')">' + t('crops_harvest_partial') + '</button>' +
+    '<button class="btn btn-primary" onclick="confirmFinalHarvest(\'' + id + '\')">' + t('crops_harvest_final') + '</button>' +
+    '</div>'
+  );
+}
+
 function previewHarvest(id, isFinal) {
   var crop = APP.crops.find(function(c) { return c.id === id; });
   if (!crop) return;

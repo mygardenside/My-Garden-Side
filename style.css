@@ -2178,6 +2178,35 @@ body {
   margin: 16px 0 8px; cursor: pointer; padding: 0 2px;
 }
 
+/* ── V5.2 Journal de récolte — stats dans Aujourd'hui ── */
+.today-harvest-stats {
+  background: linear-gradient(135deg, #f0faf5 0%, #e8f7f0 100%);
+  border: 1px solid rgba(11,93,71,0.12); border-radius: 18px;
+  padding: 14px 16px; margin: 12px 0 6px;
+}
+.today-harvest-stats-head {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 8px;
+}
+.today-harvest-stats-title { font-size: 0.78rem; font-weight: 700; color: var(--brand-800); }
+.today-harvest-stats-total { font-size: 1.3rem; font-weight: 800; color: var(--brand-700); }
+.today-harvest-bar-wrap { margin-bottom: 10px; }
+.today-harvest-bar {
+  height: 6px; background: rgba(11,93,71,0.12); border-radius: 99px;
+  overflow: hidden; margin-bottom: 3px;
+}
+.today-harvest-bar-fill { height: 100%; background: var(--brand-500); border-radius: 99px; }
+.today-harvest-bar-label { font-size: 0.7rem; color: var(--brand-600); }
+.today-harvest-entries { display: flex; flex-direction: column; gap: 4px; }
+.today-harvest-entry {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 0.76rem; padding: 3px 0;
+}
+.today-harvest-entry-icon  { font-size: 1rem; flex-shrink: 0; }
+.today-harvest-entry-name  { flex: 1; color: var(--text); font-weight: 500; }
+.today-harvest-entry-kg    { font-weight: 700; color: var(--brand-700); flex-shrink: 0; }
+.today-harvest-entry-date  { color: var(--text-light); flex-shrink: 0; min-width: 60px; text-align: right; }
+
 /* ── V5.1 Compagnonnage dans le modal culture ── */
 .crop-companion-panel {
   margin: 6px 0 10px; display: flex; flex-direction: column; gap: 5px;
