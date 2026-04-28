@@ -433,8 +433,8 @@ var I18N = {
 
     // ── V5.2 Journal de récolte ──
     today_harvest_title:'Récoltes cette saison',
-    today_harvest_pct:'{pct}% de l'objectif ({est} kg estimés)',
-    today_harvest_today:'aujourd'hui',
+    today_harvest_pct:'{pct}% de l\'objectif ({est} kg estimés)',
+    today_harvest_today:'aujourd\'hui',
     today_harvest_yesterday:'hier',
     today_harvest_days_ago:'il y a {n} j',
     today_empty:'Aucune action pour aujourd\'hui.\nVotre jardin est en pleine forme\u00a0!',
@@ -600,7 +600,7 @@ var I18N = {
     task_reason_cold:'Sol à {temp}°C : {name} est sensible au froid (indice {cold}/10). Protéger avec un voile ou rentrer les jeunes plants.',
     task_reason_heat:'Température {temp}°C : {name} subit un stress thermique. Ombrer et arroser le matin.',
     task_reason_wind:'Rafales à {speed} km/h : risque de verse pour {name}. Vérifier les tuteurs.',
-    task_reason_rain:'Pluie {mm} mm : {name} est sensible à l'excès d'eau. Prévenir les maladies fongiques.',
+    task_reason_rain:'Pluie {mm} mm : {name} est sensible à l\'excès d\'eau. Prévenir les maladies fongiques.',
     task_reason_frost:'Température {temp}°C : risque de gel sur les cultures sensibles. Rentrer les potées, couvrir les jeunes plants.',
     task_reason_harvest:'Stade de maturité atteint pour {name} : récoltez maintenant avant que la qualité baisse.',
     task_reason_harvest_soon:'{name} sera prête dans {n} jour(s). Préparez votre récolte.',
@@ -608,7 +608,7 @@ var I18N = {
     task_reason_entretien:'Inspection hebdomadaire : vérifier tuteurs, paillis et signes de ravageurs.',
     task_water_bed:'{bed} : arroser environ {liters} L cette semaine',
     task_reason_water_bed:'ET0 = {et0} mm/sem · pluie efficace = {rain} mm · KC moyen = {kc}. Déficit hydrique calculé via Hargreaves-Samani.',
-    task_water_rain_ok:'Pluie prévue ({mm} mm) — pas besoin d'arroser avant {day}',
+    task_water_rain_ok:'Pluie prévue ({mm} mm) — pas besoin d\'arroser avant {day}',
     task_reason_water_rain:'ET0 = {et0} mm/sem mais {mm} mm de pluie attendus : le déficit sera couvert par les précipitations.',
     today_group_notnow:'⛔ Pas conseillé maintenant',
     task_notnow_title:'Ne pas planter {name} maintenant',
