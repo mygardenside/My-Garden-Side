@@ -77,13 +77,17 @@ var IrrigationModule = (function () {
   }
 
   // ET0 mensuelle (mm/mois) via Hargreaves-Samani
-  // ET0_j (mm/j) = 0.0023 × Ra × (Tmean + 17.8) × √(Tmax − Tmin)
+  // ET0_j (mm/j) = 0.0023 × Ra_mm × (Tmean + 17.8) × √(Tmax − Tmin)
+  // Ra_mm = Ra (MJ/m²/j) ÷ 2.45 (chaleur latente de vaporisation)
+  // Le constant 0.0023 est calibré pour Ra en mm/j équivalent — pas MJ/m²/j.
+  var DAYS_PER_MONTH = [31,28,31,30,31,30,31,31,30,31,30,31];
   function _monthET0(mt, lat, monthIdx) {
     var doy   = Math.round(monthIdx * 30.44 + 15);
-    var Ra    = _Ra(lat, doy);
+    var RaMJ  = _Ra(lat, doy);
+    var Ra    = RaMJ / 2.45; // MJ/m²/j → mm/j équivalent (λ = 2.45 MJ/kg)
     var Tdiff = Math.max(0, mt.tmax - mt.tmin);
     var et0d  = 0.0023 * Ra * (mt.tmean + 17.8) * Math.sqrt(Tdiff);
-    return Math.max(0, et0d) * 30; // mm/mois
+    return Math.max(0, et0d) * (DAYS_PER_MONTH[monthIdx] || 30); // mm/mois
   }
 
   // KC d'une culture selon son stade de croissance
