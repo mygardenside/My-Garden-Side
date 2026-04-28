@@ -439,6 +439,13 @@ var GeoCalendar = (function () {
     return ((m - 1 + n + 120) % 12) + 1;
   }
 
+  // Décale tous les mois de +6 (hémisphère sud : inversion des saisons)
+  function _shiftMonths(months) {
+    return _uniq(months.map(function (m) {
+      return ((m - 1 + 6) % 12) + 1;
+    }));
+  }
+
   // Déduplique et trie un tableau de mois (1-12)
   function _uniq(months) {
     var seen = {}, out = [];
@@ -738,6 +745,8 @@ var GeoCalendar = (function () {
           ? getPlantingCalendarForVeggie(veggie) : null;
       }
 
+      var isSouth = location && typeof location.lat === 'number' && location.lat < 0;
+
       // ── Calendrier de référence curatie (priorité sur le modèle mathématique) ──
       var ref = _getZoneRef(veggie.name, climate.koppen);
       if (ref && ref.plant && ref.plant.length) {
@@ -747,10 +756,18 @@ var GeoCalendar = (function () {
           var indDOY = Math.max(1, _monthMidDoy(ref.plant[0]) - pheno.indoorWeeks * 7);
           indoorMo = [_doyToMonth(indDOY)];
         }
+        var plantM   = _uniq(ref.plant);
+        var indoorM  = _uniq(indoorMo);
+        var harvestM = _uniq(ref.harvest || []);
+        if (isSouth) {
+          plantM   = _shiftMonths(plantM);
+          indoorM  = _shiftMonths(indoorM);
+          harvestM = _shiftMonths(harvestM);
+        }
         return {
-          plantMonths:  _uniq(ref.plant),
-          indoorMonths: _uniq(indoorMo),
-          harvestMonths: _uniq(ref.harvest || []),
+          plantMonths:  plantM,
+          indoorMonths: indoorM,
+          harvestMonths: harvestM,
           warnings:     [],
           adjusted:     true,
         };
@@ -762,6 +779,12 @@ var GeoCalendar = (function () {
       else if (pheno.frostKill)                       result = _warmSeason(pheno, climate);
       else if (pheno.maxAirTemp !== undefined)        result = _coolSeason(pheno, climate);
       else                                            result = _generalCrop(pheno, climate);
+
+      if (isSouth) {
+        result.plantMonths   = _shiftMonths(result.plantMonths   || []);
+        result.indoorMonths  = _shiftMonths(result.indoorMonths  || []);
+        result.harvestMonths = _shiftMonths(result.harvestMonths || []);
+      }
 
       result.adjusted = true;
       return result;
