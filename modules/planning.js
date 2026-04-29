@@ -279,7 +279,7 @@ function openPlanCropModal(horizon, presetBedId) {
     var b = APP.beds[j];
     var avail = getBedAvailableSpace(b, false);
     var selected = presetBedId === b.id;
-    bedOptions += '<option value="' + b.id + '"' + (selected ? ' selected' : '') + '>' + escH(b.name) + ' (' + avail.toFixed(2) + ' m\u00B2 ' + t('plan_available') + ')</option>';
+    bedOptions += '<option value="' + b.id + '"' + (selected ? ' selected' : '') + '>' + escH(b.name) + ' (' + avail.toFixed(2) + ' ' + t('plan_available') + ')</option>';
   }
   openModal(
     '<div class="modal-header"><div class="modal-title">' + t('plan_modal_title') + '</div><button class="modal-close" onclick="closeModal()">&times;</button></div>' +
