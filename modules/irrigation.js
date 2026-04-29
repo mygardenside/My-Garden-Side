@@ -158,9 +158,9 @@ var IrrigationModule = (function () {
       var total = 0, defBeds = 0;
       beds.forEach(function (bed) {
         var n = this.getBedWaterNeed(bed);
-        if (!n) return;
-        total   += n.litersPerWeek;
-        if (n.deficit) defBeds++;
+        if (!n || !n.deficit) return;
+        total += n.litersPerWeek;
+        defBeds++;
       }, this);
       return { totalLiters: Math.round(total), deficitBeds: defBeds };
     },
