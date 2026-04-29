@@ -49,11 +49,29 @@ var RecommendationsModule = (function () {
     return null;
   }
 
-  // ── Règle 2 : Récolte imminente (≤ 7 jours) ──────────────────
+  // ── Règle 2 : Récolte prête ou imminente ──────────────────────
   function _ruleHarvest(crops, vegs, season) {
     var today = new Date();
+    // Priorité au stage ratio (cohérent avec Actions du jour)
+    var readyNow = crops.filter(function (c) {
+      if (c.status === 'harvested' || c.season !== season) return false;
+      return typeof getCropStage === 'function' && getCropStage(c) === 'harvest';
+    });
+    if (readyNow.length) {
+      var en = _en();
+      var names = readyNow.map(function (c) { return _vegName(vegs[c.veggieId]); }).slice(0, 3);
+      return {
+        priority: 1,
+        icon: '🛒',
+        title: en ? 'Ready to harvest' : 'Prêt à récolter',
+        body: names.join(', ') + ' — ' + (en ? 'harvest now for best quality.' : 'récoltez maintenant pour la meilleure qualité.'),
+        action: 'beds',
+      };
+    }
+    // Fallback : dateHarvest dans ≤ 7 jours, pas encore au stade harvest
     var imminent = crops.filter(function (c) {
       if (!c.dateHarvest || c.status === 'harvested' || c.season !== season) return false;
+      if (typeof getCropStage === 'function' && getCropStage(c) === 'harvest') return false;
       var d = Math.floor((new Date(c.dateHarvest) - today) / 86400000);
       return d >= 0 && d <= 7;
     });
