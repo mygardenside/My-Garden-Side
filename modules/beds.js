@@ -4,10 +4,18 @@
 var _bedGhostShield = false;
 
 // ========== ZONES — Mes Zones ==========
-function renderBeds() {
+async function renderBeds() {
   var el = document.getElementById('pageBeds');
   document.getElementById('headerTitle').textContent = t('nav_beds');
   document.getElementById('fab').style.display = 'flex';
+  // Météo réelle pour l'irrigation (cachée 30 min, instantanée si déjà chargée)
+  try {
+    var _wx = await fetchWeather();
+    if (typeof IrrigationModule !== 'undefined' && _wx && _wx.daily) {
+      var _r7 = (_wx.daily.precipitation_sum || []).slice(0, 7).reduce(function(s, v) { return s + (v || 0); }, 0);
+      IrrigationModule.setForecastRain(_r7);
+    }
+  } catch(e) { /* fallback moyenne historique */ }
   if (getAppState('beds').length === 0) {
     el.innerHTML = '<div class="empty-state fade-in">' +
       '<div class="empty-icon">\uD83C\uDF31</div>' +

@@ -557,6 +557,12 @@ function generateTasks(weather) {
       .forEach(function(t) { completedKeys[t.key] = true; });
   }
 
+  // ── Pluie réelle 7 jours → calibrer IrrigationModule ──────────
+  if (typeof IrrigationModule !== 'undefined' && weather && weather.daily) {
+    var _rain7 = (weather.daily.precipitation_sum || []).slice(0, 7).reduce(function(s, v) { return s + (v || 0); }, 0);
+    IrrigationModule.setForecastRain(_rain7);
+  }
+
   // ── Prévision pluie sur les 3 prochains jours ─────────────────
   var rainNext3Days = 0;
   var rainDayLabel = '';

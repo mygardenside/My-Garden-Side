@@ -100,8 +100,16 @@ var IrrigationModule = (function () {
     return table.mid;
   }
 
+  // Pluie réelle prévue (mm/semaine) — null = utiliser la moyenne historique
+  var _forecastRainWeekMm = null;
+
   // ── API publique ───────────────────────────────────────────────
   return {
+
+    // Stocker la pluie prévue sur 7 jours (mm) depuis la météo en temps réel
+    setForecastRain: function (weeklyMm) {
+      _forecastRainWeekMm = (typeof weeklyMm === 'number' && !isNaN(weeklyMm)) ? weeklyMm : null;
+    },
 
     // Besoin en eau d'un bac pour la semaine en cours (null si pas de données/cultures)
     getBedWaterNeed: function (bed) {
@@ -137,7 +145,9 @@ var IrrigationModule = (function () {
       var avgKC = totalSurf > 0 ? weightedKC / totalSurf : 0.9;
 
       var etcW    = et0w * avgKC;                    // besoin culture (mm/sem.)
-      var rainW   = (mt.precip || 0) * 0.7 / 4.33; // pluie efficace 70 % (mm/sem.)
+      var rainW   = _forecastRainWeekMm !== null
+        ? _forecastRainWeekMm * 0.7               // pluie réelle 7 j × 70 % efficacité
+        : (mt.precip || 0) * 0.7 / 4.33;          // pluie historique mensuelle ÷ 4.33
       var netMm   = Math.max(0, etcW - rainW);       // déficit net (mm/sem.)
       var bedSurf = typeof getBedSurface === 'function' ? getBedSurface(bed) : 1;
 

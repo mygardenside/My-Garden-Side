@@ -45,6 +45,10 @@ async function renderDashboard() {
 
   try {
     var weather = await fetchWeather();
+    if (typeof IrrigationModule !== 'undefined' && weather && weather.daily) {
+      var _r7 = (weather.daily.precipitation_sum || []).slice(0, 7).reduce(function(s, v) { return s + (v || 0); }, 0);
+      IrrigationModule.setForecastRain(_r7);
+    }
     var data = calculateDashboardData(weather);
 
     var hero     = _homeHero(data, weather);
