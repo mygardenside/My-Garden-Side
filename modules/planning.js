@@ -1062,6 +1062,30 @@ async function renderToday() {
     }
   }
 
+  // ── Conseils RecommendationsModule ─────────────────────────
+  var conseilsHTML = '';
+  (function() {
+    if (typeof RecommendationsModule === 'undefined') return;
+    var tips = RecommendationsModule.generate(weather) || [];
+    if (!tips.length) return;
+    var html = '<div class="prem-today-group" style="margin-top:8px;">🧠 ' + t('dash_section_conseil') + '</div>';
+    tips.slice(0, 3).forEach(function(tip) {
+      var nav = tip.action || 'beds';
+      html += '<div class="mgs-home-list-card" onclick="navigate(\'' + nav + '\')" style="margin-bottom:8px;">' +
+        '<div class="mgs-home-list-icon">' + (tip.icon || '🌿') + '</div>' +
+        '<div class="mgs-home-list-body">' +
+          '<div class="mgs-home-list-title">' + escH(tip.title) + '</div>' +
+          '<div class="mgs-home-list-sub">' + escH(tip.body) + '</div>' +
+        '</div>' +
+        '<div class="mgs-home-list-arrow">›</div>' +
+      '</div>';
+    });
+    conseilsHTML = html;
+  }());
+
+  // ── Suggestions plantation ──────────────────────────────────
+  var plantationsHTML = (typeof buildSmartSuggestionsHTML === 'function') ? buildSmartSuggestionsHTML(3) : '';
+
   el.innerHTML = '<div class="fade-in">' +
     '<div class="prem-today-hero">' +
       '<div class="prem-today-hero-left">' +
@@ -1084,6 +1108,8 @@ async function renderToday() {
     pasMaintenantHTML +
     termeesHTML +
     harvestStatsHTML +
+    conseilsHTML +
+    plantationsHTML +
   '</div>';
 }
 
