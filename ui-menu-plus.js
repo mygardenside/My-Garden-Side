@@ -55,7 +55,14 @@ function togglePlusMenu() {
  */
 function updatePlusMenuBeds() {
   var container = document.getElementById('plusBedsList');
-  if (!container) return;
+  if (!container) {
+    // Ancien cache : créer le conteneur dynamiquement dans le dropdown
+    var dropdown = document.querySelector('.hbg-dropdown');
+    if (!dropdown) return;
+    container = document.createElement('div');
+    container.id = 'plusBedsList';
+    dropdown.appendChild(container);
+  }
 
   var beds = (typeof getAppState === 'function') ? (getAppState('beds') || []) : [];
   var isEn = (typeof getAppState === 'function') && getAppState('language') === 'en';
