@@ -252,6 +252,7 @@ function renderBedDetail(bedId) {
     '<div><div style="font-size:1.1rem;font-weight:700;">' + escH(bed.name) + '</div>' +
     '<div style="font-size:0.85rem;color:var(--text-light);">' + bed.length + 'm x ' + bed.width + 'm = ' + surface.toFixed(1) + ' m\u00B2</div></div>' +
     '<div class="btn-group">' +
+    (!bed.gardenElId ? '<button class="btn btn-sm btn-primary" onclick="addBedToGardenView(\'' + bed.id + '\')" title="' + (getAppState('language')==='en' ? 'Place in garden' : 'Placer dans le jardin') + '">🗺️</button>' : '') +
     '<button class="btn btn-sm btn-secondary" onclick="openBedModal(\'' + bed.id + '\')">✏️</button>' +
     '<button class="btn btn-sm btn-danger" onclick="deleteBed(\'' + bed.id + '\')">🗑️</button>' +
     '</div></div>' +

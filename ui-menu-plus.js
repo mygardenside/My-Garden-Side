@@ -42,7 +42,6 @@ function togglePlusMenu() {
   overlay.classList.toggle('open');
   var btn = document.getElementById('navBtnPlus');
   if (btn) btn.classList.toggle('active', overlay.classList.contains('open'));
-  if (overlay.classList.contains('open')) updatePlusMenuBeds();
 }
 
 // ============================================================
