@@ -631,10 +631,7 @@ function renderAnalysis() {
     yieldChartHTML + topFlopHTML +
     surfaceHTML + healthHTML +
 
-    // 4. Actions recommandées
-    buildAnalysisActionsSection() +
-
-    // Conseils et comparaisons (existants, en bas)
+    // 4. Conseils et comparaisons
     tipsHTML + compareHTML +
 
     // 5. Saison précédente — frise chronologique

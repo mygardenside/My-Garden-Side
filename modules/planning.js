@@ -1532,16 +1532,13 @@ function renderPlanning() {
   el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-light);">\u23F3 ' + t('plan_loading') + '</div>';
 
   fetchWeather().then(function(weather) {
-    // Section 1 : Actions prioritaires
-    var actionsHTML = buildSmartActionsSection(weather);
-
-    // Section 2 : Frise saison
+    // Section 1 : Frise saison
     var friseHTML = '<div class="section-title">' + t('plan_section_frise') + '</div>' + renderFrisePlanning();
 
-    // Section 4 : Calendrier et prévisions (existants)
+    // Section 2 : Calendrier et prévisions
     var forecastHTML = '<div class="section-title">' + t('plan_section_preparation') + '</div>' + renderForecastSection('1m');
 
-    el.innerHTML = '<div class="fade-in">' + actionsHTML + friseHTML + forecastHTML + '</div>';
+    el.innerHTML = '<div class="fade-in">' + friseHTML + forecastHTML + '</div>';
 
   }).catch(function(err) {
     console.error('Erreur planning:', err);

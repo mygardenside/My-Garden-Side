@@ -56,7 +56,6 @@ async function renderDashboard() {
     var garden   = _homeGardenSection(data);
     var actions  = _homeActionsSection(data.smartActs, data.tasks);
     var irrigation = _homeIrrigationCard(data.irr);
-    var insight  = _homeInsightSection(weather);
 
     el.innerHTML =
       '<div class="mgs-home fade-in">' +
@@ -65,7 +64,6 @@ async function renderDashboard() {
         irrigation +
         actions +
         garden +
-        insight +
       '</div>';
 
   } catch (err) {
