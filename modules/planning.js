@@ -746,44 +746,44 @@ function generateTasks(weather) {
   }
 
   if (activeCrops.length > 0) {
-    addTask('entretien', t('task_check_garden'), 'Entretien', 'info', t('task_reason_entretien'));
-  }
-
-  // ── Successions de semis ─────────────────────────────────────
-  // Pour chaque culture récoltée dans les 45 prochains jours,
-  // vérifier si une suite de la même culture est déjà planifiée.
-  // Sinon, suggérer de ressemer maintenant.
-  var allCropsSeason = APP.crops.filter(function(c) {
-    return c.season === APP.currentSeason && (c.status === 'active' || c.status === 'planned');
-  });
-  for (var si = 0; si < activeCrops.length; si++) {
-    var sc = activeCrops[si];
-    if (!sc.dateHarvest) continue;
-    var daysToHarvest = Math.floor((new Date(sc.dateHarvest) - today) / 86400000);
-    if (daysToHarvest < 0 || daysToHarvest > 45) continue;
-    var sv = APP.vegetables[sc.veggieId];
-    if (!sv) continue;
-    // Vérifier si une autre culture du même légume continue après
-    var hasSuccessor = allCropsSeason.some(function(other) {
-      if (other.id === sc.id || other.veggieId !== sc.veggieId) return false;
-      if (!other.datePlant) return other.status === 'planned';
-      return new Date(other.datePlant) > new Date(sc.dateHarvest);
-    });
-    if (!hasSuccessor) {
-      // Vérifier que la saison de semis est encore ouverte (calendrier géolocalisé)
-      var calSuc = typeof GeoCalendar !== 'undefined' ? GeoCalendar.getCalendarForVeggie(sv) : null;
-      var curM = today.getMonth() + 1;
-      var canSowNow = !calSuc || !calSuc.plantMonths || !calSuc.plantMonths.length ||
-        calSuc.plantMonths.indexOf(curM) >= 0 || (calSuc.indoorMonths && calSuc.indoorMonths.indexOf(curM) >= 0);
-      if (!canSowNow) continue;
-      addTask(
-        'succession-' + sc.veggieId,
-        t('task_succession').replace('{icon}', sv.icon).replace('{name}', tVeg(sv.name)),
-        'Succession',
-        daysToHarvest <= 21 ? 'important' : 'info',
-        t('task_reason_succession').replace('{name}', tVeg(sv.name)).replace('{days}', daysToHarvest)
-      );
-    }
+    // Message d'entretien varié selon le jour de la semaine
+    var isEn = typeof getAppState === 'function' && getAppState('language') === 'en';
+    var _dow = today.getDay(); // 0=dim, 1=lun … 6=sam
+    var _checks = isEn ? [
+      'Check stakes and mulch',
+      'Remove dead leaves and weeds',
+      'Check soil moisture with your finger',
+      'Observe leaf colour and plant posture',
+      'Thin out any overcrowded seedlings',
+      'Clean tools and inspect each bed',
+      'Plan sowings and purchases for the week'
+    ] : [
+      'Vérifie tuteurs et paillis',
+      'Retire les feuilles mortes et mauvaises herbes',
+      'Vérifie l\'humidité du sol au doigt',
+      'Observe la couleur et le port de tes plants',
+      'Éclaircis les plants trop serrés si besoin',
+      'Nettoie les outils et inspecte les bacs',
+      'Prépare tes semis et achats pour la semaine'
+    ];
+    var _reasons = isEn ? [
+      'Weekly inspection: stakes, mulch and signs of pests.',
+      'Dead leaves and weeds harbour disease and pests.',
+      'Soil should be moist 2–5 cm deep — water if dry.',
+      'Yellow or drooping leaves are early warning signs.',
+      'Overcrowding reduces yield and increases disease risk.',
+      'Clean tools prevent spreading pathogens between beds.',
+      'Planning ahead avoids gaps in your harvest calendar.'
+    ] : [
+      'Inspection hebdomadaire : tuteurs, paillis et ravageurs.',
+      'Les feuilles mortes et mauvaises herbes favorisent les maladies.',
+      'Le sol doit être humide à 2–5 cm — arroser si sec.',
+      'Feuilles jaunes ou tombantes : signaux d\'alerte précoces.',
+      'La surpopulation réduit les récoltes et favorise les maladies.',
+      'Les outils sales propagent les pathogènes entre bacs.',
+      'Anticiper évite les trous dans le calendrier de récolte.'
+    ];
+    addTask('entretien', _checks[_dow], 'Entretien', 'info', _reasons[_dow]);
   }
 
   return tasks.filter(function(t) {

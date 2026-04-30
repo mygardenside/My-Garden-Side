@@ -367,26 +367,13 @@ function _homeActionsSection(smartActs, tasks) {
   var rows = '';
   var allActs = [];
 
-  if (smartActs && smartActs.length) {
-    smartActs.slice(0, 3).forEach(function(a) {
-      var id = registerSmartAction({ actionType: a.actionType, payload: a.payload || {} });
-      allActs.push({
-        id: id,
-        nav: false,
-        icon: a.icon || '🌱',
-        title: a.title || '',
-        sub: a.description || ''
-      });
-    });
-  }
-
+  // Uniquement les tâches urgentes/importantes de generateTasks()
+  // (même source que la page Aujourd'hui — cohérence garantie)
   if (tasks && tasks.length) {
     tasks.filter(function(tk) {
       return tk.priority === 'urgent' || tk.priority === 'important';
-    }).slice(0, 2).forEach(function(tk) {
+    }).slice(0, 4).forEach(function(tk) {
       allActs.push({
-        id: null,
-        nav: true,
         icon: '📌',
         title: tk.text || '',
         sub: tk.category || ''
@@ -405,9 +392,8 @@ function _homeActionsSection(smartActs, tasks) {
       '</div>';
   } else {
     rows = allActs.map(function(a) {
-      var onClick = a.nav ? 'navigate(\'today\')' : ('executeSmartActionById(\'' + a.id + '\')');
       return (
-        '<div class="mgs-home-list-card" onclick="' + onClick + '">' +
+        '<div class="mgs-home-list-card" onclick="navigate(\'today\')">' +
           '<div class="mgs-home-list-icon">' + a.icon + '</div>' +
           '<div class="mgs-home-list-body">' +
             '<div class="mgs-home-list-title">' + escH(a.title) + '</div>' +
@@ -437,7 +423,6 @@ function _homeInsightSection(weather) {
         '<span class="mgs-home-section-icon">🧠</span>' +
         '<h3 class="mgs-home-section-title">' + t('dash_section_conseil') + '</h3>' +
       '</div>' +
-      '<button class="mgs-home-section-link" onclick="navigateFromPlus(\'analysis\')">' + t('dash_see_analysis') + '</button>' +
     '</div>';
 
   // V4.3 : RecommendationsModule en priorité
