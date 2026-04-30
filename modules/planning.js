@@ -1062,23 +1062,39 @@ async function renderToday() {
     }
   }
 
-  // ── Conseils RecommendationsModule ─────────────────────────
+  // ── Conseils RecommendationsModule — cartes expansibles ────
   var conseilsHTML = '';
   (function() {
     if (typeof RecommendationsModule === 'undefined') return;
     var tips = RecommendationsModule.generate(weather) || [];
     if (!tips.length) return;
+    var navLabels = {
+      'beds':     t('nav_beds'),
+      'crops':    t('nav_crops'),
+      'planning': t('nav_planning'),
+      'analysis': t('nav_analysis')
+    };
     var html = '<div class="prem-today-group" style="margin-top:8px;">🧠 ' + t('dash_section_conseil') + '</div>';
     tips.slice(0, 3).forEach(function(tip) {
-      var nav = tip.action || 'beds';
-      html += '<div class="mgs-home-list-card" onclick="navigate(\'' + nav + '\')" style="margin-bottom:8px;">' +
-        '<div class="mgs-home-list-icon">' + (tip.icon || '🌿') + '</div>' +
-        '<div class="mgs-home-list-body">' +
-          '<div class="mgs-home-list-title">' + escH(tip.title) + '</div>' +
-          '<div class="mgs-home-list-sub">' + escH(tip.body) + '</div>' +
-        '</div>' +
-        '<div class="mgs-home-list-arrow">›</div>' +
-      '</div>';
+      var nav = tip.action || '';
+      var label = navLabels[nav] || '';
+      var actionBtn = (label && nav)
+        ? '<button class="today-conseil-action-btn" onclick="event.stopPropagation();navigate(\'' + nav + '\')">' + escH(label) + ' →</button>'
+        : '';
+      html +=
+        '<div class="today-conseil-card" onclick="toggleConseilCard(this)">' +
+          '<div class="today-conseil-head">' +
+            '<div class="today-conseil-icon">' + (tip.icon || '🌿') + '</div>' +
+            '<div class="today-conseil-title">' + escH(tip.title) + '</div>' +
+            '<div class="today-conseil-chevron">›</div>' +
+          '</div>' +
+          '<div class="today-conseil-detail">' +
+            '<div class="today-conseil-detail-inner">' +
+              '<div class="today-conseil-body-text">' + escH(tip.body) + '</div>' +
+              actionBtn +
+            '</div>' +
+          '</div>' +
+        '</div>';
     });
     conseilsHTML = html;
   }());
@@ -1119,6 +1135,10 @@ function toggleWhyPanel(id) {
   el.classList.toggle('open');
   var btn = el.previousElementSibling;
   if (btn) btn.classList.toggle('open');
+}
+
+function toggleConseilCard(card) {
+  card.classList.toggle('open');
 }
 
 function validerTache(key) {
