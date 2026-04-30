@@ -649,6 +649,5 @@ function renderAi() {
   el.innerHTML = '<div class="fade-in">' +
     '<div class="section-title">\uD83E\uDDE0 ' + t('ana_section_ai') + '</div>' +
     buildLearningSection(getLearningInsightsV2()) +
-    buildSmartSuggestionsHTML() +
   '</div>';
 }

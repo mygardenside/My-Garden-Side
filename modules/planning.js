@@ -1520,9 +1520,14 @@ function buildSmartActionsSection(weather) {
 
 // ============================================================
 // ========== PLANNING — "Préparer l'avenir" ==========
+function _goToBedWithCrop(bedId, veggieId) {
+  navigate('beds');
+  setTimeout(function() { openCropModal(null, bedId, veggieId); }, 250);
+}
+
 /**
  * Génère le HTML des suggestions intelligentes (prem-sug-card).
- * Appelé depuis renderPlanning() et renderAi().
+ * Appelé depuis renderToday().
  * @param {number} [max=4] — nombre max de suggestions
  */
 function buildSmartSuggestionsHTML(max) {
@@ -1533,11 +1538,9 @@ function buildSmartSuggestionsHTML(max) {
   var html = '<div class="section-title">' + t('plan_section_smart_sug') + '</div>';
   sugs.slice(0, max).forEach(function(sug) {
     var vp = mem.vegetableProfiles[sug.veggieId];
-    var setup = getSuggestedCropSetup(sug.bedId, sug.veggieId);
-    var sugId = registerSmartAction({ actionType:'open_modal', payload:{ modalType:'plan_crop', veggieId:sug.veggieId, bedId:sug.bedId, setup:setup } });
     var sugBedIllus = (typeof getZoneVisual === 'function') ? getZoneVisual(sug.bedId) : '';
     html +=
-      '<div class="prem-sug-card" onclick="executeSmartActionById(\'' + sugId + '\')">' +
+      '<div class="prem-sug-card" onclick="_goToBedWithCrop(\'' + sug.bedId + '\',\'' + sug.veggieId + '\')">' +
         (sugBedIllus ? '<div class="prem-sug-illus" aria-hidden="true">' + sugBedIllus + '</div>' : '') +
         '<div class="prem-sug-icon">' + vIcon(sug.veggie, sug.veggieId, 32) + '</div>' +
         '<div style="flex:1;min-width:0;">' +
