@@ -575,6 +575,7 @@ var I18N = {
     plan_sug_m2:'m\u00b2 dispo',
     plan_cat_harvest:'R\u00e9colte', plan_cat_water:'Arrosage', plan_cat_weather:'Protection m\u00e9t\u00e9o',
     plan_cat_stake:'Tuteurage', plan_cat_maintenance:'Entretien', plan_cat_rotation:'Rotation',
+    plan_cat_plantation:'Plantation',
 
     // ── V5.1 Compagnonnage & Successions ──
     companion_conflict:'Association déconseillée avec {names} (présent dans ce bac)',
@@ -1468,6 +1469,7 @@ var I18N = {
     plan_sug_m2:'m\u00b2 available',
     plan_cat_harvest:'Harvest', plan_cat_water:'Watering', plan_cat_weather:'Weather protection',
     plan_cat_stake:'Staking', plan_cat_maintenance:'Maintenance', plan_cat_rotation:'Rotation',
+    plan_cat_plantation:'Planting',
 
     // ── V5.1 Companion planting & Successions ──
     companion_conflict:'Bad companion: {names} (present in this bed)',

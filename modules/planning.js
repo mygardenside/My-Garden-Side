@@ -731,6 +731,37 @@ function generateTasks(weather) {
     }
   }
 
+  // ── Plantations prévues : alertes et rappels ─────────────────
+  (function() {
+    var isEnPlant = typeof getAppState === 'function' && getAppState('language') === 'en';
+    APP.crops.forEach(function(c) {
+      if (c.status !== 'planned' || !c.datePlant) return;
+      var vg = APP.vegetables[c.veggieId];
+      if (!vg) return;
+      var bed = APP.beds.find(function(b) { return b.id === c.bedId; });
+      var name = tVeg(vg.name);
+      var bedSuffix = bed ? (' — ' + bed.name) : '';
+      var diffDays = Math.round((new Date(c.datePlant) - today) / 86400000);
+      if (diffDays > 3) return;
+      var taskText, priority, reason;
+      if (diffDays > 0) {
+        taskText = vg.icon + ' ' + (isEnPlant ? 'Plant in ' + diffDays + 'd: ' : 'Planter dans ' + diffDays + 'j : ') + name + bedSuffix;
+        priority = diffDays === 1 ? 'important' : 'info';
+        reason = isEnPlant ? 'Planned planting date in ' + diffDays + ' day(s)' : 'Date de plantation prévue dans ' + diffDays + ' jour(s)';
+      } else if (diffDays === 0) {
+        taskText = vg.icon + ' ' + (isEnPlant ? "Plant today : " : "Planter aujourd'hui : ") + name + bedSuffix;
+        priority = 'urgent';
+        reason = isEnPlant ? "Planting day is today!" : "C’est le jour de plantation prévu !";
+      } else {
+        var n = -diffDays;
+        taskText = vg.icon + ' ' + (isEnPlant ? 'Plant (overdue) : ' : 'Planter (en retard) : ') + name + bedSuffix;
+        priority = 'urgent';
+        reason = isEnPlant ? 'Planned ' + n + ' day(s) ago — still time!' : 'Prévu il y a ' + n + ' jour(s) — encore du temps !';
+      }
+      addTask('plant-' + c.id, taskText, 'Plantation', priority, reason);
+    });
+  }());
+
   for (var k = 0; k < APP.beds.length; k++) {
     var rotBed = APP.beds[k];
     var r = getRotationScore(rotBed);
@@ -807,6 +838,7 @@ async function renderToday() {
     '</div>';
 
   var weather = await fetchWeather();
+  _cleanupExpiredPlannedCrops();
   var toutesLesTaches = generateTasks(weather);
   var today = new Date();
   var todayStr = today.toISOString().split('T')[0];
@@ -858,8 +890,8 @@ async function renderToday() {
   var infos       = toutesLesTaches.filter(function(t) { return t.priority === 'info'; });
 
   // Icones par categorie
-  var iconeCategorie = { 'Recolte':'🎉', 'Arrosage':'💧', 'Protection meteo':'🛡️', 'Tuteurage':'🌿', 'Entretien':'🔧', 'Rotation':'🔄', 'Succession':'🔁' };
-  var nomCategorie = { 'Recolte': t('plan_cat_harvest'), 'Arrosage': t('plan_cat_water'), 'Protection meteo': t('plan_cat_weather'), 'Tuteurage': t('plan_cat_stake'), 'Entretien': t('plan_cat_maintenance'), 'Rotation': t('plan_cat_rotation'), 'Succession': t('plan_cat_succession') };
+  var iconeCategorie = { 'Recolte':'🎉', 'Arrosage':'💧', 'Protection meteo':'🛡️', 'Tuteurage':'🌿', 'Entretien':'🔧', 'Rotation':'🔄', 'Succession':'🔁', 'Plantation':'🌱' };
+  var nomCategorie = { 'Recolte': t('plan_cat_harvest'), 'Arrosage': t('plan_cat_water'), 'Protection meteo': t('plan_cat_weather'), 'Tuteurage': t('plan_cat_stake'), 'Entretien': t('plan_cat_maintenance'), 'Rotation': t('plan_cat_rotation'), 'Succession': t('plan_cat_succession'), 'Plantation': t('plan_cat_plantation') };
 
   function buildTacheHTML(tache) {
     var icone = iconeCategorie[tache.category] || '📌';
@@ -867,12 +899,16 @@ async function renderToday() {
     var isRecolte = tache.key.indexOf('harvest-') === 0;
     var cropId = isRecolte ? tache.key.replace('harvest-', '') : '';
     var btnRecolte = isRecolte ? '<div style="margin-top:8px;"><button class="btn btn-sm btn-primary" onclick="event.stopPropagation();quickHarvestCrop(\'' + cropId + '\')">' + t('today_harvest_btn') + '</button></div>' : '';
+    var isPlantation = tache.key.indexOf('plant-') === 0;
+    var cropIdPlant = isPlantation ? tache.key.replace('plant-', '') : '';
+    var isEnUI = typeof getAppState === 'function' && getAppState('language') === 'en';
+    var btnPlantation = isPlantation ? '<div style="margin-top:8px;"><button class="btn btn-sm btn-primary" onclick="event.stopPropagation();quickPlantCrop(\'' + cropIdPlant + '\')">' + (isEnUI ? 'Plant now' : 'Planter maintenant') + '</button></div>' : '';
     var whyId = 'why-' + tache.key.replace(/[^a-z0-9]/gi, '-');
     var btnWhy = tache.reason
       ? '<button class="prem-today-why-btn" onclick="event.stopPropagation();toggleWhyPanel(\'' + whyId + '\')">' + t('task_why_btn') + '</button>' +
         '<div class="prem-today-why-panel" id="' + whyId + '">' + escH(tache.reason) + '</div>'
       : '';
-    return '<div class="prem-today-task ' + priorityCls + '" onclick="validerTache(\'' + tache.key + '\')">' +
+    return '<div class="prem-today-task ' + priorityCls + '" onclick="' + (isPlantation ? 'quickPlantCrop(\'' + cropIdPlant + '\')' : 'validerTache(\'' + tache.key + '\')') + '">' +
       '<div class="prem-today-task-circle"></div>' +
       '<div class="prem-today-task-icon">' + icone + '</div>' +
       '<div style="flex:1;min-width:0;">' +
@@ -880,6 +916,7 @@ async function renderToday() {
         '<div class="prem-today-task-sub">' + escH(nomCategorie[tache.category] || tache.category) + '</div>' +
         btnWhy +
         btnRecolte +
+        btnPlantation +
       '</div>' +
     '</div>';
   }
@@ -1139,6 +1176,28 @@ function toggleWhyPanel(id) {
 
 function toggleConseilCard(card) {
   card.classList.toggle('open');
+}
+
+function quickPlantCrop(cropId) {
+  var crop = APP.crops.find(function(c) { return c.id === cropId; });
+  if (!crop || crop.status !== 'planned') return;
+  var todayStr = new Date().toISOString().split('T')[0];
+  crop.status = 'active';
+  if (!crop.datePlant || crop.datePlant < todayStr) crop.datePlant = todayStr;
+  saveData();
+  renderToday();
+}
+
+function _cleanupExpiredPlannedCrops() {
+  var cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - 14);
+  var cutoffStr = cutoff.toISOString().split('T')[0];
+  var before = APP.crops.length;
+  APP.crops = APP.crops.filter(function(c) {
+    if (c.status !== 'planned' || !c.datePlant) return true;
+    return c.datePlant >= cutoffStr;
+  });
+  if (APP.crops.length !== before) saveData();
 }
 
 function validerTache(key) {
