@@ -3,6 +3,46 @@
 // ========== BEDS ==========
 var _bedGhostShield = false;
 
+// Ajoute un bac APP existant (sans gardenElId) sur le canvas Vue Jardin
+function addBedToGardenView(bedId) {
+  var beds = typeof getAppState === 'function' ? (getAppState('beds') || []) : [];
+  var bed  = beds.find(function(b) { return b.id === bedId; });
+  if (!bed) return;
+
+  navigate('garden');
+
+  setTimeout(function() {
+    if (typeof GardenStore === 'undefined' || typeof createBed === 'undefined') return;
+
+    var cx = 0, cy = 0;
+    if (typeof Renderer !== 'undefined' && Renderer.canvas &&
+        typeof Camera !== 'undefined' && typeof Camera.toWorld === 'function') {
+      var w = Camera.toWorld(Renderer.canvas.width / 2, Renderer.canvas.height / 2);
+      cx = w.x; cy = w.y;
+    }
+
+    var el = createBed(cx, cy, { label: bed.name });
+    if (typeof m2px === 'function') {
+      el.dimensions.width  = m2px(bed.length || 1.2);
+      el.dimensions.height = m2px(bed.width  || 0.8);
+    }
+    el.position.x = cx - el.dimensions.width  / 2;
+    el.position.y = cy - el.dimensions.height / 2;
+    el.appBedId   = bed.id;
+
+    GardenStore.add(el);
+    bed.gardenElId = el.id;
+    if (typeof updateAppState === 'function') updateAppState('beds', beds);
+    GardenStore.save();
+    if (typeof Panels !== 'undefined') Panels.update(el);
+
+    var isEn = typeof getAppState === 'function' && getAppState('language') === 'en';
+    if (typeof GardenBridge !== 'undefined') {
+      GardenBridge._toast(bed.name + ' ' + (isEn ? 'added — drag to position it.' : 'ajouté — déplacez-le à la bonne place.'));
+    }
+  }, 400);
+}
+
 // ========== ZONES — Mes Zones ==========
 async function renderBeds() {
   var el = document.getElementById('pageBeds');
