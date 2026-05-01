@@ -243,10 +243,21 @@ function showBedDetail(bedId) {
   document.getElementById('fab').style.display = 'none';
   history.pushState({ page: 'beds', detail: bedId }, '', '#beds');
 }
-function renderBedDetail(bedId) {
+async function renderBedDetail(bedId) {
   var el = document.getElementById('pageBeds');
   var bed = getAppState('beds').find(function(b) { return b.id === bedId; });
   if (!bed) { detailView = null; renderBeds(); return; }
+
+  // Météo réelle avant tout calcul d'irrigation
+  try {
+    var _wx = await fetchWeather();
+    if (typeof IrrigationModule !== 'undefined' && _wx && _wx.daily) {
+      var _r7 = (_wx.daily.precipitation_sum || []).slice(0, 7)
+        .reduce(function(s, v) { return s + (v || 0); }, 0);
+      IrrigationModule.setForecastRain(_r7);
+    }
+  } catch(e) {}
+
   var crops = getBedCrops(bed.id);
   var activeCrops = crops.filter(function(c) { return c.status === 'active'; });
   var occ = getBedOccupation(bed);
