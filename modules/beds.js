@@ -43,6 +43,49 @@ function addBedToGardenView(bedId) {
   }, 400);
 }
 
+// ========== PHOTO PERSONNALISÉE DES BACS ==========
+function getBedPhoto(bedId) {
+  try { return localStorage.getItem('bedPhoto_' + bedId) || null; } catch(e) { return null; }
+}
+function deleteBedPhoto(bedId) {
+  try { localStorage.removeItem('bedPhoto_' + bedId); } catch(e) {}
+  renderBedDetail(bedId);
+}
+function triggerBedPhotoUpload(bedId) {
+  var inp = document.createElement('input');
+  inp.type = 'file';
+  inp.accept = 'image/*';
+  inp.onchange = function() {
+    if (!inp.files || !inp.files[0]) return;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var img = new Image();
+      img.onload = function() {
+        var maxW = 1200, maxH = 900;
+        var w = img.width, h = img.height;
+        if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
+        if (h > maxH) { w = Math.round(w * maxH / h); h = maxH; }
+        var canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        var b64 = canvas.toDataURL('image/jpeg', 0.75);
+        try {
+          localStorage.setItem('bedPhoto_' + bedId, b64);
+        } catch(ex) {
+          // localStorage plein — réessai en qualité réduite
+          b64 = canvas.toDataURL('image/jpeg', 0.5);
+          try { localStorage.setItem('bedPhoto_' + bedId, b64); } catch(ex2) {}
+        }
+        renderBedDetail(bedId);
+        renderBeds();
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(inp.files[0]);
+  };
+  inp.click();
+}
+
 // ========== ZONES — Mes Zones ==========
 async function renderBeds() {
   var el = document.getElementById('pageBeds');
@@ -162,9 +205,12 @@ function renderBedCard(bed) {
   var heroColor = 'c' + (((bedIdx < 0) ? 0 : bedIdx) % 4);
 
   var bedIllus = (typeof getZoneVisual === 'function') ? getZoneVisual(bed.id) : '';
+  var userPhoto = getBedPhoto(bed.id);
   return '<div class="prem-bed-card" onclick="showBedDetail(\'' + bed.id + '\')">' +
     '<div class="prem-bed-hero ' + heroColor + '">' +
-      (bedIllus ? '<div class="prem-bed-illus" aria-hidden="true">' + bedIllus + '</div><div class="prem-bed-illus-overlay"></div>' : '') +
+      (userPhoto
+        ? '<img src="' + userPhoto + '" class="prem-bed-hero-photo" alt="" aria-hidden="true">'
+        : (bedIllus ? '<div class="prem-bed-illus" aria-hidden="true">' + bedIllus + '</div><div class="prem-bed-illus-overlay"></div>' : '')) +
       '<div class="prem-bed-hero-top" style="position:relative;z-index:2;">' +
         '<div>' +
           '<div class="prem-bed-name">' + escH(bed.name) + '</div>' +
@@ -280,15 +326,20 @@ function renderBedDetail(bedId) {
   var prevFamilyBadges = uniquePrevFamilies.length > 0
     ? uniquePrevFamilies.map(function(f) { return '<span class="badge badge-gray">' + escH(f) + '</span>'; }).join(' ')
     : '<span style="color:var(--text-light);font-size:0.85rem;">' + t('beds_no_history') + '</span>';
+  var userPhoto = getBedPhoto(bed.id);
+  var isEn = getAppState('language') === 'en';
   el.innerHTML = '<div class="fade-in">' +
     '<div class="card" style="padding:0;overflow:hidden;">' +
+    '<div class="bed-detail-photo" style="background-image:url(\'' + (userPhoto || 'assets/lifestyle-lits.webp') + '\');"></div>' +
     '<div style="padding:14px 16px;display:flex;justify-content:space-between;align-items:flex-start;">' +
     '<div><div style="font-size:1.1rem;font-weight:700;">' + escH(bed.name) + '</div>' +
     '<div style="font-size:0.85rem;color:var(--text-light);">' + bed.length + 'm x ' + bed.width + 'm = ' + surface.toFixed(1) + ' m\u00B2</div></div>' +
     '<div class="btn-group">' +
-    (!bed.gardenElId ? '<button class="btn btn-sm btn-primary" onclick="addBedToGardenView(\'' + bed.id + '\')" title="' + (getAppState('language')==='en' ? 'Place in garden' : 'Placer dans le jardin') + '">🗺️</button>' : '') +
+    (!bed.gardenElId ? '<button class="btn btn-sm btn-primary" onclick="addBedToGardenView(\'' + bed.id + '\')" title="' + (isEn ? 'Place in garden' : 'Placer dans le jardin') + '">🗺️</button>' : '') +
     '<button class="btn btn-sm btn-secondary" onclick="openBedModal(\'' + bed.id + '\')">✏️</button>' +
     '<button class="btn btn-sm btn-danger" onclick="deleteBed(\'' + bed.id + '\')">🗑️</button>' +
+    '<button class="btn btn-sm btn-secondary" onclick="triggerBedPhotoUpload(\'' + bed.id + '\')" title="' + (isEn ? 'Add photo' : 'Ajouter une photo') + '">📷</button>' +
+    (userPhoto ? '<button class="btn btn-sm btn-danger" onclick="deleteBedPhoto(\'' + bed.id + '\')" title="' + (isEn ? 'Remove photo' : 'Supprimer la photo') + '">✕</button>' : '') +
     '</div></div>' +
     (bed.notes ? '<div style="padding:0 16px 12px;font-size:0.85rem;color:var(--text-light);">' + escH(bed.notes) + '</div>' : '') +
     '</div>' +

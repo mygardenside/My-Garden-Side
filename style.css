@@ -3313,6 +3313,28 @@ body::before {
   pointer-events: none;
 }
 
+/* ---- BEDS PAGE — photo personnalisée dans la fiche bac ---- */
+.bed-detail-photo {
+  width: 100%;
+  height: 180px;
+  background-size: cover;
+  background-position: center 45%;
+  border-radius: 16px 16px 0 0;
+  flex-shrink: 0;
+}
+
+/* ---- BEDS PAGE — photo user dans la carte liste ---- */
+.prem-bed-hero-photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 50%;
+  z-index: 0;
+  border-radius: inherit;
+}
+
 /* ---- BEDS PAGE — zone illustration in bed detail ---- */
 .bed-detail-banner {
   width: 100%;
