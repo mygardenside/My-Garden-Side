@@ -280,14 +280,8 @@ function renderBedDetail(bedId) {
   var prevFamilyBadges = uniquePrevFamilies.length > 0
     ? uniquePrevFamilies.map(function(f) { return '<span class="badge badge-gray">' + escH(f) + '</span>'; }).join(' ')
     : '<span style="color:var(--text-light);font-size:0.85rem;">' + t('beds_no_history') + '</span>';
-  var detailIllus = (typeof getZoneVisual === 'function') ? getZoneVisual(bed.id) : '';
-  var detailBannerHTML = detailIllus
-    ? '<div class="bed-detail-banner">' + detailIllus + '<div class="bed-detail-banner-overlay"></div></div>'
-    : '';
-
   el.innerHTML = '<div class="fade-in">' +
     '<div class="card" style="padding:0;overflow:hidden;">' +
-    detailBannerHTML +
     '<div style="padding:14px 16px;display:flex;justify-content:space-between;align-items:flex-start;">' +
     '<div><div style="font-size:1.1rem;font-weight:700;">' + escH(bed.name) + '</div>' +
     '<div style="font-size:0.85rem;color:var(--text-light);">' + bed.length + 'm x ' + bed.width + 'm = ' + surface.toFixed(1) + ' m\u00B2</div></div>' +

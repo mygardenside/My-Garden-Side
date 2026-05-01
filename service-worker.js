@@ -14,8 +14,8 @@
  *             Network Only pour les APIs météo (jamais en cache).
  */
 
-var CACHE_NAME    = 'gv-v73';
-var CACHE_VERSION = '60.0.0';
+var CACHE_NAME    = 'gv-v74';
+var CACHE_VERSION = '61.0.0';
 
 // ---- Assets statiques à mettre en cache (chemins RELATIFS) ----
 // Important : pas de / en préfixe — fonctionne quel que soit
