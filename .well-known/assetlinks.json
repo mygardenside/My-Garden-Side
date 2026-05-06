@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "com.mygardenside.app",
+        "sha256_cert_fingerprints": ["D9:C7:5F:D4:0D:82:DD:0F:EB:13:34:13:F4:58:6F:AA:14:7E:8B:A5:B1:8F:07:4C:0C:E6:CB:2D:2F:08:CE:C9"]
+      }
+    }]
