@@ -24,25 +24,35 @@ var GardenBridge = {
           ? '🏡 Serre — +' + (gEl.microclimateBonus || 2) + '°C'
           : (gEl.notes || '');
 
+        var gSoil    = (gEl.soil && gEl.soil.type) || null;
+        var gSun     = (gEl.microclimate && gEl.microclimate.sunExposure) || null;
+        var gMulched = !!gEl.mulched;
+
         if (gEl.appBedId) {
           var appBed = appBeds.find(function(b) { return b.id === gEl.appBedId; });
           if (appBed) {
-            if (appBed.name !== name || appBed.length !== length || appBed.width !== width) {
-              appBed.name   = name;
-              appBed.length = length;
-              appBed.width  = width;
+            var changed = appBed.name !== name || appBed.length !== length || appBed.width !== width
+              || (gSoil && appBed.soil !== gSoil) || (gSun && appBed.sun !== gSun)
+              || appBed.mulched !== gMulched;
+            if (changed) {
+              appBed.name    = name;
+              appBed.length  = length;
+              appBed.width   = width;
               if (gEl.type === 'serre') appBed.notes = notes;
+              if (gSoil) appBed.soil = gSoil;
+              if (gSun)  appBed.sun  = gSun;
+              appBed.mulched = gMulched;
               appDirty = true;
             }
           } else {
-            var rb = GardenBridge._makeAppBed(gEl.id, name, length, width, notes);
+            var rb = GardenBridge._makeAppBed(gEl.id, name, length, width, notes, gSoil, gSun, gMulched);
             appBeds.push(rb);
             gEl.appBedId = rb.id;
             appDirty    = true;
             gardenDirty = true;
           }
         } else {
-          var nb = GardenBridge._makeAppBed(gEl.id, name, length, width, notes);
+          var nb = GardenBridge._makeAppBed(gEl.id, name, length, width, notes, gSoil, gSun, gMulched);
           appBeds.push(nb);
           gEl.appBedId = nb.id;
           appDirty    = true;
@@ -56,7 +66,7 @@ var GardenBridge = {
     this._syncing = false;
   },
 
-  _makeAppBed: function(gardenElId, name, length, width, notes) {
+  _makeAppBed: function(gardenElId, name, length, width, notes, soil, sun, mulched) {
     return {
       id:         genId(),
       name:       name,
@@ -64,6 +74,9 @@ var GardenBridge = {
       width:      width,
       notes:      notes || '',
       gardenElId: gardenElId,
+      soil:       soil    || null,
+      sun:        sun     || null,
+      mulched:    !!mulched,
     };
   },
 
@@ -400,6 +413,58 @@ var GardenBridge = {
       if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
     }
     _origKeyDown(e);
+  };
+}());
+
+// ── Hook 6 : clôture mobile — glissé pour définir un segment ───────────
+// Sur desktop : tap to add point (comportement inchangé via onMouseDown).
+// Sur mobile  : touchstart = début du glissé, touchend = confirme le point.
+//   → Le preview s'anime en temps réel pendant le glissé.
+//   → Le relâchement ajoute le sommet (pas le toucher initial).
+// Cela permet : glisser → relâcher → reglisser depuis le dernier point.
+(function() {
+  var _origTouchStart = Interactions.onTouchStart;
+  var _origTouchEnd   = Interactions.onTouchEnd;
+
+  Interactions.onTouchStart = function(e) {
+    // En mode tracé clôture avec 1 doigt : ne pas ajouter de point au toucher.
+    // Le segment sera confirmé au relâchement (touchend).
+    if (Renderer.fenceDrawMode && Renderer.fenceDraft && e.touches.length === 1) {
+      var rect = Renderer.canvas.getBoundingClientRect();
+      var w = Camera.toWorld(e.touches[0].clientX - rect.left, e.touches[0].clientY - rect.top);
+      Renderer.fencePreviewPt = { x: snapWorld(w.x), y: snapWorld(w.y) };
+      return;
+    }
+    _origTouchStart.call(this, e);
+  };
+
+  Interactions.onTouchEnd = function(e) {
+    // En mode tracé clôture : confirmer le sommet à la position de relâchement.
+    if (Renderer.fenceDrawMode && Renderer.fenceDraft && e.changedTouches.length >= 1) {
+      var rect   = Renderer.canvas.getBoundingClientRect();
+      var touch  = e.changedTouches[0];
+      var w      = Camera.toWorld(touch.clientX - rect.left, touch.clientY - rect.top);
+      var snapped = { x: snapWorld(w.x), y: snapWorld(w.y) };
+      var pts     = Renderer.fenceDraft.pts;
+      var last    = pts[pts.length - 1];
+
+      // Fermeture automatique si relâchement près du 1er point
+      if (pts.length >= 3 && Math.hypot(snapped.x - pts[0].x, snapped.y - pts[0].y) < m2px(0.5)) {
+        Renderer.fenceDraft.closed = true;
+        Renderer.fencePreviewPt   = null;
+        Interactions.finishFenceDraw();
+        GardenStore.save();
+        return;
+      }
+
+      // Ajouter le sommet seulement si le doigt a parcouru ≥ 15 cm (évite les taps accidentels)
+      if (Math.hypot(snapped.x - last.x, snapped.y - last.y) >= m2px(0.15)) {
+        pts.push(snapped);
+        Renderer.fencePreviewPt = null;
+      }
+      return;
+    }
+    _origTouchEnd.call(this, e);
   };
 }());
 

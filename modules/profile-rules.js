@@ -380,7 +380,7 @@ function getProfileMetrics(profileId) {
     occupation:    { id: 'occupation',     label: 'Occupation',         value: occPct + '%' },
     surface:       { id: 'surface',        label: 'Surface m²',         value: totalSurf.toFixed(1) },
     real_yield:    { id: 'real_yield',     label: 'Récoltés (kg)',       value: realKg.toFixed(1) },
-    beds_count:    { id: 'beds_count',     label: 'Bacs',               value: APP.beds.length }
+    beds_count:    { id: 'beds_count',     label: 'Espaces',            value: APP.beds.length }
   };
 
   var configs = {

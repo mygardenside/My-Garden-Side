@@ -17,7 +17,10 @@ function addBedToGardenView(bedId) {
     var cx = 0, cy = 0;
     if (typeof Renderer !== 'undefined' && Renderer.canvas &&
         typeof Camera !== 'undefined' && typeof Camera.toWorld === 'function') {
-      var w = Camera.toWorld(Renderer.canvas.width / 2, Renderer.canvas.height / 2);
+      // getBoundingClientRect() retourne les dimensions CSS (px indépendants du DPR),
+      // contrairement à canvas.width qui retourne les pixels physiques (×DPR sur Retina).
+      var _rect = Renderer.canvas.getBoundingClientRect();
+      var w = Camera.toWorld(_rect.width / 2, _rect.height / 2);
       cx = w.x; cy = w.y;
     }
 
@@ -29,6 +32,13 @@ function addBedToGardenView(bedId) {
     el.position.x = cx - el.dimensions.width  / 2;
     el.position.y = cy - el.dimensions.height / 2;
     el.appBedId   = bed.id;
+    // Hériter sol, soleil et paillage depuis le bac APP pour éviter que
+    // syncToApp() n'écrase les propriétés existantes avec les valeurs par défaut du canvas.
+    // Normaliser 'peat' (legacy Mon Jardin) → 'rich' (valeur canonique du canvas)
+    var _canonSoil = bed.soil === 'peat' ? 'rich' : (bed.soil || null);
+    if (el.soil && _canonSoil)      el.soil.type                 = _canonSoil;
+    if (el.microclimate && bed.sun) el.microclimate.sunExposure  = bed.sun;
+    el.mulched = !!bed.mulched;
 
     GardenStore.add(el);
     bed.gardenElId = el.id;
@@ -97,6 +107,14 @@ async function renderBeds() {
     if (typeof IrrigationModule !== 'undefined' && _wx && _wx.daily) {
       var _r7 = (_wx.daily.precipitation_sum || []).slice(0, 7).reduce(function(s, v) { return s + (v || 0); }, 0);
       IrrigationModule.setForecastRain(_r7);
+      var _tmx7 = (_wx.daily.temperature_2m_max || []).slice(0, 7);
+      var _tmn7 = (_wx.daily.temperature_2m_min || []).slice(0, 7);
+      if (_tmx7.length && _tmn7.length) {
+        IrrigationModule.setForecastTemp(
+          _tmx7.reduce(function(s,v){return s+(v||0);},0) / _tmx7.length,
+          _tmn7.reduce(function(s,v){return s+(v||0);},0) / _tmn7.length
+        );
+      }
     }
   } catch(e) { /* fallback moyenne historique */ }
   if (getAppState('beds').length === 0) {
@@ -255,6 +273,14 @@ async function renderBedDetail(bedId) {
       var _r7 = (_wx.daily.precipitation_sum || []).slice(0, 7)
         .reduce(function(s, v) { return s + (v || 0); }, 0);
       IrrigationModule.setForecastRain(_r7);
+      var _tmx7 = (_wx.daily.temperature_2m_max || []).slice(0, 7);
+      var _tmn7 = (_wx.daily.temperature_2m_min || []).slice(0, 7);
+      if (_tmx7.length && _tmn7.length) {
+        IrrigationModule.setForecastTemp(
+          _tmx7.reduce(function(s,v){return s+(v||0);},0) / _tmx7.length,
+          _tmn7.reduce(function(s,v){return s+(v||0);},0) / _tmn7.length
+        );
+      }
     }
   } catch(e) {}
 
@@ -263,7 +289,7 @@ async function renderBedDetail(bedId) {
   var occ = getBedOccupation(bed);
   var surface = getBedSurface(bed);
   var rotation = getRotationScore(bed);
-  var families = getBedFamilies(bed.id);
+  var families = getBedFamilies(bed.id) || [];
   document.getElementById('headerTitle').textContent = bed.name;
   var uniquePrevFamilies = [];
   getAppState('seasons').forEach(function(s) {
@@ -339,6 +365,16 @@ async function renderBedDetail(bedId) {
     : '<span style="color:var(--text-light);font-size:0.85rem;">' + t('beds_no_history') + '</span>';
   var userPhoto = getBedPhoto(bed.id);
   var isEn = getAppState('language') === 'en';
+
+  // Pluie 7 jours — même fenêtre que getBedWaterNeed pour cohérence
+  var _bedRain7 = 0;
+  var _bedHasRealForecast = typeof _wx !== 'undefined' && _wx && _wx.daily && _wx.daily.precipitation_sum;
+  if (_bedHasRealForecast) {
+    var _brSums = _wx.daily.precipitation_sum;
+    for (var _bri = 0; _bri < 7 && _bri < _brSums.length; _bri++) _bedRain7 += _brSums[_bri] || 0;
+  }
+  var _bedRainSoon = _bedHasRealForecast && _bedRain7 >= 10;
+
   el.innerHTML = '<div class="fade-in">' +
     '<div class="card" style="padding:0;overflow:hidden;">' +
     '<div class="bed-detail-photo" style="background-image:url(\'' + (userPhoto || 'assets/lifestyle-lits.webp') + '\');"></div>' +
@@ -353,6 +389,15 @@ async function renderBedDetail(bedId) {
     (userPhoto ? '<button class="btn btn-sm btn-danger" onclick="deleteBedPhoto(\'' + bed.id + '\')" title="' + (isEn ? 'Remove photo' : 'Supprimer la photo') + '">✕</button>' : '') +
     '</div></div>' +
     (bed.notes ? '<div style="padding:0 16px 12px;font-size:0.85rem;color:var(--text-light);">' + escH(bed.notes) + '</div>' : '') +
+    (bed.sun || bed.soil ? (function() {
+      var sunLabels = { shade: t('beds_sun_shade'), partial: t('beds_sun_partial'), full: t('beds_sun_full') };
+      var soilLabels = { sandy: t('beds_soil_sandy'), loam: t('beds_soil_loam'), clay: t('beds_soil_clay'), peat: t('beds_soil_peat'), rich: t('beds_soil_rich') };
+      var sunIcon = { shade: '🌥️', partial: '⛅', full: '☀️' };
+      return '<div style="padding:0 16px 10px;display:flex;gap:8px;flex-wrap:wrap;">' +
+        (bed.sun  ? '<span class="badge badge-gray">' + (sunIcon[bed.sun]||'') + ' ' + (sunLabels[bed.sun]||bed.sun) + '</span>' : '') +
+        (bed.soil ? '<span class="badge badge-gray">🪨 ' + (soilLabels[bed.soil]||bed.soil) + '</span>' : '') +
+      '</div>';
+    })() : '') +
     '</div>' +
     (function () {
       var irrNeed = typeof IrrigationModule !== 'undefined' ? IrrigationModule.getBedWaterNeed(bed) : null;
@@ -361,16 +406,37 @@ async function renderBedDetail(bedId) {
       if (!irrNeed) {
         irrVal = '–'; irrLbl = isEn ? 'Irrigation' : 'Arrosage'; irrColor = '';
       } else if (!irrNeed.deficit) {
-        irrVal = '✓'; irrLbl = isEn ? 'No deficit' : 'Pas de déficit'; irrColor = 'color:#16a34a;';
+        irrVal = '✅'; irrLbl = isEn ? 'No watering needed' : 'Pas d\'arrosage nécessaire'; irrColor = 'color:#16a34a;';
+      } else if (_bedRainSoon) {
+        irrVal = irrNeed.litersPerWeek + ' L'; irrLbl = isEn ? '🌧️ After rain/week' : '🌧️ Après pluie/sem.'; irrColor = 'color:#0369a1;';
       } else {
-        irrVal = irrNeed.litersPerWeek + ' L'; irrLbl = isEn ? 'Deficit /week' : 'Déficit /sem.'; irrColor = 'color:#d97706;';
+        irrVal = irrNeed.litersPerWeek + ' L'; irrLbl = isEn ? '💧 per week' : '💧 par semaine'; irrColor = 'color:#d97706;';
+      }
+      var irrDetail = '';
+      if (irrNeed && irrNeed.deficit) {
+        irrDetail = '<div style="font-size:0.7rem;color:var(--text-light);text-align:center;padding:2px 0 0;">' +
+          'ET0 ' + irrNeed.et0Week + 'mm · ETC ' + irrNeed.etcWeek + 'mm · ' +
+          (isEn ? 'Rain ' : 'Pluie ') + irrNeed.rainWeek + 'mm' +
+          '</div>';
       }
       return '<div class="stats-grid" style="grid-template-columns:repeat(4,1fr);">' +
         '<div class="stat-card"><div class="stat-value">' + occ + '%</div><div class="stat-label">' + t('stat_occupation') + '</div></div>' +
         '<div class="stat-card"><div class="stat-value">' + healthScore + '</div><div class="stat-label">' + t('beds_stat_health') + '</div></div>' +
         '<div class="stat-card"><div class="stat-value">' + activeCrops.length + '</div><div class="stat-label">' + t('stat_crops') + '</div></div>' +
-        '<div class="stat-card"><div class="stat-value" style="font-size:1rem;' + irrColor + '">' + irrVal + '</div><div class="stat-label">💧 ' + irrLbl + '</div></div>' +
+        '<div class="stat-card"><div class="stat-value" style="font-size:1rem;' + irrColor + '">' + irrVal + '</div><div class="stat-label">💧 ' + irrLbl + '</div>' + irrDetail + '</div>' +
         '</div>';
+    }()) +
+    (function() {
+      if (!bed.sun || bed.sun === 'full') return '';
+      var maxSun = bed.sun === 'shade' ? 4 : 7;
+      var warns = activeCrops.filter(function(c) {
+        var v = APP.vegetables[c.veggieId]; return v && (v.sun || 5) > maxSun + 1;
+      }).map(function(c) { var v = APP.vegetables[c.veggieId]; return v.icon + ' ' + tVeg(v.name); });
+      if (!warns.length) return '';
+      return '<div style="background:#fef3c7;border-left:3px solid #d97706;border-radius:8px;padding:10px 14px;margin-bottom:10px;font-size:0.85rem;">' +
+        '⚠️ ' + (isEn ? 'These crops need more sun than this space provides: ' : 'Ces cultures ont besoin de plus de soleil que cet espace n\'en reçoit : ') +
+        '<strong>' + warns.join(', ') + '</strong>' +
+      '</div>';
     }()) +
     '<div class="card"><div style="font-weight:700;margin-bottom:8px;">' + t('beds_rotation') + '</div>' +
     getRotationBadge(bed) +
@@ -385,6 +451,7 @@ async function renderBedDetail(bedId) {
 }
 function openBedModal(editId) {
   var bed = editId ? APP.beds.find(function(b) { return b.id === editId; }) : null;
+  var isEn = typeof getAppState === 'function' && getAppState('language') === 'en';
   var title = bed ? t('beds_modal_edit') : t('beds_modal_new');
   openModal(
     '<div class="modal-header"><div class="modal-title">' + title + '</div><button class="modal-close" onclick="closeModal()">&times;</button></div>' +
@@ -394,6 +461,26 @@ function openBedModal(editId) {
     '<div class="form-group"><label class="form-label">' + t('beds_lbl_length') + '</label><input type="number" step="0.1" min="0.1" class="form-input" id="bedLength" value="' + (bed ? bed.length : '') + '" placeholder="2.0"></div>' +
     '<div class="form-group"><label class="form-label">' + t('beds_lbl_width') + '</label><input type="number" step="0.1" min="0.1" class="form-input" id="bedWidth" value="' + (bed ? bed.width : '') + '" placeholder="1.0"></div></div>' +
     '<div class="form-group"><label class="form-label">' + t('beds_lbl_notes') + '</label><textarea class="form-textarea" id="bedNotes" placeholder="' + t('lbl_placeholder_notes') + '">' + (bed ? escH(bed.notes || '') : '') + '</textarea></div>' +
+    '<div class="form-row">' +
+    '<div class="form-group"><label class="form-label">' + t('beds_lbl_sun') + '</label>' +
+    '<select class="form-input" id="bedSun">' +
+    '<option value="">' + (isEn ? '— optional —' : '— optionnel —') + '</option>' +
+    '<option value="shade"'   + (bed && bed.sun === 'shade'   ? ' selected' : '') + '>' + t('beds_sun_shade')   + '</option>' +
+    '<option value="partial"' + (bed && bed.sun === 'partial' ? ' selected' : '') + '>' + t('beds_sun_partial') + '</option>' +
+    '<option value="full"'    + (bed && bed.sun === 'full'    ? ' selected' : '') + '>' + t('beds_sun_full')    + '</option>' +
+    '</select></div>' +
+    '<div class="form-group"><label class="form-label">' + t('beds_lbl_soil') + '</label>' +
+    '<select class="form-input" id="bedSoil">' +
+    '<option value="">' + (isEn ? '— optional —' : '— optionnel —') + '</option>' +
+    '<option value="sandy"' + (bed && bed.soil === 'sandy' ? ' selected' : '') + '>' + t('beds_soil_sandy') + '</option>' +
+    '<option value="loam"'  + (bed && bed.soil === 'loam'  ? ' selected' : '') + '>' + t('beds_soil_loam')  + '</option>' +
+    '<option value="clay"'  + (bed && bed.soil === 'clay'  ? ' selected' : '') + '>' + t('beds_soil_clay')  + '</option>' +
+    '<option value="rich"'  + (bed && (bed.soil === 'rich' || bed.soil === 'peat') ? ' selected' : '') + '>' + t('beds_soil_rich')  + '</option>' +
+    '</select></div></div>' +
+    '<div class="form-group" style="margin-top:4px;"><label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.9rem;">' +
+    '<input type="checkbox" id="bedMulched"' + (bed && bed.mulched ? ' checked' : '') + '> ' +
+    (isEn ? 'Mulched soil (reduces evaporation ~35%)' : 'Sol paillé (réduit l\'évaporation d\'environ 35%)') +
+    '</label></div>' +
     '<div class="modal-actions">' +
     '<button class="btn btn-secondary" onclick="closeModal()">' + t('btn_cancel') + '</button>' +
     '<button class="btn btn-primary" onclick="saveBed(\'' + (editId || '') + '\')">' + (bed ? t('btn_edit_label') : t('btn_add_label')) + '</button></div>'
@@ -408,14 +495,17 @@ function saveBed(editId) {
   var length = parseFloat(document.getElementById('bedLength').value);
   var width = parseFloat(document.getElementById('bedWidth').value);
   var notes = document.getElementById('bedNotes').value.trim();
+  var sun     = document.getElementById('bedSun').value    || null;
+  var soil    = document.getElementById('bedSoil').value   || null;
+  var mulched = document.getElementById('bedMulched').checked;
   if (!name) { _bedFormError(t('beds_err_name')); return; }
   if (!length || length <= 0) { _bedFormError(t('beds_err_length')); return; }
   if (!width || width <= 0) { _bedFormError(t('beds_err_width')); return; }
   if (editId) {
     var bed = APP.beds.find(function(b) { return b.id === editId; });
-    if (bed) { bed.name = name; bed.length = length; bed.width = width; bed.notes = notes; }
+    if (bed) { bed.name = name; bed.length = length; bed.width = width; bed.notes = notes; bed.sun = sun; bed.soil = soil; bed.mulched = mulched; }
   } else {
-    APP.beds.push({ id: genId(), name: name, length: length, width: width, notes: notes });
+    APP.beds.push({ id: genId(), name: name, length: length, width: width, notes: notes, sun: sun, soil: soil, mulched: mulched });
   }
   saveData();
   closeModal();

@@ -140,11 +140,18 @@ function restoreBackup(index) {
   }
 
   try {
-    // Restaurer APP
+    // Restaurer APP avec validation des types critiques
     var appData = snapshot.app;
     Object.keys(appData).forEach(function(key) {
       APP[key] = appData[key];
     });
+    // Garantir que les tableaux critiques restent des tableaux
+    if (!Array.isArray(APP.beds))                 APP.beds                 = [];
+    if (!Array.isArray(APP.crops))                APP.crops                = [];
+    if (!Array.isArray(APP.completedTasks))       APP.completedTasks       = [];
+    if (!Array.isArray(APP.notificationsRead))    APP.notificationsRead    = [];
+    if (!Array.isArray(APP.notificationsIgnored)) APP.notificationsIgnored = [];
+    if (typeof APP.vegetables !== 'object' || Array.isArray(APP.vegetables)) APP.vegetables = {};
     saveData();
 
     // Restaurer l'historique si disponible

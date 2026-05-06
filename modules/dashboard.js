@@ -48,6 +48,14 @@ async function renderDashboard() {
     if (typeof IrrigationModule !== 'undefined' && weather && weather.daily) {
       var _r7 = (weather.daily.precipitation_sum || []).slice(0, 7).reduce(function(s, v) { return s + (v || 0); }, 0);
       IrrigationModule.setForecastRain(_r7);
+      var _tmax7 = (weather.daily.temperature_2m_max || []).slice(0, 7);
+      var _tmin7 = (weather.daily.temperature_2m_min || []).slice(0, 7);
+      if (_tmax7.length && _tmin7.length) {
+        IrrigationModule.setForecastTemp(
+          _tmax7.reduce(function(s,v){return s+(v||0);},0) / _tmax7.length,
+          _tmin7.reduce(function(s,v){return s+(v||0);},0) / _tmin7.length
+        );
+      }
     }
     var data = calculateDashboardData(weather);
 
@@ -55,11 +63,13 @@ async function renderDashboard() {
     var weatherB = _homeWeatherBanner(weather);
     var garden   = _homeGardenSection(data);
     var actions  = _homeActionsSection(data.smartActs, data.tasks);
-    var irrigation = _homeIrrigationCard(data.irr);
+    var irrigation = _homeIrrigationCard(data.irr, weather);
+    var gettingStarted = _homeGettingStartedCard();
 
     el.innerHTML =
       '<div class="mgs-home fade-in">' +
         hero +
+        gettingStarted +
         weatherB +
         irrigation +
         actions +
@@ -79,7 +89,10 @@ async function renderDashboard() {
    CALCULS
 ============================================================ */
 function calculateDashboardData(weather) {
-  var seasonCrops = getAppState('crops').filter(function(c) {
+  var _allCrops = getAppState('crops') || [];
+  var _allBeds  = getAppState('beds')  || [];
+
+  var seasonCrops = _allCrops.filter(function(c) {
     return c.season === getAppState('currentSeason');
   });
 
@@ -87,9 +100,9 @@ function calculateDashboardData(weather) {
     return c.status === 'active';
   });
 
-  var totalBeds = getAppState('beds').length;
+  var totalBeds = _allBeds.length;
   var totalCrops = seasonCrops.length;
-  var totalSurf = getAppState('beds').reduce(function(s, b) {
+  var totalSurf = _allBeds.reduce(function(s, b) {
     return s + getBedSurface(b);
   }, 0);
   var usedSurf = activeCrops.reduce(function(s, c) {
@@ -188,7 +201,7 @@ function _homeWeatherBanner(weather) {
         '</div>' +
         '<div class="mgs-home-empty">' +
           '<div class="mgs-home-empty-main">' + t('wx_offline') + '</div>' +
-          '<div class="mgs-home-empty-sub">' + escH(APP.location.name || '') + '</div>' +
+          '<div class="mgs-home-empty-sub">' + escH(APP.location.name || 'Paris') + '</div>' +
         '</div>' +
       '</section>'
     );
@@ -215,7 +228,7 @@ function _homeWeatherBanner(weather) {
     '<section class="mgs-home-weather-card">' +
       '<div class="mgs-home-weather-top">' +
         '<div>' +
-          '<div class="mgs-home-weather-place">' + escH(APP.location.name || t('wx_location_fallback')) + '</div>' +
+          '<div class="mgs-home-weather-place">' + escH(APP.location.name || 'Paris') + '</div>' +
           '<div class="mgs-home-weather-temp">' + Math.round(c.temperature_2m) + '°</div>' +
           '<div class="mgs-home-weather-desc">' + escH(desc) + '</div>' +
         '</div>' +
@@ -234,19 +247,48 @@ function _homeWeatherBanner(weather) {
 /* ============================================================
    IRRIGATION CARD (V4.2)
 ============================================================ */
-function _homeIrrigationCard(irr) {
+function _homeIrrigationCard(irr, weather) {
   if (!irr) return ''; // pas de profil climatique
 
   var isEn   = typeof getAppState === 'function' && getAppState('language') === 'en';
   var noNeed = !irr.totalLiters;
 
-  var color  = noNeed ? '#16a34a' : (irr.deficitBeds > 2 ? '#dc2626' : '#d97706');
-  var icon   = noNeed ? '💧' : '🌿';
-  var label  = noNeed
-    ? (isEn ? 'No watering needed this week' : 'Pas d\'arrosage nécessaire cette semaine')
-    : (isEn
-        ? '~' + irr.totalLiters + ' L needed this week (' + irr.deficitBeds + ' bed' + (irr.deficitBeds > 1 ? 's' : '') + ')'
-        : '~' + irr.totalLiters + ' L à apporter cette semaine (' + irr.deficitBeds + ' carré' + (irr.deficitBeds > 1 ? 's' : '') + ')');
+  // Pluie sur 7 jours — même fenêtre que getBedWaterNeed / generateTasks
+  var rain7 = 0;
+  var rainDayName = '';
+  var hasRealForecast = weather && weather.daily && weather.daily.precipitation_sum;
+  if (hasRealForecast) {
+    var _hSums  = weather.daily.precipitation_sum;
+    var _hTimes = weather.daily.time || [];
+    for (var _hri = 0; _hri < 7 && _hri < _hSums.length; _hri++) rain7 += _hSums[_hri] || 0;
+    for (var _hrj = 1; _hrj <= 7 && _hrj < _hSums.length; _hrj++) {
+      if ((_hSums[_hrj] || 0) >= 5) {
+        rainDayName = _hTimes[_hrj] ? getDayName(_hTimes[_hrj]) : '';
+        break;
+      }
+    }
+  }
+  var rainSoon = hasRealForecast && rain7 >= 10;
+
+  var bedStr = irr.deficitBeds + ' ' + (isEn
+    ? 'bed' + (irr.deficitBeds > 1 ? 's' : '')
+    : 'carré' + (irr.deficitBeds > 1 ? 's' : ''));
+
+  var color, icon, label;
+  if (noNeed) {
+    color = '#166534'; icon = '✅';
+    label = isEn ? 'No watering needed — rain covers your crops' : 'Pas d\'arrosage nécessaire — la pluie couvre vos cultures';
+  } else if (rainSoon) {
+    color = '#0369a1'; icon = '🌧️';
+    label = isEn
+      ? 'Rain expected' + (rainDayName ? ' — water after ' + rainDayName : ' this week — no need to water now')
+      : 'Pluie prévue' + (rainDayName ? ' — arrosez après ' + rainDayName : ' cette semaine — pas besoin d\'arroser maintenant');
+  } else {
+    color = irr.deficitBeds > 2 ? '#dc2626' : '#d97706'; icon = '💧';
+    label = isEn
+      ? '~' + irr.totalLiters + ' L per week (' + bedStr + ')'
+      : '~' + irr.totalLiters + ' L par semaine (' + bedStr + ')';
+  }
 
   return (
     '<section style="margin:0 16px 10px;padding:10px 14px;background:#fff;border-radius:14px;' +
@@ -261,6 +303,50 @@ function _homeIrrigationCard(irr) {
         '</div>' +
       '</div>' +
       '<button onclick="navigate(\'beds\')" style="background:none;border:none;color:var(--brand-600);font-size:0.8rem;cursor:pointer;padding:4px 0;flex-shrink:0;">›</button>' +
+    '</section>'
+  );
+}
+
+/* ============================================================
+   GETTING STARTED CARD (nouveaux utilisateurs sans espace)
+============================================================ */
+function _homeGettingStartedCard() {
+  if (APP.beds && APP.beds.length > 0) return '';
+  return (
+    '<section class="mgs-home-panel mgs-gs-card">' +
+      '<div class="mgs-gs-header">' +
+        '<span class="mgs-gs-emoji">🌱</span>' +
+        '<div>' +
+          '<div class="mgs-gs-title">' + t('gs_title') + '</div>' +
+          '<div class="mgs-gs-sub">' + t('gs_sub') + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="mgs-gs-steps">' +
+        '<div class="mgs-gs-step">' +
+          '<div class="mgs-gs-num">1</div>' +
+          '<div class="mgs-gs-step-body">' +
+            '<div class="mgs-gs-step-title">' + t('gs_step1_title') + '</div>' +
+            '<div class="mgs-gs-step-desc">' + t('gs_step1_desc') + '</div>' +
+          '</div>' +
+          '<button class="mgs-gs-cta" onclick="navigate(\'beds\')">' + t('gs_step1_cta') + '</button>' +
+        '</div>' +
+        '<div class="mgs-gs-step">' +
+          '<div class="mgs-gs-num">2</div>' +
+          '<div class="mgs-gs-step-body">' +
+            '<div class="mgs-gs-step-title">' + t('gs_step2_title') + '</div>' +
+            '<div class="mgs-gs-step-desc">' + t('gs_step2_desc') + '</div>' +
+          '</div>' +
+          '<button class="mgs-gs-cta" onclick="navigate(\'veggieref\')">' + t('gs_step2_cta') + '</button>' +
+        '</div>' +
+        '<div class="mgs-gs-step">' +
+          '<div class="mgs-gs-num">3</div>' +
+          '<div class="mgs-gs-step-body">' +
+            '<div class="mgs-gs-step-title">' + t('gs_step3_title') + '</div>' +
+            '<div class="mgs-gs-step-desc">' + t('gs_step3_desc') + '</div>' +
+          '</div>' +
+          '<button class="mgs-gs-cta" onclick="navigate(\'planning\')">' + t('gs_step3_cta') + '</button>' +
+        '</div>' +
+      '</div>' +
     '</section>'
   );
 }
@@ -286,6 +372,7 @@ function _homeGardenSection(data) {
         header +
         '<div class="mgs-home-empty">' +
           '<div class="mgs-home-empty-main">' + t('dash_garden_empty') + '</div>' +
+          '<button class="btn btn-primary btn-sm" style="margin-top:12px;" onclick="navigate(\'beds\')">' + t('beds_add_btn') + ' →</button>' +
         '</div>' +
       '</section>'
     );
@@ -460,13 +547,19 @@ function _homeInsightSection(weather) {
   // Afficher jusqu'à 3 recommandations sous forme de cartes liste
   var rows = tips.slice(0, 3).map(function (tip) {
     var nav = tip.action || 'beds';
-    var onClick = 'navigate(\'' + nav + '\')';
+    var onClick = tip.filter
+      ? '_veggieRefFilter=\'' + tip.filter + '\';navigate(\'' + nav + '\')'
+      : 'navigate(\'' + nav + '\')';
+    var ctaHtml = tip.action === 'veggieref'
+      ? '<button class="mgs-home-list-cta" onclick="event.stopPropagation();' + onClick + '">' + t('nav_veggieref') + ' →</button>'
+      : '';
     return (
       '<div class="mgs-home-list-card" onclick="' + onClick + '">' +
         '<div class="mgs-home-list-icon">' + (tip.icon || '🌿') + '</div>' +
         '<div class="mgs-home-list-body">' +
           '<div class="mgs-home-list-title">' + escH(tip.title) + '</div>' +
           '<div class="mgs-home-list-sub">' + escH(tip.body) + '</div>' +
+          ctaHtml +
         '</div>' +
         '<div class="mgs-home-list-arrow">›</div>' +
       '</div>'

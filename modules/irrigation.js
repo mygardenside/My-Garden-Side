@@ -102,6 +102,9 @@ var IrrigationModule = (function () {
 
   // Pluie réelle prévue (mm/semaine) — null = utiliser la moyenne historique
   var _forecastRainWeekMm = null;
+  // Températures prévues 7j (°C) — null = utiliser les moyennes climatiques mensuelles
+  var _forecastTmax = null;
+  var _forecastTmin = null;
 
   // ── API publique ───────────────────────────────────────────────
   return {
@@ -109,6 +112,14 @@ var IrrigationModule = (function () {
     // Stocker la pluie prévue sur 7 jours (mm) depuis la météo en temps réel
     setForecastRain: function (weeklyMm) {
       _forecastRainWeekMm = (typeof weeklyMm === 'number' && !isNaN(weeklyMm)) ? weeklyMm : null;
+    },
+
+    // Stocker les températures prévues (moyenne 7j) pour un ET0 basé sur la vraie semaine
+    // Hargreaves-Samani utilise Tdiff = tmax-tmin comme proxy de l'ensoleillement :
+    // une semaine nuageuse a un Tdiff réduit → ET0 automatiquement plus faible.
+    setForecastTemp: function (tmax, tmin) {
+      _forecastTmax = (typeof tmax === 'number' && !isNaN(tmax)) ? tmax : null;
+      _forecastTmin = (typeof tmin === 'number' && !isNaN(tmin)) ? tmin : null;
     },
 
     // Besoin en eau d'un bac pour la semaine en cours (null si pas de données/cultures)
@@ -121,8 +132,20 @@ var IrrigationModule = (function () {
       var mi   = new Date().getMonth(); // 0-11
       var mt   = climate.monthly[mi];
 
-      var et0m = _monthET0(mt, lat, mi); // mm/mois
-      var et0w = et0m / 4.33;            // mm/semaine
+      // Si températures réelles disponibles, on les utilise à la place des moyennes historiques.
+      // Tdiff (tmax-tmin) est naturellement plus faible les semaines nuageuses → ET0 réduit.
+      var mtEff = (_forecastTmax !== null && _forecastTmin !== null) ? {
+        tmean:  (_forecastTmax + _forecastTmin) / 2,
+        tmax:   _forecastTmax,
+        tmin:   _forecastTmin,
+        precip: mt.precip
+      } : mt;
+
+      var et0m = _monthET0(mtEff, lat, mi); // mm/mois
+      // Calibration H-S : la formule Hargreaves-Samani surestime l'ET0 de 10-15%
+      // en France tempérée (climatologie continentale/océanique humide vs semi-aride original).
+      // Coefficient 0.90 conservateur, bien documenté pour l'Europe de l'Ouest.
+      var et0w = et0m / 4.33 * 0.90;       // mm/semaine (calibré France)
 
       var season = typeof getAppState === 'function' ? getAppState('currentSeason') : null;
       var crops  = typeof getAppState === 'function'
@@ -136,7 +159,8 @@ var IrrigationModule = (function () {
       // KC moyen pondéré par surface occupée
       var totalSurf = 0, weightedKC = 0;
       crops.forEach(function (c) {
-        var v    = typeof getAppState === 'function' ? getAppState('vegetables')[c.veggieId] : null;
+        var _vegs = typeof getAppState === 'function' ? (getAppState('vegetables') || {}) : {};
+        var v    = _vegs[c.veggieId] || null;
         var kc   = _kc(c, v);
         var surf = typeof getCropSurface === 'function' ? getCropSurface(c) : 1;
         totalSurf  += surf;
@@ -144,19 +168,27 @@ var IrrigationModule = (function () {
       });
       var avgKC = totalSurf > 0 ? weightedKC / totalSurf : 0.9;
 
-      var etcW    = et0w * avgKC;                    // besoin culture (mm/sem.)
+      var shadingCoeff = { shade: 0.75, partial: 0.88, full: 1.0 }[bed.sun] || 1.0;
+      var mulchCoeff   = bed.mulched ? 0.65 : 1.0;
+      var etcW    = et0w * avgKC * shadingCoeff * mulchCoeff; // besoin culture (mm/sem.)
+      // Efficacité pluie : bac paillé = 0.85 (paillage retient l'eau, limite ruissellement)
+      //                   bac nu    = 0.80 (pluies tempérées bien distribuées)
+      var rainEff = bed.mulched ? 0.85 : 0.80;
       var rainW   = _forecastRainWeekMm !== null
-        ? _forecastRainWeekMm * 0.7               // pluie réelle 7 j × 70 % efficacité
-        : (mt.precip || 0) * 0.7 / 4.33;          // pluie historique mensuelle ÷ 4.33
+        ? _forecastRainWeekMm * rainEff            // pluie réelle 7 j (pluie distribuée tempérée)
+        : (mt.precip || 0) * 0.70 / 4.33;         // pluie historique mensuelle ÷ 4.33 (conservative)
       var netMm   = Math.max(0, etcW - rainW);       // déficit net (mm/sem.)
-      var bedSurf = typeof getBedSurface === 'function' ? getBedSurface(bed) : 1;
+      // On utilise la surface réellement cultivée (totalSurf) et non la surface totale du bac :
+      // les zones vides ne nécessitent pas d'irrigation complémentaire.
+      var irrigSurf = Math.min(totalSurf, typeof getBedSurface === 'function' ? getBedSurface(bed) : totalSurf);
+      var soilCoeff = { sandy:1.3, loam:1.0, clay:0.75, peat:0.85, rich:0.80 }[bed.soil] || 1.0;
 
       return {
         et0Week:       Math.round(et0w  * 10) / 10,
         etcWeek:       Math.round(etcW  * 10) / 10,
         rainWeek:      Math.round(rainW * 10) / 10,
         netMmPerM2:    Math.round(netMm * 10) / 10,
-        litersPerWeek: Math.round(netMm * bedSurf),
+        litersPerWeek: Math.round((isNaN(netMm) ? 0 : netMm) * irrigSurf * soilCoeff),
         avgKC:         Math.round(avgKC * 100) / 100,
         deficit:       netMm >= 2, // seuil de déficit significatif
       };

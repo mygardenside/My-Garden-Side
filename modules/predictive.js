@@ -70,7 +70,7 @@ function buildPredictiveSection() {
   }
   var py = pred.projectedYield;
   if (py.total > 0) {
-    html += '<div class="dash-section-label" style="margin-top:14px;"><div>\uD83D\uDCCA ' + t('pred_section_yield') + '</div></div>' +
+    html += '<div class="section-title" style="margin-top:14px;">\uD83D\uDCCA ' + t('pred_section_yield') + '</div>' +
       '<div class="card" style="padding:12px 16px;"><div style="display:flex;gap:8px;">' +
       '<div style="flex:1;text-align:center;"><div style="font-size:1.2rem;font-weight:700;color:var(--green-700);">' + py.harvested + ' kg</div><div style="font-size:0.7rem;color:var(--text-light);">' + t('pred_lbl_harvested') + '</div></div>' +
       '<div style="flex:1;text-align:center;"><div style="font-size:1.2rem;font-weight:700;color:var(--orange);">' + py.projected + ' kg</div><div style="font-size:0.7rem;color:var(--text-light);">' + t('pred_lbl_projected') + '</div></div>' +

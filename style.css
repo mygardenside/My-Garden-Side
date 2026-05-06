@@ -4,7 +4,7 @@
    Palette : Vert profond #0B5D47 · Sauge #6FAF8F · Crème #F8F6EF
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap');
+/* Google Fonts chargé depuis index.html (non-bloquant) */
 
 /* ========== DESIGN TOKENS ========== */
 :root {
@@ -2609,6 +2609,66 @@ body {
 .learn-pattern.warning .learn-pattern-badge { background: var(--orange-light); color: var(--orange); }
 .learn-pattern.info .learn-pattern-badge    { background: var(--blue-light); color: var(--blue); }
 
+/* ---- Confidence badge (partagé patterns + recos) ---- */
+.learn-confidence {
+  display: inline-block;
+  font-size: 0.6rem; font-weight: 700;
+  padding: 2px 7px; border-radius: 8px;
+  margin-left: 6px; vertical-align: middle;
+  text-transform: uppercase; letter-spacing: 0.03em;
+}
+.learn-confidence.fort   { background: var(--brand-100); color: var(--brand-900); }
+.learn-confidence.moyen  { background: var(--orange-light); color: var(--orange); }
+.learn-confidence.faible,
+.learn-confidence.low    { background: #f3f4f6; color: var(--text-light); }
+
+/* ---- Veggie row ---- */
+.learn-veggie-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 0;
+  border-bottom: 1px solid rgba(11,93,71,0.06);
+}
+.learn-veggie-row:last-child { border-bottom: none; }
+.learn-veggie-icon  { font-size: 1.7rem; width: 36px; text-align: center; flex-shrink: 0; }
+.learn-veggie-info  { flex: 1; min-width: 0; }
+.learn-veggie-name  { font-size: 0.87rem; font-weight: 600; color: var(--text); line-height: 1.2; }
+.learn-veggie-stats { font-size: 0.72rem; color: var(--text-light); margin-top: 2px; }
+.learn-veggie-bar-track { height: 4px; background: #f0f4f0; border-radius: 3px; margin-top: 6px; overflow: hidden; }
+.learn-veggie-bar-fill  { height: 100%; border-radius: 3px; transition: width 0.4s ease; }
+.learn-veggie-ratio { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; flex-shrink: 0; }
+.learn-veggie-pct   { font-size: 1.05rem; font-weight: 700; line-height: 1; }
+.learn-veggie-pct.bon { color: var(--green-700); }
+.learn-veggie-pct.moy { color: var(--orange); }
+.learn-veggie-pct.bas { color: var(--red); }
+.learn-veggie-trend { font-size: 0.68rem; color: var(--text-light); }
+
+/* ---- Bed row ---- */
+.learn-bed-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 0;
+  border-bottom: 1px solid rgba(11,93,71,0.06);
+}
+.learn-bed-row:last-child { border-bottom: none; }
+.learn-bed-icon  { font-size: 1.5rem; width: 36px; text-align: center; flex-shrink: 0; }
+.learn-bed-info  { flex: 1; min-width: 0; }
+.learn-bed-name  { font-size: 0.87rem; font-weight: 600; color: var(--text); line-height: 1.2; }
+.learn-bed-stats { font-size: 0.72rem; color: var(--text-light); margin-top: 2px; }
+.learn-bed-bar-track { height: 4px; background: #f0f4f0; border-radius: 3px; margin-top: 6px; overflow: hidden; }
+.learn-bed-bar-fill  { height: 100%; border-radius: 3px; }
+.learn-bed-score { font-size: 1.05rem; font-weight: 700; flex-shrink: 0; }
+
+/* ---- Reco row ---- */
+.learn-reco {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(11,93,71,0.06);
+}
+.learn-reco:last-child { border-bottom: none; }
+.learn-reco-icon  { font-size: 1.3rem; flex-shrink: 0; margin-top: 2px; }
+.learn-reco-body  { flex: 1; min-width: 0; }
+.learn-reco-title { font-size: 0.86rem; font-weight: 600; color: var(--text); line-height: 1.3; }
+.learn-reco-text  { font-size: 0.73rem; color: var(--text-light); margin-top: 3px; line-height: 1.45; }
+
 /* ---- 7. EMPTY STATE — upgrade ---- */
 .empty-state {
   background: white; border-radius: 22px;
@@ -4319,6 +4379,88 @@ body {
   font-size: 1.2rem;
   color: var(--text-xlight);
   flex-shrink: 0;
+}
+
+.mgs-home-list-cta {
+  display: inline-block;
+  margin-top: 7px;
+  padding: 3px 10px;
+  background: var(--brand-500);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  line-height: 1.6;
+}
+
+/* ---- Getting Started Card ---- */
+.mgs-gs-card {
+  border: 2px solid var(--brand-200, #c8e6c9);
+  background: linear-gradient(135deg, var(--brand-50, #f1f8f2) 0%, #fff 100%);
+}
+.mgs-gs-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.mgs-gs-emoji { font-size: 2rem; line-height: 1; }
+.mgs-gs-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--green-700);
+}
+.mgs-gs-sub {
+  font-size: 0.78rem;
+  color: var(--text-light);
+  margin-top: 2px;
+}
+.mgs-gs-steps { display: flex; flex-direction: column; gap: 10px; }
+.mgs-gs-step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 10px 12px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+.mgs-gs-num {
+  width: 26px;
+  height: 26px;
+  min-width: 26px;
+  border-radius: 50%;
+  background: var(--brand-800, #0f6d55);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.mgs-gs-step-body { flex: 1; min-width: 0; }
+.mgs-gs-step-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+.mgs-gs-step-desc {
+  font-size: 0.72rem;
+  color: var(--text-light);
+  margin-top: 1px;
+}
+.mgs-gs-cta {
+  white-space: nowrap;
+  padding: 5px 12px;
+  background: var(--brand-800, #0f6d55);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
 }
 
 .mgs-home-insight-label {

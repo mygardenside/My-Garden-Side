@@ -105,7 +105,7 @@ function exportAppData() {
  */
 function exportHarvestsCSV() {
   var today   = new Date().toISOString().split('T')[0];
-  var headers = ['Saison','Legume','Famille','Bac','Plante le','Recolte prevue','Estime (kg)','Reel (kg)','Performance (%)'];
+  var headers = ['Saison','Legume','Famille','Espace','Plante le','Recolte prevue','Estime (kg)','Reel (kg)','Performance (%)'];
   var rows    = [_csvRow(headers)];
 
   // Cultures récoltées dans APP
@@ -118,7 +118,7 @@ function exportHarvestsCSV() {
     var perf = est > 0 ? Math.round((real / est) * 100) : '';
     rows.push(_csvRow([
       c.season || '',
-      veg ? veg.name : c.veggieId,
+      veg ? veg.name : '?',
       veg ? (veg.family || '') : '',
       bed ? bed.name : 'Sans espace',
       c.datePlant || '',
@@ -146,8 +146,8 @@ function exportHarvestsCSV() {
         entry.bedName || 'Sans espace',
         entry.datePlant || '',
         entry.dateHarvest || '',
-        est.toFixed ? est.toFixed(2) : est,
-        real.toFixed ? real.toFixed(2) : real,
+        (typeof est  === 'number' ? est.toFixed(2)  : '0.00'),
+        (typeof real === 'number' ? real.toFixed(2) : '0.00'),
         perf
       ]));
     });
@@ -191,8 +191,8 @@ function exportAnalysisCSV() {
   output += '\n';
 
   // ---- Tableau 2 : par bac ----
-  output += 'PERFORMANCE PAR BAC\n';
-  output += _csvRow(['Bac','Surface (m2)','Nb recoltes','Rendement reel total (kg)','Occupation actuelle (%)']) + '\n';
+  output += 'PERFORMANCE PAR ESPACE\n';
+  output += _csvRow(['Espace','Surface (m2)','Nb recoltes','Rendement reel total (kg)','Occupation actuelle (%)']) + '\n';
 
   APP.beds.forEach(function(bed) {
     var recoltes = APP.crops.filter(function(c) { return c.bedId === bed.id && c.status === 'harvested'; });

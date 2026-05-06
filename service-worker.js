@@ -14,8 +14,8 @@
  *             Network Only pour les APIs météo (jamais en cache).
  */
 
-var CACHE_NAME    = 'gv-v76';
-var CACHE_VERSION = '63.0.0';
+var CACHE_NAME    = 'gv-v114';
+var CACHE_VERSION = '88.0.0';
 
 // ---- Assets statiques à mettre en cache (chemins RELATIFS) ----
 // Important : pas de / en préfixe — fonctionne quel que soit
@@ -24,59 +24,10 @@ var STATIC_ASSETS = [
   'index.html',
 
   // Styles
-  'style.css',
+  'style.min.css',
 
-  // Scripts core
-  'app.js',
-  'core.js',
-  'data.js',
-  'ui-menu-plus.js',
-
-  // Utils
-  'utils/storage.js',
-  'utils/weather.js',
-  'utils/calculations.js',
-
-  // Modules — chargés dans l'ordre de index.html
-  'modules/i18n.js',
-  'modules/learning.js',
-  'modules/learning-memory.js',
-  'modules/learning-history.js',
-  'modules/learning-calculations.js',
-  'modules/learning-render.js',
-  'modules/learning-notifications.js',
-  'modules/learning-insights.js',
-  'modules/notifications.js',
-  'modules/onboarding.js',
-  'modules/predictive.js',
-  'modules/dashboard.js',
-  'modules/beds.js',
-  'modules/crops.js',
-  'modules/planning.js',
-  'modules/analysis.js',
-  'modules/settings.js',
-  'modules/calendar.js',
-  'modules/geo-calendar.js',
-  'modules/irrigation.js',
-  'modules/recommendations.js',
-
-  // Modules intelligence (ajoutés v22)
-  'modules/intelligence.js',
-  'modules/risk-engine.js',
-  'modules/opportunities.js',
-
-  // Modules profils (ajoutés v22)
-  'modules/profiles.js',
-  'modules/profile-rules.js',
-
-  // Modules utilitaires
-  'modules/export.js',
-  'modules/backup.js',
-  'modules/pwa.js',
-
-  // Assets visuels
-  'assets/garden-visuals.js',
-  'assets/veggie-visuals.js',
+  // Script bundle (tous les modules concaténés + minifiés)
+  'bundle.min.js',
 
   // Photos dashboard (converties en WebP v31)
   'assets/heros-meteo.webp',

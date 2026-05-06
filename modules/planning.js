@@ -392,92 +392,9 @@ function checkPlanRotation() {
 }
 
 function renderForecastSection(planningFilter) {
-  var sectionSubtitle = '';
-
-  if (planningFilter === 'today') sectionSubtitle = t('plan_filter_today');
-  else if (planningFilter === 'week') sectionSubtitle = t('plan_filter_week');
-  else if (planningFilter === 'all') sectionSubtitle = t('plan_filter_all');
-  else if (planningFilter === '1m') sectionSubtitle = t('plan_filter_1m');
-  else if (planningFilter === '2m') sectionSubtitle = t('plan_filter_2m');
-  else if (planningFilter === '3m') sectionSubtitle = t('plan_filter_3m');
-  else if (planningFilter === 'next') sectionSubtitle = t('plan_filter_next');
-  else sectionSubtitle = t('plan_filter_default');
-
-  var html = '<div class="forecast-section">' +
-    '<div style="font-size:0.82rem;color:var(--text-light);margin:-2px 0 12px 0;">' + sectionSubtitle + '</div>' +
-    '<button class="btn btn-secondary btn-block" style="margin-bottom:12px;" onclick="createNewSeason()">' + t('plan_new_season') + '</button>';
-
-  var horizonForBtn = '1';
-
-  if (planningFilter === '1m') horizonForBtn = '1';
-  else if (planningFilter === '2m') horizonForBtn = '2';
-  else if (planningFilter === '3m') horizonForBtn = '3';
-  else if (planningFilter === 'next') horizonForBtn = 'next-season';
-  else horizonForBtn = '1';
-
-  html += '<button class="plan-btn" onclick="openPlanCropModal(\'' + horizonForBtn + '\')">' + t('plan_btn_plan') + '</button>';
-
-  // Section "Cultures planifiées" masquée (doublon avec la frise de saison)
-  // Les données, filtres et logique sont intacts — seul le rendu HTML est omis.
-
-  if (APP.beds.length > 0) {
-    html += '<div class="section-title">' + t('plan_section_rotation') + '</div>';
-    html += '<div class="card card-flush">';
-    html += '<div style="padding:10px 14px 6px;font-size:0.8rem;color:var(--text-light);">' + t('plan_rota_subtitle') + '</div>';
-
-    for (var bi = 0; bi < APP.beds.length; bi++) {
-      var bed2 = APP.beds[bi];
-      var score2 = getRotationScore(bed2);
-      var reco2 = getRotationRecommendations(bed2.id);
-      var currentFams = getBedFamilies(bed2.id, APP.currentSeason);
-
-      var statusCls, statusLabel;
-      if (score2.score === 'good') {
-        statusCls = 'rota-status--good';
-        statusLabel = '\uD83D\uDFE2 ' + t('plan_rota_status_good');
-      } else if (score2.score === 'warning') {
-        statusCls = 'rota-status--warn';
-        statusLabel = '\uD83D\uDFE0 ' + t('plan_rota_status_warn');
-      } else {
-        statusCls = 'rota-status--bad';
-        statusLabel = '\uD83D\uDD34 ' + t('plan_rota_status_bad');
-      }
-
-      var sugNames = [];
-      if (reco2.recommended.length > 0) {
-        var vkeys2 = Object.keys(APP.vegetables);
-        for (var vi2 = 0; vi2 < vkeys2.length && sugNames.length < 2; vi2++) {
-          var vsug = APP.vegetables[vkeys2[vi2]];
-          if (reco2.recommended.indexOf(vsug.family) >= 0) {
-            sugNames.push(vsug.icon + ' ' + escH(tVeg(vsug.name)));
-          }
-        }
-      }
-
-      var famText = currentFams.length > 0
-        ? currentFams.map(function(f) { return escH(t('family_' + f)); }).join(', ')
-        : t('plan_rota_no_fam');
-
-      html += '<div class="rota-row">' +
-        '<div style="flex:1;min-width:0;">' +
-          '<div class="rota-row-name">' + escH(bed2.name) + '</div>' +
-          '<div style="margin-top:3px;">' +
-            '<span class="rota-status ' + statusCls + '">' + statusLabel + '</span>' +
-            '&ensp;<span style="font-size:0.73rem;color:var(--text-light);">' + famText + '</span>' +
-          '</div>' +
-          (sugNames.length > 0
-            ? '<div class="rota-sugg">' + t('plan_rota_try') + ' ' + sugNames.join(', ') + '</div>'
-            : '') +
-        '</div>' +
-        '<button class="btn btn-sm btn-secondary" style="flex-shrink:0;white-space:nowrap;" onclick="openRotationDetail(\'' + bed2.id + '\')">' + t('plan_rota_detail') + ' \u2192</button>' +
-      '</div>';
-    }
-
-    html += '</div>';
-  }
-
-  html += '</div>';
-  return html;
+  return '<div class="forecast-section">' +
+    '<button class="btn btn-secondary btn-block" style="margin-bottom:12px;" onclick="createNewSeason()">' + t('plan_new_season') + '</button>' +
+    '</div>';
 }
 
 function openRotationDetail(bedId) {
@@ -557,10 +474,18 @@ function generateTasks(weather) {
       .forEach(function(t) { completedKeys[t.key] = true; });
   }
 
-  // ── Pluie réelle 7 jours → calibrer IrrigationModule ──────────
+  // ── Pluie + températures réelles 7 jours → calibrer IrrigationModule ──────────
   if (typeof IrrigationModule !== 'undefined' && weather && weather.daily) {
     var _rain7 = (weather.daily.precipitation_sum || []).slice(0, 7).reduce(function(s, v) { return s + (v || 0); }, 0);
     IrrigationModule.setForecastRain(_rain7);
+    var _ptmx = (weather.daily.temperature_2m_max || []).slice(0, 7);
+    var _ptmn = (weather.daily.temperature_2m_min || []).slice(0, 7);
+    if (_ptmx.length && _ptmn.length) {
+      IrrigationModule.setForecastTemp(
+        _ptmx.reduce(function(s,v){return s+(v||0);},0) / _ptmx.length,
+        _ptmn.reduce(function(s,v){return s+(v||0);},0) / _ptmn.length
+      );
+    }
   }
 
   // ── Prévision pluie sur les 3 prochains jours ─────────────────
@@ -675,23 +600,29 @@ function generateTasks(weather) {
       if (!waterNeed || !waterNeed.deficit) continue;
 
       var liters = waterNeed.litersPerWeek;
-      if (rainNext3Days >= 10) {
-        // Pluie suffisante prévue → pas besoin d'arroser
+      var litersDay = Math.round(liters / 7);
+      // Comparer sur la même fenêtre 7 jours que le calcul du déficit.
+      // waterNeed.rainWeek = pluie efficace (×0.80) → seuil 7mm ≈ 9mm brut.
+      // On n'active ce bypass que si on a de vraies données météo (pas le fallback historique).
+      var hasRealForecast = weather && weather.daily && weather.daily.precipitation_sum;
+      if (hasRealForecast && waterNeed.rainWeek >= 7) {
+        // Pluie significative sur 7 jours → pas besoin d'arroser
         if (!seen['water-rain-ok']) {
           seen['water-rain-ok'] = true;
+          var rawMm7 = Math.round(waterNeed.rainWeek / 0.80);
           addTask(
             'water-rain-' + irrigBed.id,
-            t('task_water_rain_ok').replace('{mm}', Math.round(rainNext3Days)).replace('{day}', rainDayLabel),
+            t('task_water_rain_ok').replace('{mm}', rawMm7).replace('{day}', rainDayLabel),
             'Arrosage',
             'info',
-            t('task_reason_water_rain').replace('{et0}', waterNeed.et0Week).replace('{mm}', Math.round(rainNext3Days))
+            t('task_reason_water_rain').replace('{et0}', waterNeed.et0Week).replace('{mm}', rawMm7)
           );
         }
       } else {
         var waterPriority = waterNeed.netMmPerM2 >= 15 ? 'important' : 'info';
         addTask(
           'water-bed-' + irrigBed.id,
-          t('task_water_bed').replace('{bed}', escH(irrigBed.name)).replace('{liters}', liters),
+          t('task_water_bed').replace('{bed}', escH(irrigBed.name)).replace('{liters}', liters).replace('{litersDay}', litersDay),
           'Arrosage',
           waterPriority,
           t('task_reason_water_bed').replace('{et0}', waterNeed.et0Week).replace('{rain}', waterNeed.rainWeek).replace('{kc}', waterNeed.avgKC)
@@ -794,7 +725,7 @@ function generateTasks(weather) {
       'Vérifie l\'humidité du sol au doigt',
       'Observe la couleur et le port de tes plants',
       'Éclaircis les plants trop serrés si besoin',
-      'Nettoie les outils et inspecte les bacs',
+      'Nettoie les outils et inspecte les espaces de culture',
       'Prépare tes semis et achats pour la semaine'
     ];
     var _reasons = isEn ? [
@@ -811,7 +742,7 @@ function generateTasks(weather) {
       'Le sol doit être humide à 2–5 cm — arroser si sec.',
       'Feuilles jaunes ou tombantes : signaux d\'alerte précoces.',
       'La surpopulation réduit les récoltes et favorise les maladies.',
-      'Les outils sales propagent les pathogènes entre bacs.',
+      'Les outils sales propagent les pathogènes entre les espaces.',
       'Anticiper évite les trous dans le calendrier de récolte.'
     ];
     addTask('entretien', _checks[_dow], 'Entretien', 'info', _reasons[_dow]);
@@ -1678,7 +1609,10 @@ function renderFrisePlanning() {
   var cultures = APP.crops.filter(function(c) { return c.season === APP.currentSeason; });
 
   if (cultures.length === 0) {
-    return '<div class="frise-vide">' + t('plan_frise_empty') + '</div>';
+    var _frBtn = APP.beds.length > 0
+      ? '<button class="btn btn-primary btn-sm" style="margin-top:12px;" onclick="navigate(\'beds\')">' + t('beds_add_crop') + ' →</button>'
+      : '<button class="btn btn-primary btn-sm" style="margin-top:12px;" onclick="navigate(\'beds\')">' + t('beds_add_btn') + ' →</button>';
+    return '<div class="frise-vide">' + t('plan_frise_empty') + '<br>' + _frBtn + '</div>';
   }
   var html = '';
 

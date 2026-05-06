@@ -546,7 +546,7 @@ var VEGGIE_ENRICHI = {
     ]
   },
   'Cresson': {
-    conseils: ['Necessite beaucoup d\'eau : cultiver pres d\'un point d\'eau ou arroser tres regulierement', 'Peut se cultiver en bac avec une soucoupe toujours pleine d\'eau', 'Recolter les tiges avant la floraison pour plus d\'arome'],
+    conseils: ['Necessite beaucoup d\'eau : cultiver pres d\'un point d\'eau ou arroser tres regulierement', 'Peut se cultiver en pot avec une soucoupe toujours pleine d\'eau', 'Recolter les tiges avant la floraison pour plus d\'arome'],
     associations: { bons: ['Menthe','Radis'], mauvais: [] },
     maladies: [
       { icon: '🐌', nom: 'Limaces', desc: 'Feuilles trouees. Pieges, cendres.' }

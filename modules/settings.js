@@ -23,7 +23,7 @@ function renderSettings() {
       '<div class="prem-settings-avatar">' + avatarChar + '</div>' +
       '<div class="prem-settings-profile-info">' +
         '<div class="prem-settings-profile-name">' + escH(prof.name || t('settings_my_garden')) + '</div>' +
-        '<div class="prem-settings-profile-level">' + (prof.level ? t('level_' + prof.level) : 'D\u00e9butant') + (prof.spaceType ? ' \u00B7 ' + escH(prof.spaceType) : '') + '</div>' +
+        '<div class="prem-settings-profile-level">' + (prof.level ? t('level_' + prof.level) : 'D\u00e9butant') + (prof.spaceType ? ' \u00B7 ' + (t('spaceType_' + prof.spaceType) || escH(prof.spaceType)) : '') + '</div>' +
         (prof.goals && prof.goals.length ? '<div class="prem-settings-profile-goals">' + prof.goals.slice(0, 2).join(' \u00B7 ') + '</div>' : '') +
       '</div>' +
       '<button class="prem-settings-edit" onclick="' + onbClick + '">' + t('settings_edit') + '</button>' +
@@ -147,7 +147,7 @@ function renderVeggieRefSection(totalCount) {
   for (var i = 0; i < keys.length; i++) {
     var v = APP.vegetables[keys[i]];
     families[v.family] = true;
-    var cal = getPlantingCalendarForVeggie(v);
+    var cal = typeof GeoCalendar !== 'undefined' ? GeoCalendar.getCalendarForVeggie(v) : getPlantingCalendarForVeggie(v);
     if (cal && cal.plantMonths && cal.plantMonths.indexOf(currentMonth) >= 0) inSeason++;
   }
   var familyCount = Object.keys(families).length;
@@ -159,7 +159,9 @@ function renderVeggieRefSection(totalCount) {
     { key: 'summer',   label: t('settings_filter_summer') },
     { key: 'winter',   label: t('settings_filter_winter') },
     { key: 'low-water',label: t('settings_filter_dry') },
-    { key: 'yield',    label: t('settings_filter_yield') }
+    { key: 'yield',    label: t('settings_filter_yield') },
+    { key: 'sow-now',    label: t('settings_filter_sow_now') },
+    { key: 'container',  label: t('settings_filter_container') }
   ];
 
   var filterHtml = '<div class="ref-filter-bar">';
@@ -193,7 +195,7 @@ function setVeggieRefFilter(f) {
   if (el) el.innerHTML = renderVeggieRefList();
   // Mettre a jour l'apparence des boutons
   var btns = document.querySelectorAll('.ref-filter-btn');
-  var filters = ['all','fav','easy','summer','winter','low-water','yield'];
+  var filters = ['all','fav','easy','summer','winter','low-water','yield','sow-now','container'];
   for (var i = 0; i < btns.length; i++) {
     if (filters[i] === f) {
       btns[i].classList.add('ref-filter-active');
@@ -227,16 +229,25 @@ function renderVeggieRefList() {
     if (_veggieRefFilter === 'low-water' && (!v.water || v.water > 3)) continue;
     if (_veggieRefFilter === 'yield' && (v.yieldPerM2 || 0) < 5) continue;
     if (_veggieRefFilter === 'summer') {
-      var calS = getPlantingCalendarForVeggie(v);
+      var calS = typeof GeoCalendar !== 'undefined' ? GeoCalendar.getCalendarForVeggie(v) : getPlantingCalendarForVeggie(v);
       if (!calS || !calS.plantMonths) continue;
       var hasSummer = calS.plantMonths.indexOf(5) >= 0 || calS.plantMonths.indexOf(6) >= 0 || calS.plantMonths.indexOf(7) >= 0;
       if (!hasSummer) continue;
     }
     if (_veggieRefFilter === 'winter') {
-      var calW = getPlantingCalendarForVeggie(v);
+      var calW = typeof GeoCalendar !== 'undefined' ? GeoCalendar.getCalendarForVeggie(v) : getPlantingCalendarForVeggie(v);
       if (!calW || !calW.plantMonths) continue;
       var hasWinter = calW.plantMonths.indexOf(10) >= 0 || calW.plantMonths.indexOf(11) >= 0 || calW.plantMonths.indexOf(12) >= 0;
       if (!hasWinter) continue;
+    }
+    if (_veggieRefFilter === 'sow-now') {
+      var calN = typeof GeoCalendar !== 'undefined' ? GeoCalendar.getCalendarForVeggie(v) : getPlantingCalendarForVeggie(v);
+      if (!calN || !calN.plantMonths || calN.plantMonths.indexOf(currentMonth) < 0) continue;
+    }
+    if (_veggieRefFilter === 'container') {
+      var containerOk = (v.spacePerPlant || 1) <= 0.1 ||
+        ['v1','v6','v7','v15','v10','v13','v18','v47','v48','v52','v53','v54','v55','v56'].indexOf(id) >= 0;
+      if (!containerOk) continue;
     }
 
     filtered.push({ id: id, v: v });
@@ -255,7 +266,7 @@ function renderVeggieRefList() {
     var v2 = item.v;
     var isFav = isVeggieFavorite(item.id);
     var diffStars = v2.difficulty === 1 ? '\u2605\u2606\u2606' : v2.difficulty === 2 ? '\u2605\u2605\u2606' : v2.difficulty === 3 ? '\u2605\u2605\u2605' : '';
-    var cal2 = getPlantingCalendarForVeggie(v2);
+    var cal2 = typeof GeoCalendar !== 'undefined' ? GeoCalendar.getCalendarForVeggie(v2) : getPlantingCalendarForVeggie(v2);
     var inSeason2 = cal2 && cal2.plantMonths && cal2.plantMonths.indexOf(currentMonth) >= 0;
     var seasonBadge = inSeason2 ? '<span class="ref-season-badge">' + t('settings_in_season_badge') + '</span>' : '';
     html += '<div class="prem-settings-row prem-settings-row-action" onclick="ouvrirFicheVeggie(\'' + item.id + '\')">' +
@@ -386,7 +397,7 @@ function useGeolocation() {
   );
 }
 function resetLocation() {
-  APP.location = { lat: 43.4984, lon: 1.3139, name: 'Seysses' };
+  APP.location = { lat: 48.8566, lon: 2.3522, name: 'Paris' };
   APP.weather = null;
   APP.weatherLastFetch = null;
   saveData();
@@ -514,12 +525,20 @@ function normalizeImportedData(data) {
     currentSeason: data.currentSeason || '2026',
     location: data.location && typeof data.location.lat === 'number' && typeof data.location.lon === 'number'
       ? data.location
-      : { lat: 43.4984, lon: 1.3139, name: 'Seysses' },
+      : { lat: 48.8566, lon: 2.3522, name: 'Paris' },
     weather: null,
     weatherLastFetch: null,
     climate: data.climate || null,
     completedTasks: Array.isArray(data.completedTasks) ? data.completedTasks : [],
-    settings: data.settings || { theme: 'default' }
+    settings: data.settings
+      ? Object.assign({ theme: 'default', languageChosen: false }, data.settings)
+      : { theme: 'default', languageChosen: false },
+    language: data.language || 'fr',
+    userProfile: (data.userProfile && typeof data.userProfile === 'object')
+      ? data.userProfile
+      : { name: '', level: '', spaceType: '', goals: [], onboardingDone: false },
+    notificationsRead:    Array.isArray(data.notificationsRead)    ? data.notificationsRead    : [],
+    notificationsIgnored: Array.isArray(data.notificationsIgnored) ? data.notificationsIgnored : []
   };
 
   var vegKeys = Object.keys(data.vegetables || {});
@@ -616,7 +635,7 @@ function clearAllData() {
   APP = {
     vegetables: JSON.parse(JSON.stringify(DEFAULT_VEGETABLES)),
     beds: [], crops: [], seasons: ['2026'], currentSeason: '2026',
-    location: { lat: 43.4984, lon: 1.3139, name: 'Seysses' },
+    location: { lat: 48.8566, lon: 2.3522, name: 'Paris' },
     weather: null, weatherLastFetch: null, climate: null, completedTasks: [],
     settings: { theme: 'default' }
   };

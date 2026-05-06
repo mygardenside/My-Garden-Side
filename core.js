@@ -14,7 +14,7 @@ let _APP = {
   crops: [],
   seasons: ['2026'],
   currentSeason: '2026',
-  location: { lat: 43.4984, lon: 1.3139, name: 'Seysses' },
+  location: { lat: 48.8566, lon: 2.3522, name: 'Paris' },
   weather: null,
   weatherLastFetch: null,
   climate: null,
@@ -99,7 +99,7 @@ function navigate(page, push) {
   if (pageEl) { pageEl.classList.add('active'); pageEl.classList.add('fade-in'); }
   var navEl = document.querySelector('.nav-item[data-page="' + page + '"]');
   if (navEl) navEl.classList.add('active');
-  var titles = { dashboard:'My Garden Side', beds:t('nav_beds'), crops:t('nav_crops'), today:t('nav_today'), calendar:t('nav_calendar'), planning:t('nav_planning'), analysis:t('nav_analysis'), settings:t('nav_settings'), notifications:t('nav_notifications'), ai:t('nav_ai'), veggieref:t('nav_veggieref'), garden:t('nav_garden') };
+  var titles = { dashboard:'My Garden Side', beds:t('nav_beds'), crops:t('nav_crops'), today:t('nav_today'), calendar:t('nav_calendar'), planning:t('nav_planning'), analysis:t('nav_analysis'), settings:t('nav_settings'), ai:t('nav_ai'), veggieref:t('nav_veggieref'), garden:t('nav_garden') };
   document.getElementById('headerTitle').textContent = titles[page] || 'My Garden Side';
   document.getElementById('headerBack').classList.remove('visible');
   document.getElementById('headerSeason').textContent = getAppState('currentSeason');
@@ -145,7 +145,6 @@ function renderPage(page) {
     case 'planning': renderPlanning(); break;
     case 'analysis': renderAnalysis(); break;
     case 'settings': renderSettings(); break;
-    case 'notifications': renderNotifications(); break;
     case 'ai': renderAi(); break;
     case 'veggieref': renderVeggieRef(); break;
     case 'garden': renderGarden(); break;

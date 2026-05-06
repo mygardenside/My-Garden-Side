@@ -276,38 +276,63 @@ function buildAnalysisProgressionSection() {
 /** Section 2 : Comparaison saisons */
 function buildAnalysisSeasonComparisonSection() {
   var comp = getSeasonComparison();
-  if (!comp.hasPrevious) {
+
+  // progressionHistory riche (rendements saisis) — comparaison par kg et ratio
+  if (comp.hasPrevious) {
+    var mem  = getLearningMemory();
+    var prog = mem.progressionHistory;
+    var maxR = Math.max.apply(null, prog.map(function(s){ return s.totalReal; })) || 1;
+    var barsHTML = '';
+    prog.forEach(function(s) {
+      var pct   = Math.min(100, Math.round((s.totalReal / maxR) * 100));
+      var color = s.ratio >= 0.8 ? 'var(--green-500)' : s.ratio >= 0.55 ? 'var(--orange)' : 'var(--red)';
+      barsHTML += '<div class="ana-season-row">' +
+        '<div class="ana-season-label">' + s.season + '</div>' +
+        '<div class="ana-season-bar"><div class="ana-season-fill" style="width:' + pct + '%;background:' + color + '"></div></div>' +
+        '<div class="ana-season-val" style="color:' + color + '">' + s.totalReal.toFixed(1) + ' kg</div>' +
+      '</div>';
+    });
+    var deltaClass = comp.trend === 'amelioration' ? '' : comp.trend === 'regression' ? 'warning' : 'neutral';
+    var deltaIcon  = comp.trend === 'amelioration' ? '↗' : comp.trend === 'regression' ? '↘' : '→';
+    return '<div class="section-title">📅 ' + t('ana_section_seasons') + '</div>' +
+      '<div class="ana-season-card">' + barsHTML +
+        '<div class="ana-season-delta ' + deltaClass + '">' +
+          '<span>' + deltaIcon + '</span><span>' + comp.message + '</span>' +
+        '</div>' +
+      '</div>';
+  }
+
+  // Une seule saison — invitation à continuer
+  if (APP.seasons.length < 2) {
     return '<div class="section-title">📅 ' + t('ana_section_seasons') + '</div>' +
       '<div class="card" style="color:var(--text-light);font-size:0.85rem;text-align:center;padding:20px;">' +
       comp.message + '</div>';
   }
 
-  var mem  = getLearningMemory();
-  var prog = mem.progressionHistory;
-  var maxR = Math.max.apply(null, prog.map(function(s){ return s.totalReal; })) || 1;
-
+  // 2+ saisons sans rendements saisis — comparaison directe par nombre de cultures
+  var seasons = APP.seasons.slice().sort();
+  var maxCount = 1;
+  var seasonData = seasons.map(function(s) {
+    var sc   = APP.crops.filter(function(c) { return c.season === s; });
+    var harv = sc.filter(function(c) { return c.status === 'harvested'; });
+    var totalY = harv.reduce(function(sum, c) { return sum + (c.yieldReal || 0); }, 0);
+    if (sc.length > maxCount) maxCount = sc.length;
+    return { season: s, total: sc.length, harvested: harv.length, kg: totalY, isCurrent: s === APP.currentSeason };
+  });
   var barsHTML = '';
-  prog.forEach(function(s) {
-    var pct   = Math.min(100, Math.round((s.totalReal / maxR) * 100));
-    var color = s.ratio >= 0.8 ? 'var(--green-500)' : s.ratio >= 0.55 ? 'var(--orange)' : 'var(--red)';
+  seasonData.forEach(function(sd) {
+    var pct    = Math.round((sd.total / maxCount) * 100);
+    var color  = sd.isCurrent ? 'var(--brand-500)' : 'var(--green-400)';
+    var label  = sd.isCurrent ? '<strong>' + sd.season + '</strong>' : sd.season;
+    var suffix = sd.kg > 0 ? ' · ' + sd.kg.toFixed(1) + ' kg' : '';
     barsHTML += '<div class="ana-season-row">' +
-      '<div class="ana-season-label">' + s.season + '</div>' +
+      '<div class="ana-season-label">' + label + '</div>' +
       '<div class="ana-season-bar"><div class="ana-season-fill" style="width:' + pct + '%;background:' + color + '"></div></div>' +
-      '<div class="ana-season-val" style="color:' + color + '">' + s.totalReal.toFixed(1) + 'kg</div>' +
+      '<div class="ana-season-val">' + sd.total + ' ' + t('ana_cultures') + suffix + '</div>' +
     '</div>';
   });
-
-  var deltaClass = comp.trend === 'amelioration' ? '' : comp.trend === 'regression' ? 'warning' : 'neutral';
-  var deltaIcon  = comp.trend === 'amelioration' ? '↗' : comp.trend === 'regression' ? '↘' : '→';
-
   return '<div class="section-title">📅 ' + t('ana_section_seasons') + '</div>' +
-    '<div class="ana-season-card">' +
-      barsHTML +
-      '<div class="ana-season-delta ' + deltaClass + '">' +
-        '<span>' + deltaIcon + '</span>' +
-        '<span>' + comp.message + '</span>' +
-      '</div>' +
-    '</div>';
+    '<div class="ana-season-card">' + barsHTML + '</div>';
 }
 
 /** Section 3 : Actions recommandees avec boutons */
@@ -468,7 +493,7 @@ function renderAnalysis() {
   var seasonCrops = APP.crops.filter(function(c) { return c.season === APP.currentSeason; });
   var harvestedCrops = seasonCrops.filter(function(c) { return c.status === 'harvested'; });
   if (seasonCrops.length === 0) {
-    el.innerHTML = '<div class="empty-state fade-in"><div class="empty-icon">📊</div><div class="empty-text">' + t('ana_empty').replace('\n','<br>') + '</div></div>';
+    el.innerHTML = '<div class="empty-state fade-in"><div class="empty-icon">📊</div><div class="empty-text">' + t('ana_empty').replace('\n','<br>') + '</div><button class="btn btn-primary btn-sm" style="margin-top:16px;" onclick="navigate(\'crops\')">' + t('beds_add_crop') + ' →</button></div>';
     return;
   }
   // Yield by veggie
@@ -535,68 +560,6 @@ function renderAnalysis() {
       '<span style="font-size:0.85rem;">' + bocc + '% (' + bsurf.toFixed(1) + ' m\u00B2)</span></div>' +
       '<div class="progress-bar" style="margin-top:6px;"><div class="progress-fill ' + bcls + '" style="width:' + bocc + '%"></div></div></div>';
   }
-  // Smart tips
-  var tipsHTML = '<div class="section-title">💡 ' + t('ana_section_tips') + '</div>';
-  var tips = [];
-  for (var tb = 0; tb < APP.beds.length; tb++) {
-    var tbed = APP.beds[tb];
-    var tocc = getBedOccupation(tbed);
-    if (tocc < 30) tips.push({ text: t('tip_underused').replace('{name}', tbed.name).replace('{pct}', tocc), type: '' });
-    var tr = getRotationScore(tbed);
-    if (tr.score !== 'good') {
-      var tfams = getBedFamilies(tbed.id).map(function(f){ return t('family_' + f); }).join(', ');
-      tips.push({ text: t('tip_rotation').replace('{name}', tbed.name).replace('{fams}', tfams), type: 'bad' });
-    }
-  }
-  // Low performers across seasons
-  if (APP.seasons.length > 1) {
-    var vkeys = Object.keys(APP.vegetables);
-    for (var vk = 0; vk < vkeys.length; vk++) {
-      var vid = vkeys[vk];
-      var vinfo = APP.vegetables[vid];
-      var allCr = APP.crops.filter(function(c) { return c.veggieId === vid && c.status === 'harvested'; });
-      if (allCr.length >= 2) {
-        var avgRatio = allCr.reduce(function(s, c) {
-          var est = getCropEstimatedYield(c);
-          return s + (est > 0 ? (c.yieldReal || 0) / est : 0);
-        }, 0) / allCr.length;
-        if (avgRatio < 0.5) tips.push({ text: t('tip_low_perf').replace('{icon}', vinfo.icon).replace('{name}', tVeg(vinfo.name)).replace('{n}', allCr.length).replace('{pct}', (avgRatio * 100).toFixed(0)), type: 'bad' });
-      }
-    }
-  }
-  // Space-greedy crops
-  var activeC = seasonCrops.filter(function(c) { return c.status === 'active'; });
-  for (var ac = 0; ac < activeC.length; ac++) {
-    var acrop = activeC[ac];
-    var av = APP.vegetables[acrop.veggieId];
-    var abed = APP.beds.find(function(b) { return b.id === acrop.bedId; });
-    if (av && abed) {
-      var cSurf = getCropSurface(acrop);
-      var bSurf = getBedSurface(abed);
-      if (bSurf > 0 && cSurf / bSurf > 0.7) {
-        tips.push({ text: t('tip_space_greedy').replace('{icon}', av.icon).replace('{name}', tVeg(av.name)).replace('{pct}', Math.round(cSurf / bSurf * 100)).replace('{bed}', abed.name), type: '' });
-      }
-    }
-  }
-  if (tips.length === 0) tips.push({ text: t('ana_all_good'), type: 'good' });
-  for (var tp = 0; tp < tips.length; tp++) {
-    tipsHTML += '<div class="tip-card ' + tips[tp].type + '">' + escH(tips[tp].text) + '</div>';
-  }
-  // Season comparison
-  var compareHTML = '';
-  if (APP.seasons.length > 1) {
-    compareHTML = '<div class="section-title">📅 ' + t('ana_section_seasons') + '</div><div class="card">';
-    for (var si = 0; si < APP.seasons.length; si++) {
-      var seas = APP.seasons[si];
-      var sc = APP.crops.filter(function(c) { return c.season === seas; });
-      var harv = sc.filter(function(c) { return c.status === 'harvested'; });
-      var totalY = harv.reduce(function(sum, c) { return sum + (c.yieldReal || 0); }, 0);
-      compareHTML += '<div class="compare-row"><div class="compare-label">' + seas + '</div>' +
-        '<div class="compare-val">' + sc.length + ' ' + t('ana_cultures') + '</div>' +
-        '<div class="compare-val">' + totalY.toFixed(1) + ' kg</div></div>';
-    }
-    compareHTML += '</div>';
-  }
   // Bed health scores
   var healthHTML = '';
   if (APP.beds.length > 0) {
@@ -631,10 +594,7 @@ function renderAnalysis() {
     yieldChartHTML + topFlopHTML +
     surfaceHTML + healthHTML +
 
-    // 4. Conseils et comparaisons
-    tipsHTML + compareHTML +
-
-    // 5. Saison précédente — frise chronologique
+    // 4. Saison précédente — frise chronologique
     buildPreviousSeasonSection() +
 
   '</div>';

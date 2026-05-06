@@ -1,4 +1,4 @@
-// Green Vibes — modules/learning.js
+﻿// Green Vibes — modules/learning.js
 // ============================================================
 // RÔLE    : Moteur central de la couche apprentissage.
 //           Doit être chargé EN PREMIER parmi les modules learning.
@@ -1338,16 +1338,18 @@ function buildLearningSection(insights) {
     .sort(function(a, b){ return b.performanceRatio - a.performanceRatio; });
 
   if (vegList.length > 0) {
-    html += '<div class="dash-section-label" style="margin-top:16px;"><div>' + t('learn_section_veggie') + '</div></div>';
+    html += '<div class="section-title">' + t('learn_section_veggie') + '</div>';
     html += '<div class="learn-card" style="padding:10px 16px;">';
     vegList.slice(0, 6).forEach(function(e) {
       var ratioClass = e.performanceRatio >= 0.80 ? 'bon' : e.performanceRatio >= 0.55 ? 'moy' : 'bas';
+      var barColor   = e.performanceRatio >= 0.80 ? 'var(--green-500)' : e.performanceRatio >= 0.55 ? 'var(--orange)' : 'var(--red)';
       var trendIcon  = e.trend === 'hausse' ? '↗' : e.trend === 'baisse' ? '↘' : '→';
       html += '<div class="learn-veggie-row">' +
         '<div class="learn-veggie-icon">' + e.icon + '</div>' +
         '<div class="learn-veggie-info">' +
           '<div class="learn-veggie-name">' + escH(tVeg(e.name)) + '</div>' +
           '<div class="learn-veggie-stats">' + e.confidenceText + (e.avgDays ? ' \u00B7 ~' + e.avgDays + t('lbl_days_abbr') : '') + '</div>' +
+          '<div class="learn-veggie-bar-track"><div class="learn-veggie-bar-fill" style="width:' + Math.round(e.performanceRatio * 100) + '%;background:' + barColor + ';"></div></div>' +
         '</div>' +
         '<div class="learn-veggie-ratio">' +
           '<div class="learn-veggie-pct ' + ratioClass + '">' + Math.round(e.performanceRatio * 100) + '%</div>' +
@@ -1361,20 +1363,23 @@ function buildLearningSection(insights) {
   // --- BACS ---
   var bedProfiles = insights.byBed.filter(function(p){ return p && p.count >= 1; });
   if (bedProfiles.length > 0) {
-    html += '<div class="dash-section-label" style="margin-top:16px;"><div>' + t('learn_section_bed') + '</div></div>';
+    html += '<div class="section-title">' + t('learn_section_bed') + '</div>';
     html += '<div class="learn-card" style="padding:10px 16px;">';
     bedProfiles.forEach(function(p) {
       if (!p) return;
-      var score = p.count >= 1 ? Math.round(p.performanceRatio * 100) : null;
+      var score      = p.count >= 1 ? Math.round(p.performanceRatio * 100) : null;
       var scoreColor = score === null ? 'var(--text-light)' : score >= 80 ? 'var(--green-700)' : score >= 55 ? 'var(--orange)' : 'var(--red)';
-      var topV = p.topVeggies && p.topVeggies.length > 0
-        ? p.topVeggies.map(function(v){ return v.icon; }).join('') + ' '
+      var bedBarCol  = score === null ? '#e5e7eb' : score >= 80 ? 'var(--green-500)' : score >= 55 ? 'var(--orange)' : 'var(--red)';
+      var bedIcon    = p.topVeggies && p.topVeggies.length > 0 ? p.topVeggies[0].icon : '🌱';
+      var topV = p.topVeggies && p.topVeggies.length > 1
+        ? p.topVeggies.slice(1).map(function(v){ return v.icon; }).join('') + ' '
         : '';
       html += '<div class="learn-bed-row">' +
-        '<div class="learn-bed-icon">🌱</div>' +
+        '<div class="learn-bed-icon">' + bedIcon + '</div>' +
         '<div class="learn-bed-info">' +
           '<div class="learn-bed-name">' + escH(p.name) + '</div>' +
           '<div class="learn-bed-stats">' + p.confidenceText + (topV ? ' \u00B7 ' + topV : '') + '</div>' +
+          (score !== null ? '<div class="learn-bed-bar-track"><div class="learn-bed-bar-fill" style="width:' + score + '%;background:' + bedBarCol + ';"></div></div>' : '') +
         '</div>' +
         '<div class="learn-bed-score" style="color:' + scoreColor + '">' +
           (score !== null ? score + '%' : 'N/A') +
@@ -1386,7 +1391,7 @@ function buildLearningSection(insights) {
 
   // --- RECOMMANDATIONS ---
   if (insights.recommendations.length > 0) {
-    html += '<div class="dash-section-label" style="margin-top:16px;"><div>' + t('learn_section_reco') + '</div></div>';
+    html += '<div class="section-title">' + t('learn_section_reco') + '</div>';
     html += '<div class="learn-card" style="padding:10px 16px;">';
     insights.recommendations.forEach(function(r) {
       html += '<div class="learn-reco">' +
@@ -1404,7 +1409,7 @@ function buildLearningSection(insights) {
 
   // --- PROGRESSION PAR SAISON ---
   if (insights.progression && insights.progression.length >= 2) {
-    html += '<div class="dash-section-label" style="margin-top:16px;"><div>📈 Progression par saison</div></div>';
+    html += '<div class="section-title">📈 Progression par saison</div>';
     html += '<div class="learn-card" style="padding:12px 16px;">';
     var maxR = Math.max.apply(null, insights.progression.map(function(s){ return s.ratio; })) || 1;
     insights.progression.forEach(function(s) {
@@ -1421,6 +1426,49 @@ function buildLearningSection(insights) {
     });
     html += '<div style="display:flex;justify-content:space-between;font-size:0.65rem;color:var(--text-light);margin-top:2px;">' +
       '<span>Saison</span><span style="flex:1;text-align:center;">Rendement moyen</span><span>Nb</span></div>';
+    html += '</div>';
+  }
+
+  // --- ROTATION DES CULTURES ---
+  if (APP.beds && APP.beds.length > 0) {
+    html += '<div class="section-title">' + t('plan_section_rotation') + '</div>';
+    html += '<div class="learn-card" style="padding:10px 16px 6px;">';
+    html += '<div style="font-size:0.8rem;color:var(--text-light);margin-bottom:8px;">' + t('plan_rota_subtitle') + '</div>';
+    APP.beds.forEach(function(bed) {
+      var score = getRotationScore(bed);
+      var reco  = getRotationRecommendations(bed.id);
+      var currentFams = getBedFamilies(bed.id, APP.currentSeason);
+      var statusCls, statusLabel;
+      if (score.score === 'good') {
+        statusCls = 'rota-status--good'; statusLabel = '🟢 ' + t('plan_rota_status_good');
+      } else if (score.score === 'warning') {
+        statusCls = 'rota-status--warn'; statusLabel = '🟠 ' + t('plan_rota_status_warn');
+      } else {
+        statusCls = 'rota-status--bad'; statusLabel = '🔴 ' + t('plan_rota_status_bad');
+      }
+      var sugNames = [];
+      if (reco.recommended.length > 0) {
+        var vkeys = Object.keys(APP.vegetables);
+        for (var vi = 0; vi < vkeys.length && sugNames.length < 2; vi++) {
+          var vsug = APP.vegetables[vkeys[vi]];
+          if (reco.recommended.indexOf(vsug.family) >= 0) sugNames.push(vsug.icon + ' ' + escH(tVeg(vsug.name)));
+        }
+      }
+      var famText = currentFams.length > 0
+        ? currentFams.map(function(f) { return escH(t('family_' + f)); }).join(', ')
+        : t('plan_rota_no_fam');
+      html += '<div class="rota-row">' +
+        '<div style="flex:1;min-width:0;">' +
+          '<div class="rota-row-name">' + escH(bed.name) + '</div>' +
+          '<div style="margin-top:3px;">' +
+            '<span class="rota-status ' + statusCls + '">' + statusLabel + '</span>' +
+            '&ensp;<span style="font-size:0.73rem;color:var(--text-light);">' + famText + '</span>' +
+          '</div>' +
+          (sugNames.length > 0 ? '<div class="rota-sugg">' + t('plan_rota_try') + ' ' + sugNames.join(', ') + '</div>' : '') +
+        '</div>' +
+        '<button class="btn btn-sm btn-secondary" style="flex-shrink:0;white-space:nowrap;" onclick="openRotationDetail(\'' + bed.id + '\')">' + t('plan_rota_detail') + ' →</button>' +
+      '</div>';
+    });
     html += '</div>';
   }
 
@@ -1899,7 +1947,7 @@ function buildDashHero(weather) {
     return '<div class="dash-hero" style="padding:20px;text-align:center;">' +
       '<div style="font-size:2rem;margin-bottom:6px;">📡</div>' +
       '<div style="opacity:0.8;font-size:0.9rem;">' + t('dash_no_weather') + '</div>' +
-      '<div style="font-size:0.75rem;opacity:0.6;margin-top:4px;">' + escH(APP.location.name || 'Seysses') + '</div>' +
+      '<div style="font-size:0.75rem;opacity:0.6;margin-top:4px;">' + escH(APP.location.name || 'Paris') + '</div>' +
     '</div>';
   }
 
@@ -1935,7 +1983,7 @@ function buildDashHero(weather) {
   return '<div class="dash-hero">' +
     '<div class="dash-hero-top">' +
       '<div class="dash-hero-left">' +
-        '<div class="dash-hero-loc">\uD83D\uDCCD ' + escH(APP.location.name || 'Seysses') + '</div>' +
+        '<div class="dash-hero-loc">\uD83D\uDCCD ' + escH(APP.location.name || 'Paris') + '</div>' +
         '<div class="dash-hero-temp">' + Math.round(c.temperature_2m) + '\u00B0</div>' +
         '<div class="dash-hero-desc">' + desc + '</div>' +
         '<div class="dash-hero-phrase">' + phrase + '</div>' +

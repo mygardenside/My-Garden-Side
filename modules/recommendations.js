@@ -1,4 +1,4 @@
-// My Garden Side — modules/recommendations.js
+﻿// My Garden Side — modules/recommendations.js
 // V4.3 — Recommandations IA contextualisées
 // Moteur de règles agronomiques : climat × jardin × météo × GDD
 // Dépend de : ClimateModule, GeoCalendar, IrrigationModule, getAppState, tVeg, t
@@ -133,8 +133,9 @@ var RecommendationsModule = (function () {
       icon: '🌱',
       title: en ? 'Good time to plant now' : 'Bon moment pour semer maintenant',
       body: (en ? 'In your climate: ' : 'Dans votre zone : ') + sample +
-            (goodNow.length > 4 ? (en ? ' and ' + (goodNow.length - 4) + ' more.' : ' et ' + (goodNow.length - 4) + ' autres.') : '.'),
-      action: 'planning',
+            (goodNow.length > 4 ? (en ? ' and ' + (goodNow.length - 4) + ' more — see Catalogue.' : ' et ' + (goodNow.length - 4) + ' autres — voir le Catalogue.') : '.'),
+      action: 'veggieref',
+      filter: 'sow-now',
     };
   }
 
@@ -180,7 +181,7 @@ var RecommendationsModule = (function () {
     return {
       priority: 3,
       icon: '🟤',
-      title: en ? 'Unused beds this season' : 'Bacs inoccupés cette saison',
+      title: en ? 'Unused spaces this season' : 'Espaces inoccupés cette saison',
       body: (en ? 'No crops planned in: ' : 'Aucune culture prévue dans : ') + names +
             (empty.length > 2 ? (en ? ' and ' + (empty.length - 2) + ' more.' : ' et ' + (empty.length - 2) + ' autres.') : '.'),
       action: 'planning',

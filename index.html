@@ -1,9 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>My Garden Side</title>
+<meta name="description" content="Votre assistant jardin intelligent — planifiez vos cultures, suivez vos récoltes et obtenez des recommandations personnalisées pour votre potager.">
 <!-- PWA -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B5D47">
@@ -13,7 +14,13 @@
 <meta name="apple-mobile-web-app-title" content="My Garden Side">
 <link rel="icon" href="icon-192.png" sizes="192x192">
 <link rel="apple-touch-icon" href="icon-192.png">
-<link rel="stylesheet" href="style.css">
+<!-- Google Fonts — preconnect pour éviter le blocage du rendu -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap"></noscript>
+<link rel="stylesheet" href="style.min.css">
 <style>
 /* ===== Garden page scoped styles ===== */
 
@@ -658,6 +665,7 @@
 </style>
 </head>
 <body>
+<noscript><div style="font-family:sans-serif;text-align:center;padding:60px 20px;"><strong>My Garden Side</strong> nécessite JavaScript pour fonctionner. Veuillez l'activer dans votre navigateur.</div></noscript>
 <!-- ========== SPLASH SCREEN ========== -->
 <div id="splashScreen" class="splash-screen">
   <div class="splash-inner">
@@ -673,7 +681,7 @@
 </div>
 <!-- ========== HEADER ========== -->
 <header class="app-header">
-  <button class="header-back" id="headerBack" onclick="goBack()">&#8249;</button>
+  <button class="header-back" id="headerBack" onclick="goBack()" aria-label="Retour">&#8249;</button>
   <button class="header-hamburger" id="headerHamburger" onclick="togglePlusMenu()" aria-label="Menu">
     <span class="hbg-line"></span>
     <span class="hbg-line"></span>
@@ -697,7 +705,6 @@
   <div class="page" id="pagePlanning"></div>
   <div class="page" id="pageAnalysis"></div>
   <div class="page" id="pageSettings"></div>
-  <div class="page" id="pageNotifications"></div>
   <div class="page" id="pageAi"></div>
   <div class="page" id="pageVeggieref"></div>
   <!-- ========== PAGE JARDIN ========== -->
@@ -777,50 +784,45 @@
   <button class="nav-item" data-page="today" onclick="navigate('today')">
     <div class="nav-icon-wrap"><span class="nav-icon">☀️</span></div><span data-i18n="nav_today">Aujourd'hui</span>
   </button>
-  <button class="nav-item" data-page="calendar" onclick="navigate('calendar')">
-    <div class="nav-icon-wrap"><span class="nav-icon">📅</span></div><span data-i18n="nav_calendar">Calendrier</span>
+  <button class="nav-item" data-page="veggieref" onclick="navigate('veggieref')">
+    <div class="nav-icon-wrap"><span class="nav-icon">📚</span></div><span data-i18n="nav_veggieref">Catalogue</span>
   </button>
 </nav>
 
 <!-- ========== MENU HAMBURGER (dropdown premium) ========== -->
 <div class="plus-overlay" id="plusOverlay" onclick="closePlusMenu(event)">
   <div class="hbg-dropdown">
-    <div class="hbg-menu-item" onclick="navigateFromPlus('crops')">
+    <div class="hbg-menu-item" role="button" tabindex="0" onclick="navigateFromPlus('crops')">
       <span class="hbg-menu-icon">🥬</span>
       <span class="hbg-menu-label" data-i18n="nav_crops">Cultures</span>
       <span class="hbg-menu-arrow">›</span>
     </div>
-    <div class="hbg-menu-item" onclick="navigateFromPlus('planning')">
+    <div class="hbg-menu-item" role="button" tabindex="0" onclick="navigateFromPlus('planning')">
       <span class="hbg-menu-icon">📊</span>
       <span class="hbg-menu-label" data-i18n="nav_planning">Planning</span>
       <span class="hbg-menu-arrow">›</span>
     </div>
-    <div class="hbg-menu-item" onclick="navigateFromPlus('analysis')">
+    <div class="hbg-menu-item" role="button" tabindex="0" onclick="navigateFromPlus('analysis')">
       <span class="hbg-menu-icon">📈</span>
       <span class="hbg-menu-label" data-i18n="nav_analysis">Analyse</span>
       <span class="hbg-menu-arrow">›</span>
     </div>
-    <div class="hbg-menu-item" onclick="navigateFromPlus('ai')">
+    <div class="hbg-menu-item" role="button" tabindex="0" onclick="navigateFromPlus('ai')">
       <span class="hbg-menu-icon">🧠</span>
       <span class="hbg-menu-label" data-i18n="nav_ai">AI</span>
       <span class="hbg-menu-arrow">›</span>
     </div>
-    <div class="hbg-menu-item" onclick="navigateFromPlus('veggieref')">
-      <span class="hbg-menu-icon">🥦</span>
-      <span class="hbg-menu-label" data-i18n="nav_veggieref">Référentiel légumes</span>
+    <div class="hbg-menu-item" role="button" tabindex="0" onclick="navigateFromPlus('calendar')">
+      <span class="hbg-menu-icon">📅</span>
+      <span class="hbg-menu-label" data-i18n="nav_calendar">Calendrier</span>
       <span class="hbg-menu-arrow">›</span>
     </div>
-    <div class="hbg-menu-item" onclick="navigateFromPlus('notifications')">
-      <span class="hbg-menu-icon">🔔</span>
-      <span class="hbg-menu-label" data-i18n="nav_notifications">Notifications</span>
-      <span class="hbg-menu-arrow">›</span>
-    </div>
-    <div class="hbg-menu-item" onclick="navigateFromPlus('settings')">
+    <div class="hbg-menu-item" role="button" tabindex="0" onclick="navigateFromPlus('settings')">
       <span class="hbg-menu-icon">⚙️</span>
       <span class="hbg-menu-label" data-i18n="nav_settings">Réglages</span>
       <span class="hbg-menu-arrow">›</span>
     </div>
-    <div class="hbg-menu-item" onclick="navigateFromPlus('garden')">
+    <div class="hbg-menu-item" role="button" tabindex="0" onclick="navigateFromPlus('garden')">
       <span class="hbg-menu-icon">🗺️</span>
       <span class="hbg-menu-label" data-i18n="nav_garden">Vue Jardin</span>
       <span class="hbg-menu-arrow">›</span>
@@ -833,101 +835,7 @@
   <div class="modal" id="modalContent"></div>
 </div>
 <!-- ========== FAB ========== -->
-<button class="fab" id="fab" onclick="handleFab()" style="display:none;">+</button>  <!-- ===================================================
-       MY GARDEN SIDE — Ordre de chargement scripts
-       Règle : chaque fichier ne dépend que des fichiers
-       chargés AVANT lui. Ne pas modifier cet ordre.
-       =================================================== -->
-
-  <!-- 0. ASSETS VISUELS (SVG inline, pas de dépendances) -->
-  <script src="assets/garden-visuals.js"></script>
-  <script src="assets/veggie-visuals.js"></script>
-
-  <!-- 1. DONNÉES STATIQUES (pas de dépendances) -->
-  <script src="data.js"></script>
-
-  <!-- 2. INTERNATIONALISATION (dépend de : rien) -->
-  <script src="modules/i18n.js"></script>
-
-  <!-- 3. PERSISTANCE (dépend de : APP dans core.js → chargé avant via window) -->
-  <script src="utils/storage.js"></script>
-
-  <!-- 4. MÉTÉO (dépend de : APP, escH) -->
-  <script src="utils/weather.js"></script>
-
-  <!-- 5. CALCULS MÉTIER (dépend de : APP, data.js) -->
-  <script src="utils/calculations.js"></script>
-
-  <!-- 6. MOTEUR D'APPRENTISSAGE (dépend de : calculations, storage) -->
-  <script src="modules/learning.js"></script>
-  <script src="modules/learning-memory.js"></script>
-  <script src="modules/learning-history.js"></script>
-  <script src="modules/learning-calculations.js"></script>
-  <script src="modules/learning-render.js"></script>
-  <script src="modules/learning-notifications.js"></script>
-  <script src="modules/learning-insights.js"></script>
-
-  <!-- 7. MODULES SECONDAIRES (dépend de : learning, calculations) -->
-  <script src="modules/notifications.js"></script>
-  <script src="modules/onboarding.js"></script>
-  <script src="modules/predictive.js"></script>
-
-  <!-- 8. MODULES PAGES (dépend de : tout ce qui précède) -->
-  <script src="modules/dashboard.js"></script>
-  <script src="modules/beds.js"></script>
-  <script src="modules/crops.js"></script>
-  <script src="modules/planning.js"></script>
-  <script src="modules/analysis.js"></script>
-  <script src="modules/climate.js"></script>
-  <script src="modules/geo-calendar.js"></script>
-  <script src="modules/irrigation.js"></script>
-  <script src="modules/recommendations.js"></script>
-  <script src="modules/settings.js"></script>
-  <script src="modules/calendar.js"></script>
-
-  <!-- 8b. COUCHE INTELLIGENCE MÉTIER (dépend de : learning, calculations, weather) -->
-  <script src="modules/intelligence.js"></script>
-  <script src="modules/risk-engine.js"></script>
-  <script src="modules/opportunities.js"></script>
-
-  <!-- 8c. COUCHE PROFILS UTILISATEUR (dépend de : APP, learning) -->
-  <script src="modules/profiles.js"></script>
-  <script src="modules/profile-rules.js"></script>
-
-  <!-- 9. CORE : APP state + navigation + init — TOUJOURS EN DERNIER -->
-  <script src="core.js"></script>
-
-  <!-- 10. MODULES PUBLICATION (export, backup, pwa — après core) -->
-  <script src="modules/export.js"></script>
-  <script src="modules/backup.js"></script>
-  <script src="modules/pwa.js"></script>
-
-  <!-- 11. BOOTSTRAP (documentation uniquement, aucune logique) -->
-  <script src="app.js"></script>
-
-  <!-- 12. VUE JARDIN — prototype canvas (dépend de : I18N.t shim dans i18n.js) -->
-  <script src="prototype-garden-v2/data/gardenStore.js"></script>
-  <script src="prototype-garden-v2/scene/camera.js"></script>
-  <script src="prototype-garden-v2/render/utils.js"></script>
-  <script src="prototype-garden-v2/render/terrain.js"></script>
-  <script src="prototype-garden-v2/render/elements/path.js"></script>
-  <script src="prototype-garden-v2/render/elements/fence.js"></script>
-  <script src="prototype-garden-v2/render/elements/bed.js"></script>
-  <script src="prototype-garden-v2/render/elements/serre.js"></script>
-  <script src="prototype-garden-v2/render/elements/house.js"></script>
-  <script src="prototype-garden-v2/render/elements/tree.js"></script>
-  <script src="prototype-garden-v2/render/renderer.js"></script>
-  <script src="prototype-garden-v2/ui/toolbar.js"></script>
-  <script src="prototype-garden-v2/ui/panels.js"></script>
-  <script src="prototype-garden-v2/app.js"></script>
-  <script src="assets/garden-sprites.js"></script>
-  <script src="modules/garden-mobile.js"></script>
-  <script src="modules/garden-bridge.js"></script>
-  <script src="modules/garden.js"></script>
-
-  <!-- 13. TESTS (optionnel, pour développement) -->
-  <!-- La charge automatique de tests est désactivée en runtime normal. -->
-  <!-- Pour debug manuel, décommentez la ligne suivante ou exécutez runTests() depuis la console. -->
-  <!-- <script src="tests.js"></script> -->
+<button class="fab" id="fab" onclick="handleFab()" style="display:none;" aria-label="Action principale">+</button>  <!-- Scripts (tous modules concaténés + minifiés — rebuild : node build.js) -->
+  <script defer src="bundle.min.js"></script>
 </body>
 </html>

@@ -162,6 +162,13 @@ var GardenMobile = {
       html += '</select></label>';
     }
 
+    if (el.type === 'bed' || el.type === 'serre') {
+      html += '<label class="gd-sheet-row" style="cursor:pointer;">'
+            + '<span class="gd-sheet-label">🌿 ' + (isEn ? 'Mulched' : 'Paillé') + '</span>'
+            + '<input type="checkbox" class="gd-sh-checkbox" id="gd-sh-mulched"' + (el.mulched ? ' checked' : '') + '>'
+            + '</label>';
+    }
+
     // ── Section secondaire (accordéon) ──
     var secHtml = '';
 
@@ -280,6 +287,7 @@ var GardenMobile = {
     onChange('gd-sh-path',         function(e) { el.pathStyle  = e.target.value; });
     onChange('gd-sh-fence',        function(e) { el.fenceStyle = e.target.value; });
     onChange('gd-sh-fence-closed', function(e) { el.closed     = e.target.checked; });
+    onChange('gd-sh-mulched',     function(e) { el.mulched    = e.target.checked; });
 
     // Bouton Forme libre (vertex mode) — ne change PAS l'état du sheet
     onClick('gd-sh-vertex', function() {

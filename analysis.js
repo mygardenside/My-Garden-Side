@@ -72,7 +72,7 @@ function getActionableRecommendations() {
   Object.keys(vegP).forEach(function(vid) {
     var p = vegP[vid]; if (p.count < 2 || p.avgRatio < 0.82) return;
     var veg = getAppState('vegetables')[vid]; if (!veg) return;
-    var cal = getPlantingCalendarForVeggie(veg);
+    var cal = typeof GeoCalendar !== 'undefined' ? GeoCalendar.getCalendarForVeggie(veg) : getPlantingCalendarForVeggie(veg);
     var isNow = cal && cal.plantMonths && cal.plantMonths.indexOf(todayM) >= 0;
     // Trouver le meilleur bac disponible
     var bestBed = null;

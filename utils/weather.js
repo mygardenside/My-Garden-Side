@@ -6,8 +6,10 @@ async function fetchWeather() {
   var now = Date.now();
   if (getAppState('weather') && getAppState('weatherLastFetch') && (now - getAppState('weatherLastFetch') < 30 * 60 * 1000)) return getAppState('weather');
   try {
-    var lat = getAppState('location').lat;
-    var lon = getAppState('location').lon;
+    var _loc = getAppState('location');
+    if (!_loc || typeof _loc.lat !== 'number') return null;
+    var lat = _loc.lat;
+    var lon = _loc.lon;
     var url = 'https://api.open-meteo.com/v1/forecast?latitude=' + lat + '&longitude=' + lon +
       '&current=temperature_2m,relative_humidity_2m,wind_speed_10m,precipitation,weather_code' +
       '&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,weather_code&timezone=auto&forecast_days=7';
@@ -105,7 +107,7 @@ function renderWeatherWidget(weather) {
     alertsHTML += '</div>';
   }
   return '<div class="weather-widget">' +
-    '<div class="weather-location">📍 ' + escH(getAppState('location').name || 'Seysses') + '</div>' +
+    '<div class="weather-location">📍 ' + escH(getAppState('location').name || 'Paris') + '</div>' +
     '<div class="weather-main">' +
       '<div class="weather-temp">' + Math.round(c.temperature_2m) + '\u00B0C</div>' +
       '<div><div class="weather-icon">' + emoji + '</div>' +

@@ -45,7 +45,7 @@ function _buildOnbStep(step) {
       '<div class="onb-sub">' + t('onb_step3_sub') + '</div>' +
       '<div style="text-align:center;padding:8px 0 14px;">' +
         '<div style="font-size:2rem;margin-bottom:8px;">\uD83D\uDCCD</div>' +
-        '<div style="font-size:0.85rem;color:var(--text-light);margin-bottom:12px;">' + t('onb_city_lbl') + ' <strong>' + escH(APP.location.name||'Seysses') + '</strong></div>' +
+        '<div style="font-size:0.85rem;color:var(--text-light);margin-bottom:12px;">' + t('onb_city_lbl') + ' <strong>' + escH((APP.location || {}).name || 'Paris') + '</strong></div>' +
         '<button class="onb-btn-s" style="width:100%;margin-bottom:8px;" onclick="useGeolocation()">' + t('onb_use_gps') + '</button>' +
         '<button class="onb-btn-s" style="width:100%;" onclick="onbOpenCitySearch()">' + t('onb_search_city_btn') + '</button>' +
       '</div>';

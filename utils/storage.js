@@ -42,7 +42,7 @@ function loadData() {
         if (newAdded) { updateAppState('vegetables', savedVegs); }
       }
       if (!getAppState('location') || !getAppState('location').lat) {
-        updateAppState('location', { lat: 43.4984, lon: 1.3139, name: 'Seysses' });
+        updateAppState('location', { lat: 48.8566, lon: 2.3522, name: 'Paris' });
       }
       if (!getAppState('completedTasks')) updateAppState('completedTasks', []);
       if (!getAppState('seasons') || !getAppState('seasons').length) updateAppState('seasons', ['2026']);
@@ -69,9 +69,9 @@ function loadData() {
       updateAppState('crops', []);
       updateAppState('seasons', ['2026']);
       updateAppState('currentSeason', '2026');
-      updateAppState('location', { lat: 43.4984, lon: 1.3139, name: 'Seysses' });
+      updateAppState('location', { lat: 48.8566, lon: 2.3522, name: 'Paris' });
       updateAppState('completedTasks', []);
-      updateAppState('settings', { theme: 'default' });
+      updateAppState('settings', { theme: 'default', languageChosen: false });
       updateAppState('language', 'fr');
       updateAppState('userProfile', { name:'', level:'', spaceType:'', goals:[], onboardingDone:false });
       updateAppState('notificationsRead', []);
@@ -99,7 +99,7 @@ function loadData() {
     updateAppState('crops', []);
     updateAppState('seasons', ['2026']);
     updateAppState('currentSeason', '2026');
-    updateAppState('location', { lat: 43.4984, lon: 1.3139, name: 'Seysses' });
+    updateAppState('location', { lat: 48.8566, lon: 2.3522, name: 'Paris' });
     updateAppState('completedTasks', []);
     updateAppState('settings', { theme: 'default' });
   }

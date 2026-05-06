@@ -10,7 +10,7 @@
   "theme_color": "#0B5D47",
   "background_color": "#F8F6EF",
   "scope": "./",
-  "lang": "fr",
+  "lang": "fr,en",
   "dir": "ltr",
   "categories": ["lifestyle", "productivity", "food"],
   "shortcuts": [
