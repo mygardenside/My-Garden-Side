@@ -3,6 +3,6 @@
       "target": {
         "namespace": "android_app",
         "package_name": "com.mygardenside.app",
-        "sha256_cert_fingerprints": ["D9:C7:5F:D4:0D:82:DD:0F:EB:13:34:13:F4:58:6F:AA:14:7E:8B:A5:B1:8F:07:4C:0C:E6:CB:2D:2F:08:CE:C9"]
+        "sha256_cert_fingerprints": ["2F:80:32:A9:DA:5B:1F:D6:DA:54:26:23:F6:7C:33:F3:C2:A1:A9:65:09:C6:4D:02:88:E2:E8:0C:0B:6C:13:37"]
       }
     }]
